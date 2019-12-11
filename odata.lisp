@@ -69,28 +69,60 @@
          (entities (remove-if-not (lambda (node) (string= (dom:node-name node) "EntityType"))
                                (dom:child-nodes schema))))
     (loop for entity across entities
-       collect (generate-odata-entity entity prefix))))
+       collect (generate-odata-entity entity prefix)
+         collect (generate-odata-entity-serializer entity prefix))))
+
+(defun entity-class-name (node prefix)
+  (intern (concatenate 'string prefix
+                       (json:camel-case-to-lisp
+                        (dom:get-attribute node "Name")))))
 
 (defun generate-odata-entity (node &optional (prefix ""))
-  `(defclass ,(intern (concatenate 'string prefix
-                                   (json:camel-case-to-lisp
-                                    (dom:get-attribute node "Name"))))
+  `(defclass ,(entity-class-name node prefix)
        (,(intern (json:camel-case-to-lisp (dom:get-attribute node "BaseType"))))
        ,(loop
            for child across (dom:child-nodes node)
            when (string= (dom:node-name child) "Property")
-           collect (list
-                    (intern (json:camel-case-to-lisp
+           collect `(,(intern (json:camel-case-to-lisp
                              (dom:get-attribute child "Name")))
-                    :initarg (intern (json:camel-case-to-lisp
+                    :initarg ,(intern (json:camel-case-to-lisp
                                       (dom:get-attribute child "Name")) :keyword)
-                    :accessor (intern
+                    :accessor ,(intern
                                (json:camel-case-to-lisp
                                 (concatenate 'string
                                              (dom:get-attribute node "Name")
                                              "."
                                              (dom:get-attribute child "Name"))))
+                      ,@(unless (equalp (dom:get-attribute child "Nullable") "false")
+                          (list :initform nil))
+                    
                     ))))
+
+(defun generate-odata-entity-serializer (node prefix)
+  `(defmethod odata::serialize ((node ,(entity-class-name node prefix)) stream)
+     (let ((json:*json-output* stream))
+       (json:with-object ()
+         ,@(loop
+              for child across (dom:child-nodes node)
+              when (string= (dom:node-name child) "Property")
+              collect `(json:encode-object-member
+                        ,(intern (json:camel-case-to-lisp (dom:get-attribute child "Name")) :keyword)
+                        (serialize-value (slot-value node ',(intern (json:camel-case-to-lisp (dom:get-attribute child "Name"))))
+                                         ',(intern (dom:get-attribute child "Type") :keyword))))))))
 
 (defmacro def-entities (metadata &optional (prefix ""))
   `(progn ,@(%def-entities metadata prefix)))
+
+(defgeneric serialize (object stream))
+(defgeneric unserialize (type string))
+
+(defgeneric serialize-value (value type))
+(defmethod serialize-value (value type)
+  (if (null value)
+      nil
+      (error "Don't know how to serialize value: ~a (~a)" value type)))
+(defmethod serialize-value (value (type (eql :|Edm.String|)))
+  (unless (null value)
+    (princ-to-string value)))
+(defmethod serialize-value (value (type (eql :|Edm.Boolean|)))
+  (if value t nil))
