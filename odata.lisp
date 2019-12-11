@@ -51,6 +51,7 @@
             when (string= (dom:node-name child) "Member")
            collect (list (intern (json:camel-case-to-lisp
                                   (concatenate 'string (dom:get-attribute node "Name")
+                                               "/"
                                                (dom:get-attribute child "Name"))))
                           (parse-integer (dom:get-attribute child "Value"))))))
 
@@ -71,4 +72,8 @@
   `(progn ,@(loop for enum across enums
                collect (generate-odata-enum enum)))))
 
-(defenums))
+(defenums)
+
+
+
+)
