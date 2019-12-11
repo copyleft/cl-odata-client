@@ -8,4 +8,4 @@
   :serial t
   :components ((:file "package")
                (:file "odata"))
-  :depends-on (:cxml :drakma))
+  :depends-on (:cxml :drakma :cl-arrows))

@@ -1,4 +1,4 @@
 ;;;; package.lisp
 
 (defpackage #:odata
-  (:use #:cl))
+  (:use #:cl #:cl-arrows))
