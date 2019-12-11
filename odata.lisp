@@ -81,7 +81,16 @@
            when (string= (dom:node-name child) "Property")
            collect (list
                     (intern (json:camel-case-to-lisp
-                             (dom:get-attribute child "Name")))))))
+                             (dom:get-attribute child "Name")))
+                    :initarg (intern (json:camel-case-to-lisp
+                                      (dom:get-attribute child "Name")) :keyword)
+                    :accessor (intern
+                               (json:camel-case-to-lisp
+                                (concatenate 'string
+                                             (dom:get-attribute node "Name")
+                                             "."
+                                             (dom:get-attribute child "Name"))))
+                    ))))
 
 (defmacro def-entities (metadata &optional (prefix ""))
   `(progn ,@(%def-entities metadata prefix)))

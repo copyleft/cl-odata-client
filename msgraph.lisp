@@ -12,4 +12,7 @@
 (defclass microsoft.graph.entity ()
   ())
 
-(odata::def-entities #.+msgraph-metadata+ "MSG/")
+(defclass microsoft.graph.outlook-item ()
+  ())
+
+(odata::def-entities #.+msgraph-metadata+ "ENTITY/")
