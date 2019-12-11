@@ -8,3 +8,8 @@
               (cxml-dom:make-dom-builder)))
 
 (odata::def-enums #.+msgraph-metadata+)
+
+(defclass microsoft.graph.entity ()
+  ())
+
+(odata::def-entities #.+msgraph-metadata+ "MSG/")

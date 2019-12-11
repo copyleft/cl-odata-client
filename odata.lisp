@@ -62,11 +62,26 @@
 (defmacro def-enums (metadata)
   `(progn ,@(%def-enums metadata)))
 
-(defun %def-entities (metadata)
+(defun %def-entities (metadata prefix)
   (let* ((edmx (dom:document-element metadata))
          (data-services (child-node "edmx:DataServices" edmx))
          (schema (child-node "Schema" data-services))
-         (enums (remove-if-not (lambda (node) (string= (dom:node-name node) "EnumType"))
+         (entities (remove-if-not (lambda (node) (string= (dom:node-name node) "EntityType"))
                                (dom:child-nodes schema))))
-    (loop for enum across enums
-       collect (generate-odata-enum enum))))
+    (loop for entity across entities
+       collect (generate-odata-entity entity prefix))))
+
+(defun generate-odata-entity (node &optional (prefix ""))
+  `(defclass ,(intern (concatenate 'string prefix
+                                   (json:camel-case-to-lisp
+                                    (dom:get-attribute node "Name"))))
+       (,(intern (json:camel-case-to-lisp (dom:get-attribute node "BaseType"))))
+       ,(loop
+           for child across (dom:child-nodes node)
+           when (string= (dom:node-name child) "Property")
+           collect (list
+                    (intern (json:camel-case-to-lisp
+                             (dom:get-attribute child "Name")))))))
+
+(defmacro def-entities (metadata &optional (prefix ""))
+  `(progn ,@(%def-entities metadata prefix)))
