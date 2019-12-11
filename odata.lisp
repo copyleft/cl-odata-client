@@ -33,6 +33,9 @@
 (with-odata-base +trip-pin-modify+
   (odata-get* "#Person"))
 
+(defun odata-get-entity (type)
+  (let ((data (odata-get* (format nil "#" (entity-name type)))))
+    (unserialize data type)))
 
 (defun child-node (name node)
   (find-if (lambda (nd)
@@ -70,7 +73,10 @@
                                (dom:child-nodes schema))))
     (loop for entity across entities
        collect (generate-odata-entity entity prefix)
-         collect (generate-odata-entity-serializer entity prefix))))
+       collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity prefix))))
+                  ,(dom:get-attribute entity "Name"))
+       collect (generate-odata-entity-serializer entity prefix)
+       collect (generate-odata-entity-unserializer entity prefix))))
 
 (defun entity-class-name (node prefix)
   (intern (concatenate 'string prefix
@@ -110,19 +116,39 @@
                         (serialize-value (slot-value node ',(intern (json:camel-case-to-lisp (dom:get-attribute child "Name"))))
                                          ',(intern (dom:get-attribute child "Type") :keyword))))))))
 
+(defun generate-odata-entity-unserializer (node prefix)
+  `(defmethod odata::unserialize (data (type (eql ',(entity-class-name node prefix))))
+     (let ((entity (make-instance ',(entity-class-name node prefix))))
+     ,@(loop
+          for child across (dom:child-nodes node)
+          when (string= (dom:node-name child) "Property")
+          collect `(setf (slot-value entity ',(intern (json:camel-case-to-lisp (dom:get-attribute child "Name"))))
+                         (unserialize-value
+                          (access:access data ,(intern (json:camel-case-to-lisp (dom:get-attribute child "Name")) :keyword))
+                          ',(intern (dom:get-attribute child "Type") :keyword))))
+     entity)))
+
 (defmacro def-entities (metadata &optional (prefix ""))
   `(progn ,@(%def-entities metadata prefix)))
 
-(defgeneric serialize (object stream))
-(defgeneric unserialize (type string))
+(defgeneric entity-name (class))
 
+(defgeneric serialize (object stream))
+(defgeneric unserialize (data type))
 (defgeneric serialize-value (value type))
+(defgeneric unserialize-value (value type))
+
 (defmethod serialize-value (value type)
   (if (null value)
       nil
       (error "Don't know how to serialize value: ~a (~a)" value type)))
+
 (defmethod serialize-value (value (type (eql :|Edm.String|)))
   (unless (null value)
     (princ-to-string value)))
+
 (defmethod serialize-value (value (type (eql :|Edm.Boolean|)))
   (if value t nil))
+
+(defmethod unserialize-value (value type)
+  value)
