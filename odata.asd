@@ -8,4 +8,4 @@
   :serial t
   :components ((:file "package")
                (:file "odata"))
-  :depends-on (:cxml :drakma :cl-arrows :cl-json :access :defenum))
+  :depends-on (:cxml :drakma :cl-arrows :cl-json :access :defenum :cl-change-case))
