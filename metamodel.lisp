@@ -161,3 +161,11 @@
 
 (defun parse-type (node)
   node)
+
+(defun element-types (schema type)
+  "Return the elements of SCHEMA of type TYPE.
+Examples:
+(element-types *schema* 'entity-type)
+(element-types *schema* 'action)"
+  (remove-if-not (lambda (e) (typep e type))
+                 (elements schema)))
