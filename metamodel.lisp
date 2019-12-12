@@ -96,9 +96,66 @@
                                               (dom:child-nodes node))
                                 (parse-return-type it))))
 
+(defmethod parse-element-type (node (type (eql :|Action|)))
+  (make-instance 'action
+                 :name (dom:get-attribute node "Name")
+                 :parameters (loop for child across (dom:child-nodes node)
+                                when (string= (dom:tag-name child) "Parameter")
+                                collect (parse-parameter child))
+                 :return-type (awhen (find-if (lambda (child) (string= (dom:tag-name child) "ReturnType"))
+                                              (dom:child-nodes node))
+                                (parse-return-type it))))
+
+(defmethod parse-element-type (node (type (eql :|EnumType|)))
+  (make-instance 'enum-type
+                 :name (dom:get-attribute node "Name")
+                 :members (loop for child across (dom:child-nodes node)
+                                when (string= (dom:tag-name child) "Member")
+                             collect (cons (dom:get-attribute child "Name")
+                                           (parse-integer (dom:get-attribute child "Value"))))))
+
+(defmethod parse-element-type (node (type (eql :|EntityType|)))
+  (make-instance 'entity-type
+                 :name (dom:get-attribute node "Name")
+                 :base-type (and (dom:has-attribute node "BaseType")
+                                 (dom:get-attribute node "BaseType"))    
+                 :key (let ((key (child-node "Key" node)))
+                        (when key
+                          (dom:get-attribute (child-node "PropertyRef" key) "Name")))
+                 :properties
+                 (loop for child across (dom:child-nodes node)
+                    when (string= (dom:tag-name child) "Property")
+                    collect (parse-property child))))
+
+(defun emptyp (sequence)
+  (zerop (length sequence)))
+
+(defun child-node (name node)
+  (find-if (lambda (nd)
+             (string= (dom:node-name nd) name))
+           (dom:child-nodes node)))
+
+(defun camel-case-to-lisp (string)
+  (string-upcase (cl-change-case:param-case string)))
+
+(defun lisp-to-camel-case (string)
+  (cl-change-case:camel-case string))
+
+(defun parse-property (node)
+  (make-instance 'property
+                 :name (dom:get-attribute node "Name")
+                 :type (parse-type (dom:get-attribute node "Type"))
+                 :nullable (or (not (dom:has-attribute node "Nullable"))
+                               (string= (dom:get-attribute node "Nullable") "true"))
+                 :default-value (and (dom:has-attribute node "DefaultValue")
+                                     (dom:get-attribute node "DefaultValue"))))
+
 (defun parse-return-type (node)
   (dom:get-attribute node "Type"))
 
 (defun parse-parameter (node)
   (cons (dom:get-attribute node "Name")
         (dom:get-attribute node "Type")))
+
+(defun parse-type (node)
+  node)
