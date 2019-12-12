@@ -2,16 +2,7 @@
 
 (in-package #:odata)
 
-(defparameter +trip-pin+ "https://services.odata.org/V4/TripPinServiceRW")
-
 (push '("application" . "json") drakma:*text-content-types*)
-
-(drakma:http-request +trip-pin+)
-
-(defparameter +trip-pin-modify+
-  (multiple-value-bind (response status headers modify-url)
-      (drakma:http-request +trip-pin+)
-    modify-url))
 
 (defvar *odata-base*)
 
@@ -33,21 +24,28 @@
 (with-odata-base +trip-pin-modify+
   (odata-get* "#Person"))
 
-(defun odata-get-entity (type)
+(defun odata-get-entities (type)
   (let ((data (odata-get* (format nil "#" (entity-name type)))))
-    (unserialize data type)))
+    (loop for entity-data in data
+         collect (unserialize data type))))
 
 (defun child-node (name node)
   (find-if (lambda (nd)
              (string= (dom:node-name nd) name))
            (dom:child-nodes node)))
 
+(defun camel-case-to-lisp (string)
+  (string-upcase (cl-change-case:param-case string)))
+
+(defun lisp-to-camel-case (string)
+  (cl-change-case:camel-case string))
+
 (defun generate-odata-enum (node)
-  `(defenum:defenum ,(intern (json:camel-case-to-lisp (dom:get-attribute node "Name")))
+  `(defenum:defenum ,(intern (camel-case-to-lisp (dom:get-attribute node "Name")))
        ,(loop
            for child across (dom:child-nodes node)
            when (string= (dom:node-name child) "Member")
-           collect (list (intern (json:camel-case-to-lisp
+           collect (list (intern (camel-case-to-lisp
                                   (concatenate 'string (dom:get-attribute node "Name")
                                                "/"
                                                (dom:get-attribute child "Name"))))
@@ -80,21 +78,22 @@
 
 (defun entity-class-name (node prefix)
   (intern (concatenate 'string prefix
-                       (json:camel-case-to-lisp
+                       (camel-case-to-lisp
                         (dom:get-attribute node "Name")))))
 
 (defun generate-odata-entity (node &optional (prefix ""))
   `(defclass ,(entity-class-name node prefix)
-       (,(intern (json:camel-case-to-lisp (dom:get-attribute node "BaseType"))))
+       (,@(when (dom:get-attribute node "BaseType")
+            (list (intern (camel-case-to-lisp (dom:get-attribute node "BaseType"))))))
        ,(loop
            for child across (dom:child-nodes node)
            when (string= (dom:node-name child) "Property")
-           collect `(,(intern (json:camel-case-to-lisp
+           collect `(,(intern (camel-case-to-lisp
                              (dom:get-attribute child "Name")))
-                    :initarg ,(intern (json:camel-case-to-lisp
+                    :initarg ,(intern (camel-case-to-lisp
                                       (dom:get-attribute child "Name")) :keyword)
                     :accessor ,(intern
-                               (json:camel-case-to-lisp
+                               (camel-case-to-lisp
                                 (concatenate 'string
                                              (dom:get-attribute node "Name")
                                              "."
@@ -112,8 +111,8 @@
               for child across (dom:child-nodes node)
               when (string= (dom:node-name child) "Property")
               collect `(json:encode-object-member
-                        ,(intern (json:camel-case-to-lisp (dom:get-attribute child "Name")) :keyword)
-                        (serialize-value (slot-value node ',(intern (json:camel-case-to-lisp (dom:get-attribute child "Name"))))
+                        ,(intern (camel-case-to-lisp (dom:get-attribute child "Name")) :keyword)
+                        (serialize-value (slot-value node ',(intern (camel-case-to-lisp (dom:get-attribute child "Name"))))
                                          ',(intern (dom:get-attribute child "Type") :keyword))))))))
 
 (defun generate-odata-entity-unserializer (node prefix)
@@ -122,9 +121,9 @@
      ,@(loop
           for child across (dom:child-nodes node)
           when (string= (dom:node-name child) "Property")
-          collect `(setf (slot-value entity ',(intern (json:camel-case-to-lisp (dom:get-attribute child "Name"))))
+          collect `(setf (slot-value entity ',(intern (camel-case-to-lisp (dom:get-attribute child "Name"))))
                          (unserialize-value
-                          (access:access data ,(intern (json:camel-case-to-lisp (dom:get-attribute child "Name")) :keyword))
+                          (access:access data ,(intern (camel-case-to-lisp (dom:get-attribute child "Name")) :keyword))
                           ',(intern (dom:get-attribute child "Type") :keyword))))
      entity)))
 
