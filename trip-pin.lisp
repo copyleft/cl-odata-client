@@ -18,3 +18,6 @@
 
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
+
+(odata::with-odata-base +trip-pin-modify+
+  (odata::odata-get-entities "People" 'person))

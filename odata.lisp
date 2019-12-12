@@ -24,10 +24,10 @@
 (with-odata-base +trip-pin-modify+
   (odata-get* "#Person"))
 
-(defun odata-get-entities (type)
-  (let ((data (odata-get* (format nil "#" (entity-name type)))))
+(defun odata-get-entities (url type)
+  (let ((data (odata-get* url)))
     (loop for entity-data in data
-         collect (unserialize data type))))
+         collect (unserialize entity-data type))))
 
 (defun child-node (name node)
   (find-if (lambda (nd)
@@ -83,7 +83,7 @@
 
 (defun generate-odata-entity (node &optional (prefix ""))
   `(defclass ,(entity-class-name node prefix)
-       (,@(when (dom:get-attribute node "BaseType")
+       (,@(when (not (zerop (length (dom:get-attribute node "BaseType"))))
             (list (intern (camel-case-to-lisp (dom:get-attribute node "BaseType"))))))
        ,(loop
            for child across (dom:child-nodes node)
