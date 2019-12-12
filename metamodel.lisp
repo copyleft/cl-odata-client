@@ -124,8 +124,10 @@
                           (dom:get-attribute (child-node "PropertyRef" key) "Name")))
                  :properties
                  (loop for child across (dom:child-nodes node)
-                    when (string= (dom:tag-name child) "Property")
-                    collect (parse-property child))))
+                    when (string= (dom:tag-name child) "Property")        
+                    collect (parse-property child 'property)
+                    when (string= (dom:tag-name child) "NavigationProperty")
+                    collect (parse-property child 'navigation-property))))
 
 (defun emptyp (sequence)
   (zerop (length sequence)))
@@ -141,8 +143,8 @@
 (defun lisp-to-camel-case (string)
   (cl-change-case:camel-case string))
 
-(defun parse-property (node)
-  (make-instance 'property
+(defun parse-property (node class)
+  (make-instance class
                  :name (dom:get-attribute node "Name")
                  :type (parse-type (dom:get-attribute node "Type"))
                  :nullable (or (not (dom:has-attribute node "Nullable"))
