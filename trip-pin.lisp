@@ -20,4 +20,7 @@
 (odata::def-entities #.+trip-pin-metadata+)
 
 (odata::with-odata-base +trip-pin-modify+
+  (odata::odata-get* "People"))
+
+(odata::with-odata-base +trip-pin-modify+
   (odata::odata-get-entities "People" 'person))

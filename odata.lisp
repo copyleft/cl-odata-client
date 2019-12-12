@@ -3,6 +3,10 @@
 (in-package #:odata)
 
 (push '("application" . "json") drakma:*text-content-types*)
+(setf json:*lisp-identifier-name-to-json*
+      'lisp-to-camel-case)
+(setf json:*json-identifier-name-to-lisp*
+      'camel-case-to-lisp)
 
 (defvar *odata-base*)
 
@@ -20,9 +24,6 @@
 
 (defmacro with-odata-base (base &body body)
   `(call-with-odata-base ,base (lambda () ,@body)))
-
-(with-odata-base +trip-pin-modify+
-  (odata-get* "#Person"))
 
 (defun odata-get-entities (url type)
   (let ((data (odata-get* url)))
