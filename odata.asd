@@ -7,5 +7,8 @@
   :version "0.0.1"
   :serial t
   :components ((:file "package")
+               (:file "metamodel")
                (:file "odata"))
-  :depends-on (:cxml :drakma :cl-arrows :cl-json :access :defenum :cl-change-case))
+  :depends-on (:cxml :drakma :cl-arrows :cl-json
+                     :access :defenum :cl-change-case
+                     :anaphora))

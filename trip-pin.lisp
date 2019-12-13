@@ -11,10 +11,9 @@
     modify-url))
 
 (defparameter +trip-pin-metadata+
-  (cxml:parse
+  (odata/metamodel::parse-metamodel
    (probe-file
-    (asdf:system-relative-pathname :odata "TripPin.xml"))
-   (cxml-dom:make-dom-builder)))
+    (asdf:system-relative-pathname :odata "TripPin.xml"))))
 
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)

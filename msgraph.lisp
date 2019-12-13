@@ -4,8 +4,8 @@
 (in-package :msgraph)
 
 (defparameter +msgraph-metadata+
-  (cxml:parse (asdf:system-relative-pathname :odata "msgraph.xml")
-              (cxml-dom:make-dom-builder)))
+  (odata/metamodel::parse-metamodel
+   (probe-file (asdf:system-relative-pathname :odata "msgraph.xml"))))
 
 (odata::def-enums #.+msgraph-metadata+)
 

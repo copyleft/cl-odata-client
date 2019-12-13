@@ -17,11 +17,11 @@
    (elements :initarg :elements :accessor elements)))
 
 (defclass element ()
-  ((namespace :initarg :namespace :accessor namespace)))
+  ((namespace :initarg :namespace :accessor namespace)
+   (name :initarg :name :accessor name)))
 
 (defclass entity-type (element)
-  ((name :initarg :name :accessor name)
-   (base-type :initarg :base-type :accessor base-type :initform nil)
+  ((base-type :initarg :base-type :accessor base-type :initform nil)
    (key :initarg :key :accessor key)
    (properties :initarg :properties :accessor properties)
    (abstract :initarg :abstract :accessor is-abstract :initform nil)))
@@ -42,30 +42,29 @@
   ())
 
 (defclass complex-type (element)
-  ((name :initarg :name :accessor name)
-   (properties :initarg :properties :accessor properties)))
+  ((properties :initarg :properties :accessor properties)))
 
 (defclass action (element)
-  ((name :initarg :name :accessor name)
-   (parameters :initarg :parameters :accessor parameters)
+  ((parameters :initarg :parameters :accessor parameters)
    (return-type :initarg :return-type :accessor return-type)))
 
 (defclass enum-type (element)
-  ((name :initarg :name :accessor name)
-   (members :initarg :members :accessor members)))
+  ((members :initarg :members :accessor members)))
 
 (defclass function* (element)
-  ((name :initarg :name :accessor name)
-   (parameters :initarg :parameters :accessor parameters)
+  ((parameters :initarg :parameters :accessor parameters)
    (return-type :initarg :return-type :accessor return-type)))
 
 (defclass type* (element)
   ())
 
-(defun parse-metamodel (xml-document)
-  (let ((edmx (dom:document-element xml-document)))
-    (make-instance 'edmx-document
-                   :data-services (parse-data-services (aref (dom:child-nodes edmx) 0)))))
+(defun parse-metamodel (source)
+  (let ((xml-document (if (dom:document-p source)
+                          source
+                          (cxml:parse source (cxml-dom:make-dom-builder)))))
+    (let ((edmx (dom:document-element xml-document)))
+      (make-instance 'edmx-document
+                     :data-services (parse-data-services (aref (dom:child-nodes edmx) 0))))))
 
 (defun parse-data-services (node)
   (make-instance 'data-services :schemas
@@ -184,6 +183,12 @@ Examples:
 (element-types *schema* 'action)"
   (remove-if-not (lambda (e) (typep e type))
                  (elements schema)))
+
+(defun enums (schema)
+  (element-types schema 'enum-type))
+
+(defun entity-types (schema)
+  (element-types schema 'entity-type))
 
 (defun navigation-properties (entity-type)
   (remove-if-not (lambda (p) (typep p 'navigation-property))
