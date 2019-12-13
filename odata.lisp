@@ -61,20 +61,28 @@
 
 (defmacro def-packages (metadata)
   (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
+     for package-name = (intern (odata/metamodel::namespace schema))
      appending
-       `(defpackage ,(intern (odata/metamodel::namespace schema))
-          (:export ,@(loop for elem in (odata/metamodel::elements schema)
-                        collect (intern (camel-case-to-lisp (odata/metamodel::name elem)) :keyword))))))
-  
+       `(progn
+          (defpackage ,package-name
+            (:export :metadata
+                     ,@(loop for elem in (odata/metamodel::elements schema)
+                          collect (intern (camel-case-to-lisp (odata/metamodel::name elem)) :keyword))))
+          (setf (symbol-value (intern "METADATA" ',package-name))
+                ,schema))))
+
+
 (defun %def-entities (metadata)
   (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
      appending
-       (loop for entity in (odata/metamodel::entity-types schema)
-           collect (generate-odata-entity entity)
-           collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity))))
-                      ,(odata/metamodel::name entity))
-           collect (generate-odata-entity-serializer entity)
-           collect (generate-odata-entity-unserializer entity))))
+       (loop for entity in (append (odata/metamodel::entity-types schema)
+                                   (odata/metamodel::element-types schema
+                                                                   'odata/metamodel::complex-type))
+          collect (generate-odata-entity entity)
+          collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity))))
+                     ,(odata/metamodel::name entity))
+          collect (generate-odata-entity-serializer entity)
+          collect (generate-odata-entity-unserializer entity))))
 
 (defun entity-class-name (node)
   (intern (camel-case-to-lisp
@@ -166,20 +174,28 @@
       (case (first type)
         (:primitive (unserialize-primitive-value value (intern (second type) :keyword)))
         (:collection (unserialize-collection-value value (second type)))
-        (:nominal (unserialize-nominal-value value value type)))))
+        (:nominal (unserialize-nominal-value value type)))))
 
 (defun unserialize-primitive-value (value type)
   value)
 
 (defun unserialize-collection-value (value col-type)
   (loop for elem in value
-     collect (unserialize elem col-type)))
+     collect (unserialize-value elem col-type)))
 
 (defun unserialize-nominal-value (value nominal-type)
-  (let ((type (find-type nominal-type)))
-    (let ((object (make-instance (entity-class-name type))))
-      (loop for property in (odata/metamodel::properties type)
-         do
-           (setf (slot-value object (intern (camel-case-to-lisp (odata/metamodel::name property))))
-                 (unserialize (access:access value (intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
-                              (odata/metamodel::property-type property)))))))
+  (let* ((package (find-package (intern (getf nominal-type :namespace))))
+         (class-name (intern (camel-case-to-lisp (getf nominal-type :nominal))
+                             package))
+         (type (odata/metamodel::find-element
+                (symbol-value (intern "METADATA" package))
+                (getf nominal-type :nominal))))
+    (if (typep type 'odata/metamodel::enum-type)
+        (odata/metamodel::enum-value type value)
+        (let ((object (make-instance class-name)))
+          (loop for property in (odata/metamodel::properties type)
+             do
+               (setf (slot-value object (intern (camel-case-to-lisp (odata/metamodel::name property))))
+                     (unserialize-value (access:access value (intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
+                                        (odata/metamodel::property-type property))))
+          object))))

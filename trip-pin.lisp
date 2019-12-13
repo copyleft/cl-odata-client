@@ -23,4 +23,4 @@
   (odata::odata-get* "People"))
 
 (odata::with-odata-base +trip-pin-modify+
-  (odata::odata-get-entities "People" 'person))
+  (odata::odata-get-entities "People" '|Microsoft.OData.SampleService.Models.TripPin|:person))

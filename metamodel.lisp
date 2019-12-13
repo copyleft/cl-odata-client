@@ -225,3 +225,10 @@ Examples:
 (defun structural-properties (entity-type)
   (remove-if-not (lambda (p) (typep p 'structural-property))
                  (properties entity-type)))
+
+(defun find-element (schema name)
+  (find-if (lambda (el) (string= (name el) name))
+           (elements schema)))
+
+(defun enum-value (enum value)
+  (cdr (assoc value (members enum) :test 'string=)))
