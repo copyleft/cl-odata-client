@@ -35,6 +35,9 @@
 (defclass navigation-property (property)
   ())
 
+(defclass structural-property (property)
+  ())
+
 (defclass annotation (element)
   ())
 
@@ -125,7 +128,7 @@
                  :properties
                  (loop for child across (dom:child-nodes node)
                     when (string= (dom:tag-name child) "Property")        
-                    collect (parse-property child 'property)
+                    collect (parse-property child 'structural-property)
                     when (string= (dom:tag-name child) "NavigationProperty")
                     collect (parse-property child 'navigation-property))))
 
@@ -181,3 +184,11 @@ Examples:
 (element-types *schema* 'action)"
   (remove-if-not (lambda (e) (typep e type))
                  (elements schema)))
+
+(defun navigation-properties (entity-type)
+  (remove-if-not (lambda (p) (typep p 'navigation-property))
+                 (properties entity-type)))
+
+(defun structural-properties (entity-type)
+  (remove-if-not (lambda (p) (typep p 'structural-property))
+                 (properties entity-type)))
