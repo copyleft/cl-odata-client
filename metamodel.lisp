@@ -168,10 +168,11 @@
      ;; A collection
       (ppcre:register-groups-bind (col-type)
           ("Collection\\((.*)\\)" node)
-        (list :collection col-type)))
+        (list :collection (parse-type col-type))))
     (t
-     ;; Another type
-     node)))
+     ;; Nominal type
+     (ppcre:register-groups-bind (ns type) ("(.*)\\.(.*)" node)
+       (list :nominal type :namespace ns)))))
 
 (defun element-types (schema type)
   "Return the elements of SCHEMA of type TYPE.
