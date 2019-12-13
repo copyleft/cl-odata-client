@@ -160,7 +160,18 @@
         (dom:get-attribute node "Type")))
 
 (defun parse-type (node)
-  node)
+  (cond
+    ((eql (search "Edm." node) 0)
+     ;; Primitive type
+     (list :primitive node))
+    ((eql (search "Collection" node) 0)
+     ;; A collection
+      (ppcre:register-groups-bind (col-type)
+          ("Collection\\((.*)\\)" node)
+        (list :collection col-type)))
+    (t
+     ;; Another type
+     node)))
 
 (defun element-types (schema type)
   "Return the elements of SCHEMA of type TYPE.
