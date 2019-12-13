@@ -15,6 +15,7 @@
    (probe-file
     (asdf:system-relative-pathname :odata "TripPin.xml"))))
 
+(odata::def-packages #.+trip-pin-metadata+)
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
 

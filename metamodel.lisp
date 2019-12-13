@@ -58,6 +58,12 @@
 (defclass type* (element)
   ())
 
+(defclass entity-container (element)
+  ())
+
+(defclass annotations (element)
+  ())
+
 (defun parse-metamodel (source)
   (let ((xml-document (if (dom:document-p source)
                           source
@@ -78,15 +84,27 @@
 
 (defun parse-elements (schema)
   (loop for element across (dom:child-nodes schema)
-       collect (parse-element element)))
+       collect (parse-element element (dom:get-attribute schema "Namespace"))))
 
-(defun parse-element (node)
-  (parse-element-type node (intern (dom:tag-name node) :keyword)))
+(defun parse-element (node namespace)
+  (let ((el (parse-element-type node (intern (dom:tag-name node) :keyword))))
+    (setf (namespace el) namespace)
+    el))
 
 (defgeneric parse-element-type (node type))
 
 (defmethod parse-element-type (node type)
   node)
+
+(defmethod parse-element-type (node (type (eql :|EntityContainer|)))
+  ;; TODO
+  (make-instance 'entity-container
+                 :name (dom:get-attribute node "Name")))
+
+(defmethod parse-element-type (node (type (eql :|Annotations|)))
+  ;; TODO
+  (make-instance 'annotations
+                 :name (dom:get-attribute node "Name")))
 
 (defmethod parse-element-type (node (type (eql :|Function|)))
   (make-instance 'function*
@@ -124,6 +142,16 @@
                  :key (let ((key (child-node "Key" node)))
                         (when key
                           (dom:get-attribute (child-node "PropertyRef" key) "Name")))
+                 :properties
+                 (loop for child across (dom:child-nodes node)
+                    when (string= (dom:tag-name child) "Property")        
+                    collect (parse-property child 'structural-property)
+                    when (string= (dom:tag-name child) "NavigationProperty")
+                    collect (parse-property child 'navigation-property))))
+
+(defmethod parse-element-type (node (type (eql :|ComplexType|)))
+  (make-instance 'entity-type
+                 :name (dom:get-attribute node "Name")
                  :properties
                  (loop for child across (dom:child-nodes node)
                     when (string= (dom:tag-name child) "Property")        

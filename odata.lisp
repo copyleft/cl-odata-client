@@ -8,24 +8,6 @@
 (setf json:*json-identifier-name-to-lisp*
       'camel-case-to-lisp)
 
-(defvar *schemas* nil)
-
-(defun register-schema (schema)
-  (push schema *schemas*))
-
-(defun find-type (type)
-  (let* ((ns (getf type :namespace))
-         (schema (or
-                  (find-if (lambda (sch) (string= (odata/metamodel::namespace sch)
-                                             ns))
-                           *schemas*)
-                  (error "Namespace not found: ~a" ns))))
-    (or
-     (find-if (lambda (el) (string= (odata/metamodel::name el)
-                               (getf type :nominal)))
-              (odata/metamodel::elements schema))
-     (error "Type not found: ~a" type))))
-
 (defvar *odata-base*)
 
 (defun odata-get (url)
@@ -46,7 +28,7 @@
 (defun odata-get-entities (url type)
   (let ((data (odata-get* url)))
     (loop for entity-data in data
-         collect (unserialize entity-data type))))
+       collect (unserialize entity-data type))))
 
 (defun child-node (name node)
   (find-if (lambda (nd)
@@ -77,84 +59,127 @@
 (defmacro def-enums (metadata)
   `(progn ,@(%def-enums metadata)))
 
-(defun %def-entities (metadata prefix)
+(defmacro def-packages (metadata)
+  (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
+     appending
+       `(defpackage ,(intern (odata/metamodel::namespace schema))
+          (:export ,@(loop for elem in (odata/metamodel::elements schema)
+                        collect (intern (camel-case-to-lisp (odata/metamodel::name elem)) :keyword))))))
+  
+(defun %def-entities (metadata)
   (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
      appending
        (loop for entity in (odata/metamodel::entity-types schema)
-          collect (generate-odata-entity entity prefix)
-          collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity prefix))))
-                     ,(odata/metamodel::name entity))
-       collect (generate-odata-entity-serializer entity prefix)
-       collect (generate-odata-entity-unserializer entity prefix))))
+           collect (generate-odata-entity entity)
+           collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity))))
+                      ,(odata/metamodel::name entity))
+           collect (generate-odata-entity-serializer entity)
+           collect (generate-odata-entity-unserializer entity))))
 
-(defun entity-class-name (node prefix)
-  (intern (concatenate 'string prefix
-                       (camel-case-to-lisp
-                        (odata/metamodel::name node)))))
+(defun entity-class-name (node)
+  (intern (camel-case-to-lisp
+           (odata/metamodel::name node))
+          (intern (odata/metamodel::namespace node))))
 
-(defun generate-odata-entity (node &optional (prefix ""))
-  `(defclass ,(entity-class-name node prefix)
+(defun generate-odata-entity (node)
+  `(defclass ,(entity-class-name node)
        (,@(when (odata/metamodel::base-type node)
-              (list (intern (camel-case-to-lisp (odata/metamodel::base-type node))))))
-       ,(loop
-           for property in (odata/metamodel::structural-properties node)
-           collect `(,(intern (camel-case-to-lisp (odata/metamodel::name property)))
-                      :initarg ,(intern (camel-case-to-lisp
-                                         (odata/metamodel::name property)) :keyword)
-                      :accessor ,(intern
-                                  (camel-case-to-lisp
-                                   (concatenate 'string
-                                                (odata/metamodel::name node)
-                                                "."
-                                                (odata/metamodel::name property))))
-                      ,@(unless (not (odata/metamodel::is-nullable property))
-                          (list :initform nil))
-                    
-                      ))))
+            (list (intern (camel-case-to-lisp (odata/metamodel::base-type node))))))
+     ,(loop
+         for property in (odata/metamodel::structural-properties node)
+         collect `(,(intern (camel-case-to-lisp (odata/metamodel::name property)))
+                    :initarg ,(intern (camel-case-to-lisp
+                                       (odata/metamodel::name property)) :keyword)
+                    :accessor ,(intern
+                                (camel-case-to-lisp
+                                 (concatenate 'string
+                                              (odata/metamodel::name node)
+                                              "."
+                                              (odata/metamodel::name property))))
+                    ,@(unless (not (odata/metamodel::is-nullable property))
+                        (list :initform nil))
 
-(defun generate-odata-entity-serializer (node prefix)
-  `(defmethod odata::serialize ((node ,(entity-class-name node prefix)) stream)
+                    ))))
+
+(defun generate-odata-entity-serializer (node)
+  `(defmethod odata::serialize ((node ,(entity-class-name node)) stream)
      (let ((json:*json-output* stream))
        (json:with-object ()
          ,@(loop
               for property in (odata/metamodel::structural-properties node)
-              collect `(json:encode-object-member
-                        ,(intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword)
-                        (serialize-value (slot-value node ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
-                                         ',(odata/metamodel::property-type property))))))))
+              collect `(json:as-object-member
+                           (,(intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
+                         (serialize-value (slot-value node ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
+                                          ',(odata/metamodel::property-type property))))))))
 
-(defun generate-odata-entity-unserializer (node prefix)
-  `(defmethod odata::unserialize (data (type (eql ',(entity-class-name node prefix))))
-     (let ((entity (make-instance ',(entity-class-name node prefix))))
-     ,@(loop
-          for property in (odata/metamodel::structural-properties node)
-          collect `(setf (slot-value entity ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
-                         (unserialize-value
-                          (access:access data ,(intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
-                          ',(odata/metamodel::property-type property))))
-     entity)))
+(defun generate-odata-entity-unserializer (node)
+  `(defmethod odata::unserialize (data (type (eql ',(entity-class-name node))))
+     (let ((entity (make-instance ',(entity-class-name node))))
+       ,@(loop
+            for property in (odata/metamodel::structural-properties node)
+            collect `(setf (slot-value entity ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
+                           (unserialize-value
+                            (access:access data ,(intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
+                            ',(odata/metamodel::property-type property))))
+       entity)))
 
-(defmacro def-entities (metadata &optional (prefix ""))
-  `(progn ,@(%def-entities metadata prefix)))
+(defmacro def-entities (metadata)
+  `(progn ,@(%def-entities metadata)))
 
 (defgeneric entity-name (class))
 
 (defgeneric serialize (object stream))
 (defgeneric unserialize (data type))
-(defgeneric serialize-value (value type))
-(defgeneric unserialize-value (value type))
+(defgeneric serialize-primitive-value (value type))
 
-(defmethod serialize-value (value type)
+(defun serialize-value (value type)
   (if (null value)
       nil
-      (error "Don't know how to serialize value: ~a (~a)" value type)))
+      (case (first type)
+        (:primitive (serialize-primitive-value value (intern (second type) :keyword)))
+        (:collection (serialize-collection-value (second type)))
+        (:nominal (serialize-nominal-value value type)))))
 
-(defmethod serialize-value (value (type (eql '(:primitive "Edm.String"))))
-  (unless (null value)
-    (princ-to-string value)))
+(defmethod serialize-primitive-value (value (type (eql :|Edm.String|)))
+  (json:encode-json value))
 
-(defmethod serialize-value (value (type (eql '(:primitive "Edm.Boolean"))))
-  (if value t nil))
+(defmethod serialize-primitive-value (value (type (eql :|Edm.Boolean|)))
+  (if value
+      (write-string "true" json:*json-output*)
+      (write-string "false" json:*json-output*)))
 
-(defmethod unserialize-value (value type)
+(defmethod serialize-primitive-value (value type)
+  (json:encode-json value))
+
+(defun serialize-collection-value (collection col-type)
+  (json:with-array ()
+    (loop for elem in collection
+       do (serialize-value elem col-type))))
+
+(defun serialize-nominal-value (value nominal-type)
+  ;;(let ((type (find-type nominal-type)))
+  (serialize value json:*json-output*))
+
+(defun unserialize-value (value type)
+  (if (null value)
+      nil
+      (case (first type)
+        (:primitive (unserialize-primitive-value value (intern (second type) :keyword)))
+        (:collection (unserialize-collection-value value (second type)))
+        (:nominal (unserialize-nominal-value value value type)))))
+
+(defun unserialize-primitive-value (value type)
   value)
+
+(defun unserialize-collection-value (value col-type)
+  (loop for elem in value
+     collect (unserialize elem col-type)))
+
+(defun unserialize-nominal-value (value nominal-type)
+  (let ((type (find-type nominal-type)))
+    (let ((object (make-instance (entity-class-name type))))
+      (loop for property in (odata/metamodel::properties type)
+         do
+           (setf (slot-value object (intern (camel-case-to-lisp (odata/metamodel::name property))))
+                 (unserialize (access:access value (intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
+                              (odata/metamodel::property-type property)))))))
