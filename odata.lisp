@@ -145,7 +145,7 @@
       nil
       (case (first type)
         (:primitive (serialize-primitive-value value (intern (second type) :keyword)))
-        (:collection (serialize-collection-value (second type)))
+        (:collection (serialize-collection-value value (second type)))
         (:nominal (serialize-nominal-value value type)))))
 
 (defmethod serialize-primitive-value (value (type (eql :|Edm.String|)))
@@ -165,8 +165,15 @@
        do (serialize-value elem col-type))))
 
 (defun serialize-nominal-value (value nominal-type)
-  ;;(let ((type (find-type nominal-type)))
-  (serialize value json:*json-output*))
+  (let* ((package (find-package (intern (getf nominal-type :namespace))))
+         (class-name (intern (camel-case-to-lisp (getf nominal-type :nominal))
+                             package))
+         (type (odata/metamodel::find-element
+                (symbol-value (intern "METADATA" package))
+                (getf nominal-type :nominal))))
+    (if (typep type 'odata/metamodel::enum-type)
+        (json:encode-json value)
+        (serialize value json:*json-output*))))
 
 (defun unserialize-value (value type)
   (if (null value)
