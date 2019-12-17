@@ -54,4 +54,4 @@
   (fetch-people :$filter "FirstName eq 'Scott'"))
 
 (odata::with-odata-base +trip-pin-modify+
-  (fetch-people :id "russellwhyte"))
+  (fetch-person-by-id "russellwhyte"))
