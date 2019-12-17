@@ -1,8 +1,8 @@
 ;;;; odata.asd
 
 (asdf:defsystem #:odata
-  :description "Describe odata here"
-  :author "Your Name <your.name@example.com>"
+  :description "Common Lisp client library for OData"
+  :author "Mariano Montone <marianomontone@gmail.com>"
   :license  "Specify license here"
   :version "0.0.1"
   :serial t
@@ -11,4 +11,4 @@
                (:file "odata"))
   :depends-on (:cxml :drakma :cl-arrows :cl-json
                      :access :defenum :cl-change-case
-                     :anaphora))
+                     :anaphora :quri))

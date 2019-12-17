@@ -10,13 +10,18 @@
 
 (defvar *odata-base*)
 
-(defun odata-get (url)
-  (access (json:decode-json-from-string
-           (drakma:http-request url))
-          :value))
+(defun odata-get (url &key $filter)
+  (let ((url* url))
+    (when $filter
+      (setf url* (quri:merge-uris (quri:make-uri :query `(("$filter" . ,$filter)))
+                                  url*)))
+    (access (json:decode-json-from-string
+             (drakma:http-request (quri:render-uri url*)))
+            :value)))
 
-(defun odata-get* (uri &optional (base *odata-base*))
-  (odata-get (puri:merge-uris uri base)))
+(defun odata-get* (uri &rest args &key $filter)
+  (apply #'odata-get (quri:merge-uris uri *odata-base*)
+         args))
 
 (defun call-with-odata-base (base func)
   (let ((*odata-base* base))
@@ -25,8 +30,8 @@
 (defmacro with-odata-base (base &body body)
   `(call-with-odata-base ,base (lambda () ,@body)))
 
-(defun odata-get-entities (url type)
-  (let ((data (odata-get* url)))
+(defun odata-get-entities (url type &rest args &key $filter)
+  (let ((data (apply #'odata-get* url args)))
     (loop for entity-data in data
        collect (unserialize entity-data type))))
 
@@ -218,12 +223,17 @@
                                        (odata/metamodel::elements entity-container))))
                       (def-service service el))))))
 
+(defun compile-$filter (exp)
+  (error "TODO"))
+
 (defmethod def-service (service (entity-set odata/metamodel::entity-set))
   (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set))))))
-    `(defun ,fetch-fn-name ()
-       (odata::odata-get-entities ,(access service :url)
-                                  ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
-                                           (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))))))
+    `(defun ,fetch-fn-name (&key $filter)
+       (odata::odata-get-entities
+        ,(access service :url)
+        ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
+                  (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))
+        :$filter $filter))))
 
 (defmethod def-service (service (singleton odata/metamodel::singleton))
   ;; TODO

@@ -18,7 +18,7 @@
 (defparameter +trip-pin-modify+
   (multiple-value-bind (response status headers modify-url)
       (drakma:http-request +trip-pin-base+)
-    modify-url))
+    (quri:uri (princ-to-string modify-url))))
 
 (defparameter +trip-pin-metadata+
   (odata/metamodel::parse-metamodel
@@ -46,3 +46,9 @@
 (odata::with-odata-base +trip-pin-modify+
   (fetch-people)
   (fetch-airlines))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-airlines :$filter "contains(Location/Address, 'San Francisco'"))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter "FirstName eq 'Scott'"))
