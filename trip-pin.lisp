@@ -25,15 +25,24 @@
    (probe-file
     (asdf:system-relative-pathname :odata "TripPin.xml"))))
 
+(defparameter +trip-pin-service-spec+
+  (json:decode-json-from-source (drakma:http-request +trip-pin-base+)))
+
 (odata::def-packages #.+trip-pin-metadata+)
 
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
 
-(odata::def-service-model-functions #.(drakma:http-request +trip-pin-base+))
+(odata::def-service-model-functions
+    #.+trip-pin-service-spec+
+    #.+trip-pin-metadata+)
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get-entities "People" '|Microsoft.OData.SampleService.Models.TripPin|:person))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people)
+  (fetch-airlines))

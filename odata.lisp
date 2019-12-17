@@ -207,13 +207,28 @@
                                         (odata/metamodel::property-type property))))
           object))))
 
-(defmacro def-service-model-functions (service-model)
-  `(progn
-     ,@(loop
-          for service in (access service-model :value)
-          collect (def-service-getter service))))
+(defmacro def-service-model-functions (services metadata)
+  (let ((entity-container (odata/metamodel::entity-container metadata)))
+    `(progn
+       ,@(loop
+            for service in (access services :value)
+            collect (let ((el (find-if (lambda (el)
+                                         (string= (odata/metamodel::name el)
+                                                  (access service :name)))
+                                       (odata/metamodel::elements entity-container))))
+                      (def-service service el))))))
 
-(defun def-service-getter (service)
-  (let ((name 
-  `(defun )
+(defmethod def-service (service (entity-set odata/metamodel::entity-set))
+  (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set))))))
+    `(defun ,fetch-fn-name ()
+       (odata::odata-get-entities ,(access service :url)
+                                  ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
+                                           (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))))))
+
+(defmethod def-service (service (singleton odata/metamodel::singleton))
+  ;; TODO
+  )
+
+(defmethod def-service (service (singleton odata/metamodel::function-import))
+  ;; TODO
   )

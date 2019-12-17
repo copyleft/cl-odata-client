@@ -138,7 +138,8 @@
                  :name (dom:get-attribute node "Name")))
 
 (defmethod parse-element-type (node (type (eql :|Singleton|)))
-  (make-instance 'singleton))
+  (make-instance 'singleton
+                 :name (dom:get-attribute node "Name")))
 
 (defmethod parse-element-type (node (type (eql :|FunctionImport|)))
   (make-instance 'function-import
@@ -288,4 +289,13 @@ Examples:
   (cdr (assoc value (members enum) :test 'string=)))
 
 (defun entity-container (metadata)
-  (find-if (lambda (el) (typep el 'entity-container)) metadata))
+  (let ((schemas (schemas (data-services metadata))))
+    (loop
+       for schema in schemas
+       for ec = (find-if (lambda (el) (typep el 'entity-container))
+                         (elements schema))
+       when ec
+       return ec)))
+
+(defun entity-sets (entity-container)
+  (remove-if-not (lambda (el) (typep el 'entity-set)) (elements entity-container)))
