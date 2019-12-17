@@ -38,6 +38,10 @@
 (defclass structural-property (property)
   ())
 
+(defclass navigation-property-binding (element)
+  ((target :initarg :target :accessor target)
+   (path :initarg :path :accessor path)))
+
 (defclass annotation (element)
   ())
 
@@ -59,10 +63,27 @@
   ())
 
 (defclass entity-container (element)
-  ())
+  ((elements :initarg :elements :accessor elements)))
+
+(defclass entity-set (element)
+  ((entity-type :initarg :entity-type :accessor entity-type)
+   (elements :initarg :elements :accessor elements)))
 
 (defclass annotations (element)
   ())
+
+(defclass singleton (element)
+  ())
+
+(defclass function-import (element)
+  ((function :initarg :function :accessor function*)
+   (entity-set :initarg :entity-set :accessor entity-set)
+   (include-in-service-document :initarg :include-in-service-document
+                                :accessor include-in-service-document)))
+
+(defclass action-import (element)
+  ((action :initarg :action :accessor action)
+   (entity-set :initarg :entity-set :accessor entity-set)))
 
 (defun parse-metamodel (source)
   (let ((xml-document (if (dom:document-p source)
@@ -97,14 +118,40 @@
   node)
 
 (defmethod parse-element-type (node (type (eql :|EntityContainer|)))
-  ;; TODO
   (make-instance 'entity-container
-                 :name (dom:get-attribute node "Name")))
+                 :name (dom:get-attribute node "Name")
+                 :elements (parse-elements node)))
+
+(defmethod parse-element-type (node (type (eql :|NavigationPropertyBinding|)))
+  (make-instance 'navigation-property-binding
+                 :target (dom:get-attribute node "Target")
+                 :path (dom:get-attribute node "Path")))
 
 (defmethod parse-element-type (node (type (eql :|Annotations|)))
   ;; TODO
   (make-instance 'annotations
                  :name (dom:get-attribute node "Name")))
+
+(defmethod parse-element-type (node (type (eql :|Annotation|)))
+  ;; TODO
+  (make-instance 'annotation
+                 :name (dom:get-attribute node "Name")))
+
+(defmethod parse-element-type (node (type (eql :|Singleton|)))
+  (make-instance 'singleton))
+
+(defmethod parse-element-type (node (type (eql :|FunctionImport|)))
+  (make-instance 'function-import
+                 :name (dom:get-attribute node "Name")
+                 :function (dom:get-attribute node "Function")
+                 :entity-set (dom:get-attribute node "EntitySet")
+                 :include-in-service-document (dom:get-attribute node "IncludeInServiceDocument")))
+
+(defmethod parse-element-type (node (type (eql :|ActionImport|)))
+  (make-instance 'action-import
+                 :name (dom:get-attribute node "Name")
+                 :action (dom:get-attribute node "Action")
+                 :entity-set (dom:get-attribute node "EntitySet")))
 
 (defmethod parse-element-type (node (type (eql :|Function|)))
   (make-instance 'function*
@@ -158,6 +205,13 @@
                     collect (parse-property child 'structural-property)
                     when (string= (dom:tag-name child) "NavigationProperty")
                     collect (parse-property child 'navigation-property))))
+
+(defmethod parse-element-type (node (type (eql :|EntitySet|)))
+  (make-instance 'entity-set
+                 :name (dom:get-attribute node "Name")
+                 :entity-type (ppcre:register-groups-bind (ns type) ("(.*)\\.(.*)" (dom:get-attribute node "EntityType"))
+                                (list :type type :namespace ns))
+                 :elements (parse-elements node)))
 
 (defun emptyp (sequence)
   (zerop (length sequence)))
@@ -232,3 +286,6 @@ Examples:
 
 (defun enum-value (enum value)
   (cdr (assoc value (members enum) :test 'string=)))
+
+(defun entity-container (metadata)
+  (find-if (lambda (el) (typep el 'entity-container)) metadata))

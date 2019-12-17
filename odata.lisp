@@ -206,3 +206,14 @@
                      (unserialize-value (access:access value (intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
                                         (odata/metamodel::property-type property))))
           object))))
+
+(defmacro def-service-model-functions (service-model)
+  `(progn
+     ,@(loop
+          for service in (access service-model :value)
+          collect (def-service-getter service))))
+
+(defun def-service-getter (service)
+  (let ((name 
+  `(defun )
+  )
