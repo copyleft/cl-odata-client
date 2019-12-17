@@ -16,7 +16,7 @@
       (setf url* (quri:merge-uris (quri:make-uri :query `(("$filter" . ,$filter)))
                                   url*)))
     (access (json:decode-json-from-string
-             (drakma:http-request (quri:render-uri url*)))
+             (drakma:http-request (quri:render-uri url*) :preserve-uri t))
             :value)))
 
 (defun odata-get* (uri &rest args &key $filter)

@@ -48,7 +48,10 @@
   (fetch-airlines))
 
 (odata::with-odata-base +trip-pin-modify+
-  (fetch-airlines :$filter "contains(Location/Address, 'San Francisco'"))
+  (fetch-airlines :$filter "contains(Location/Address, 'San Francisco')"))
 
 (odata::with-odata-base +trip-pin-modify+
   (fetch-people :$filter "FirstName eq 'Scott'"))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :id "russellwhyte"))
