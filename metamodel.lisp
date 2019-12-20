@@ -33,7 +33,9 @@
    (default-value :initarg :default-value :accessor default-value :initform nil)))
 
 (defclass navigation-property (property)
-  ())
+  ((contains-target :initarg :contains-target
+                   :accessor contains-target
+                   :initform nil)))
 
 (defclass structural-property (property)
   ())
@@ -228,7 +230,7 @@
 (defun lisp-to-camel-case (string)
   (cl-change-case:camel-case string))
 
-(defun parse-property (node class)
+(defmethod parse-property (node class)
   (make-instance class
                  :name (dom:get-attribute node "Name")
                  :type (parse-type (dom:get-attribute node "Type"))
@@ -236,6 +238,13 @@
                                (string= (dom:get-attribute node "Nullable") "true"))
                  :default-value (and (dom:has-attribute node "DefaultValue")
                                      (dom:get-attribute node "DefaultValue"))))
+
+(defmethod parse-property (node (class (eql 'navigation-property)))
+  (let ((property (call-next-method)))
+    (setf (contains-target property)
+          (and (dom:has-attribute node "ContainsTarget")
+               (string= (dom:get-attribute node "ContainsTarget") "true")))
+    property))
 
 (defun parse-return-type (node)
   (dom:get-attribute node "Type"))
