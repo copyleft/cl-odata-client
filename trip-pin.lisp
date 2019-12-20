@@ -58,3 +58,17 @@
 
 (odata::with-odata-base +trip-pin-modify+
   (fetch-person-by-id "russellwhyte"))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter '(:eq "FirstName" "Scott")
+                :$expand "Address"))
+
+(describe '|Microsoft.OData.SampleService.Models.TripPin|:person)
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter '(:eq "FirstName" "Scott")
+                :$expand "Friends"))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter '(:eq "FirstName" "Scott")
+                :$expand (list "Friends" "Trips" "Photo")))
