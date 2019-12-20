@@ -106,21 +106,24 @@
   `(defclass ,(entity-class-name node)
        (,@(when (odata/metamodel::base-type node)
             (list (intern (camel-case-to-lisp (odata/metamodel::base-type node))))))
-     ,(loop
-         for property in (odata/metamodel::properties node)
-         collect `(,(intern (camel-case-to-lisp (odata/metamodel::name property)))
-                    :initarg ,(intern (camel-case-to-lisp
-                                       (odata/metamodel::name property)) :keyword)
-                    :accessor ,(intern
-                                (camel-case-to-lisp
-                                 (concatenate 'string
-                                              (odata/metamodel::name node)
-                                              "."
-                                              (odata/metamodel::name property))))
-                    ,@(unless (not (odata/metamodel::is-nullable property))
-                        (list :initform nil))
+     ((odata-id :initarg :odata-id :accessor odata-id)
+      (odata-etag :initarg :odata-etag :accessor odata-etag)
+      (odata-edit-link :initarg :odata-edit-link :accessor odata-edit-link)
+      ,@(loop
+           for property in (odata/metamodel::properties node)
+           collect `(,(intern (camel-case-to-lisp (odata/metamodel::name property)))
+                      :initarg ,(intern (camel-case-to-lisp
+                                         (odata/metamodel::name property)) :keyword)
+                      :accessor ,(intern
+                                  (camel-case-to-lisp
+                                   (concatenate 'string
+                                                (odata/metamodel::name node)
+                                                "."
+                                                (odata/metamodel::name property))))
+                      ,@(unless (not (odata/metamodel::is-nullable property))
+                          (list :initform nil))
 
-                    ))))
+                      )))))
 
 (defun generate-odata-entity-serializer (node)
   `(defmethod odata::serialize ((node ,(entity-class-name node)) stream)
@@ -136,6 +139,9 @@
 (defun generate-odata-entity-unserializer (node)
   `(defmethod odata::unserialize (data (type (eql ',(entity-class-name node))))
      (let ((entity (make-instance ',(entity-class-name node))))
+       (setf (odata-id entity) (access data :odata-id))
+       (setf (odata-etag entity) (access data :odata-etag))
+       (setf (odata-edit-link entity) (access data :odata-edit-link))
        ,@(loop
             for property in (odata/metamodel::properties node)
             collect `(setf (slot-value entity ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
