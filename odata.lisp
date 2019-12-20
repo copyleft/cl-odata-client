@@ -109,7 +109,7 @@
        (,@(when (odata/metamodel::base-type node)
             (list (intern (camel-case-to-lisp (odata/metamodel::base-type node))))))
      ,(loop
-         for property in (odata/metamodel::structural-properties node)
+         for property in (odata/metamodel::properties node)
          collect `(,(intern (camel-case-to-lisp (odata/metamodel::name property)))
                     :initarg ,(intern (camel-case-to-lisp
                                        (odata/metamodel::name property)) :keyword)
