@@ -247,11 +247,22 @@
     (loop for x in (rest exp)
        do
          (princ "," s)
-         (princ (compile-$expand x) s))))
+         (princ (compile-$expand-path x) s))))
+
+(defun compile-$expand-path (path)
+  (if (stringp path)
+      path
+      (with-output-to-string (s)
+        (princ (compile-$expand (first path)) s)
+        (loop for x in (rest path)
+           do
+             (princ "/" s)
+             (princ x s)))))
 
 ;; (odata::compile-$expand "asdf")
 ;; (odata::compile-$expand '("asdf"))
 ;; (odata::compile-$expand '("asdf" "foo"))
+;; (odata::compile-$expand '("asdf" "foo" ("Bar" "Baz")))
 
 (defmethod def-service (service (entity-set odata/metamodel::entity-set))
   (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set)))))
