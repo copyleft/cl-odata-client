@@ -13,11 +13,9 @@
 (defun odata-get (url &key $filter $expand)
   (let ((url* url))
     (when $filter
-      (setf url* (quri:merge-uris (quri:make-uri :query `(("$filter" . ,$filter)))
-                                  url*)))
+      (push (cons "$filter" $filter) (quri:uri-query-params url*)))
     (when $expand
-      (setf url* (quri:merge-uris (quri:make-uri :query `(("$expand" . ,$expand)))
-                                  url*)))
+      (push (cons "$expand" $expand) (quri:uri-query-params url*)))
     (multiple-value-bind (response status)
         (drakma:http-request (quri:render-uri url*) :preserve-uri t)
       (let ((json (json:decode-json-from-string response)))
