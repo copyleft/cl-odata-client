@@ -80,3 +80,9 @@
 (odata::with-odata-base +trip-pin-modify+
   (fetch-people :$filter '(:eq "FirstName" "Scott")
                 :$expand :all))
+
+(defparameter *p* (first (odata::with-odata-base +trip-pin-modify+
+                           (fetch-people :$filter '(:eq "FirstName" "Scott")))))
+
+(|Microsoft.OData.SampleService.Models.TripPin|::person-trips *p*)
+(|Microsoft.OData.SampleService.Models.TripPin|::person-friends *p*)

@@ -94,8 +94,25 @@
           collect (generate-odata-entity entity)
           collect `(defmethod entity-name ((entity-type (eql ',(entity-class-name entity))))
                      ,(odata/metamodel::name entity))
+          appending (generate-odata-entity-methods entity)
           collect (generate-odata-entity-serializer entity)
           collect (generate-odata-entity-unserializer entity))))
+
+(defun generate-odata-entity-methods (entity)
+  (loop
+     for prop in (odata/metamodel::navigation-properties entity)
+     collect (generate-entity-navigation-method prop entity)))
+
+(defun generate-entity-navigation-method (navigation-property entity)
+  `(defmethod ,(intern (camel-case-to-lisp
+                        (concatenate 'string (odata/metamodel::name entity)
+                                     "." (odata/metamodel::name navigation-property))) 
+                       (intern (odata/metamodel::namespace entity)))
+       (entity &rest args &key $filter $expand)
+     (unserialize-value
+      (access (apply #'odata-get (quri:uri (concatenate 'string (odata-id entity) "/" ,(odata/metamodel::name navigation-property))) args)
+              :value)
+      ',(odata/metamodel::property-type navigation-property))))
 
 (defun entity-class-name (node)
   (intern (camel-case-to-lisp
@@ -249,6 +266,7 @@
     ((stringp exp) exp)
     ((eql exp :all) "*")
     ((eql exp t) "*")
+    ((null exp) nil)
     (t
      (with-output-to-string (s)
        (princ (compile-$expand-path (first exp)) s)
