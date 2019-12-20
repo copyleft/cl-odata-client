@@ -109,10 +109,13 @@
                                      "." (odata/metamodel::name navigation-property))) 
                        (intern (odata/metamodel::namespace entity)))
        (entity &rest args &key $filter $expand)
-     (unserialize-value
-      (access (apply #'odata-get (quri:uri (concatenate 'string (odata-id entity) "/" ,(odata/metamodel::name navigation-property))) args)
-              :value)
-      ',(odata/metamodel::property-type navigation-property))))
+     (let ((data (apply #'odata-get (quri:uri (concatenate 'string (odata-id entity) "/" ,(odata/metamodel::name navigation-property))) args)))
+       (unserialize-value
+        ;; When does the response contain "value" and when does it not? It seems "value" is present for collections, but for only top-level ones?
+        (if (access data :value)
+            (access data :value)
+            data)
+        ',(odata/metamodel::property-type navigation-property)))))
 
 (defun entity-class-name (node)
   (intern (camel-case-to-lisp

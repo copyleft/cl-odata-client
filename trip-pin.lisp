@@ -86,3 +86,4 @@
 
 (|Microsoft.OData.SampleService.Models.TripPin|::person-trips *p*)
 (|Microsoft.OData.SampleService.Models.TripPin|::person-friends *p*)
+(|Microsoft.OData.SampleService.Models.TripPin|::person-photo *p*)
