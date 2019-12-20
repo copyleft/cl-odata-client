@@ -10,15 +10,21 @@
 
 (defvar *odata-base*)
 
-(defun odata-get (url &key $filter)
+(defun odata-get (url &key $filter $expand)
   (let ((url* url))
     (when $filter
       (setf url* (quri:merge-uris (quri:make-uri :query `(("$filter" . ,$filter)))
                                   url*)))
-    (json:decode-json-from-string
-     (drakma:http-request (quri:render-uri url*) :preserve-uri t))))
+    (when $expand
+      (setf url* (quri:merge-uris (quri:make-uri :query `(("$expand" . ,$expand)))
+                                  url*)))
+    (multiple-value-bind (response status)
+        (drakma:http-request (quri:render-uri url*) :preserve-uri t)
+      (when (>= status 400)
+        (error "HTTP request error: ~a" status))
+    (json:decode-json-from-string response))))
 
-(defun odata-get* (uri &rest args &key $filter)
+(defun odata-get* (uri &rest args &key $filter $expand)
   (apply #'odata-get (quri:merge-uris uri *odata-base*)
          args))
 
@@ -29,7 +35,7 @@
 (defmacro with-odata-base (base &body body)
   `(call-with-odata-base ,base (lambda () ,@body)))
 
-(defun odata-get-entities (url type &rest args &key $filter)
+(defun odata-get-entities (url type &rest args &key $filter $expand)
   (let ((data (apply #'odata-get* url args)))
     (loop for entity-data in (access data :value)
        collect (unserialize entity-data type))))
@@ -233,17 +239,32 @@
     (:eq (format nil "~a eq '~a'" (second exp) (third exp)))
     (:= (format nil "~a eq '~a'" (second exp) (third exp)))))
 
+(defun compile-$expand (exp)
+  (when (stringp exp)
+    (return-from compile-$expand exp))
+  (with-output-to-string (s)
+    (princ (compile-$expand (first exp)) s)
+    (loop for x in (rest exp)
+       do
+         (princ "," s)
+         (princ (compile-$expand x) s))))
+
+;; (odata::compile-$expand "asdf")
+;; (odata::compile-$expand '("asdf"))
+;; (odata::compile-$expand '("asdf" "foo"))
+
 (defmethod def-service (service (entity-set odata/metamodel::entity-set))
   (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set)))))
         (fetch-fn-by-id-name (intern (format nil "FETCH-~a-BY-ID"
                                              (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))))))
     `(progn
-       (defun ,fetch-fn-name (&key $filter)
+       (defun ,fetch-fn-name (&key $filter $expand)
          (odata-get-entities
           ,(access service :url)
           ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
                     (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))
-          :$filter (compile-$filter $filter)))
+          :$filter (compile-$filter $filter)
+          :$expand (compile-$expand $expand)))
        (defun ,fetch-fn-by-id-name (id &rest args)
          (odata-get-entity-by-id
           ,(access service :url)
