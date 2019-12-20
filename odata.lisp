@@ -20,9 +20,10 @@
                                   url*)))
     (multiple-value-bind (response status)
         (drakma:http-request (quri:render-uri url*) :preserve-uri t)
-      (when (>= status 400)
-        (error "HTTP request error: ~a" status))
-    (json:decode-json-from-string response))))
+      (let ((json (json:decode-json-from-string response)))
+        (when (>= status 400)
+          (error "OData request error (~a): ~a" status (accesses json :error :message)))
+        json))))
 
 (defun odata-get* (uri &rest args &key $filter $expand)
   (apply #'odata-get (quri:merge-uris uri *odata-base*)
@@ -138,7 +139,7 @@
   `(defmethod odata::unserialize (data (type (eql ',(entity-class-name node))))
      (let ((entity (make-instance ',(entity-class-name node))))
        ,@(loop
-            for property in (odata/metamodel::structural-properties node)
+            for property in (odata/metamodel::properties node)
             collect `(setf (slot-value entity ',(intern (camel-case-to-lisp (odata/metamodel::name property))))
                            (unserialize-value
                             (access:access data ,(intern (camel-case-to-lisp (odata/metamodel::name property)) :keyword))
