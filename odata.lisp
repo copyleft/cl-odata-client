@@ -227,7 +227,11 @@
                       (def-service service el))))))
 
 (defun compile-$filter (exp)
-  (error "TODO"))
+  (when (stringp exp)
+    (return-from compile-$filter exp))
+  (ecase (first exp)
+    (:eq (format nil "~a eq '~a'" (second exp) (third exp)))
+    (:= (format nil "~a eq '~a'" (second exp) (third exp)))))
 
 (defmethod def-service (service (entity-set odata/metamodel::entity-set))
   (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set)))))
@@ -239,7 +243,7 @@
           ,(access service :url)
           ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
                     (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))
-          :$filter $filter))
+          :$filter (compile-$filter $filter)))
        (defun ,fetch-fn-by-id-name (id &rest args)
          (odata-get-entity-by-id
           ,(access service :url)
