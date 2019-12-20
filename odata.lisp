@@ -239,24 +239,28 @@
     (:= (format nil "~a eq '~a'" (second exp) (third exp)))))
 
 (defun compile-$expand (exp)
-  (when (stringp exp)
-    (return-from compile-$expand exp))
-  (with-output-to-string (s)
-    (princ (compile-$expand (first exp)) s)
-    (loop for x in (rest exp)
-       do
-         (princ "," s)
-         (princ (compile-$expand-path x) s))))
+  (cond
+    ((stringp exp) exp)
+    ((eql exp :all) "*")
+    ((eql exp t) "*")
+    (t
+     (with-output-to-string (s)
+       (princ (compile-$expand-path (first exp)) s)
+       (loop for x in (rest exp)
+          do
+            (princ "," s)
+            (princ (compile-$expand-path x) s))))))
 
 (defun compile-$expand-path (path)
-  (if (stringp path)
-      path
-      (with-output-to-string (s)
-        (princ (compile-$expand (first path)) s)
-        (loop for x in (rest path)
-           do
-             (princ "/" s)
-             (princ x s)))))
+  (cond
+    ((stringp path) path)
+    (t
+     (with-output-to-string (s)
+       (princ (compile-$expand (first path)) s)
+       (loop for x in (rest path)
+          do
+            (princ "/" s)
+            (princ x s))))))
 
 ;; (odata::compile-$expand "asdf")
 ;; (odata::compile-$expand '("asdf"))

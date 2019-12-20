@@ -72,3 +72,11 @@
 (odata::with-odata-base +trip-pin-modify+
   (fetch-people :$filter '(:eq "FirstName" "Scott")
                 :$expand (list "Friends" "Trips" "Photo")))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter '(:eq "FirstName" "Scott")
+                :$expand "*"))
+
+(odata::with-odata-base +trip-pin-modify+
+  (fetch-people :$filter '(:eq "FirstName" "Scott")
+                :$expand :all))
