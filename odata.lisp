@@ -304,8 +304,8 @@
           ,(access service :url)
           ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
                     (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))
-          :$filter (compile-$filter $filter)
-          :$expand (compile-$expand $expand)))
+          :$filter (when $filter (compile-$filter $filter))
+          :$expand (when $expand (compile-$expand $expand))))
        (defun ,fetch-fn-by-id-name (id &rest args)
          (odata-get-entity-by-id
           ,(access service :url)
