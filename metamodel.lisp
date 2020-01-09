@@ -20,6 +20,9 @@
   ((namespace :initarg :namespace :accessor namespace)
    (name :initarg :name :accessor name)))
 
+(defclass term (element)
+  ())
+
 (defclass entity-type (element)
   ((base-type :initarg :base-type :accessor base-type :initform nil)
    (key :initarg :key :accessor key)
@@ -118,6 +121,9 @@
 
 (defmethod parse-element-type (node type)
   node)
+
+(defmethod parse-element-type (node (type (eql :|Term|)))
+  (make-instance 'term))
 
 (defmethod parse-element-type (node (type (eql :|EntityContainer|)))
   (make-instance 'entity-container
