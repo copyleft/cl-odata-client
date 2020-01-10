@@ -60,11 +60,13 @@
 (defclass enum-type (element)
   ((members :initarg :members :accessor members)))
 
-(defclass function* (element)
+(defclass odata-function (element)
   ((parameters :initarg :parameters :accessor parameters)
-   (return-type :initarg :return-type :accessor return-type)))
+   (return-type :initarg :return-type :accessor return-type)
+   (is-bound :initarg :is-bound :accessor is-bound)
+   (is-composable :initarg :is-composable :accessor is-composable)))
 
-(defclass type* (element)
+(defclass odata-type (element)
   ())
 
 (defclass entity-container (element)
@@ -78,10 +80,11 @@
   ())
 
 (defclass singleton (element)
-  ())
+  ((type :initarg :type :accessor singleton-type)
+   (elements :initarg :elements :accessor elements)))
 
 (defclass function-import (element)
-  ((function :initarg :function :accessor function*)
+  ((function :initarg :function :accessor odata-function)
    (entity-set :initarg :entity-set :accessor entity-set)
    (include-in-service-document :initarg :include-in-service-document
                                 :accessor include-in-service-document)))
@@ -147,7 +150,9 @@
 
 (defmethod parse-element-type (node (type (eql :|Singleton|)))
   (make-instance 'singleton
-                 :name (dom:get-attribute node "Name")))
+                 :name (dom:get-attribute node "Name")
+                 :type (dom:get-attribute node "Type")
+                 :elements (parse-elements node)))
 
 (defmethod parse-element-type (node (type (eql :|FunctionImport|)))
   (make-instance 'function-import
@@ -163,14 +168,18 @@
                  :entity-set (dom:get-attribute node "EntitySet")))
 
 (defmethod parse-element-type (node (type (eql :|Function|)))
-  (make-instance 'function*
+  (make-instance 'odata-function
                  :name (dom:get-attribute node "Name")
                  :parameters (loop for child across (dom:child-nodes node)
                                 when (string= (dom:tag-name child) "Parameter")
                                 collect (parse-parameter child))
                  :return-type (awhen (find-if (lambda (child) (string= (dom:tag-name child) "ReturnType"))
                                               (dom:child-nodes node))
-                                (parse-return-type it))))
+                                (parse-return-type it))
+                 :is-bound (and (dom:has-attribute node "IsBound")
+                                (equalp (dom:get-attribute node "IsBound") "True"))
+                 :is-composable (and (dom:has-attribute node "IsComposable")
+                                     (equalp (dom:get-attribute node "IsComposable") "True"))))
 
 (defmethod parse-element-type (node (type (eql :|Action|)))
   (make-instance 'action

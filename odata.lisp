@@ -11,7 +11,9 @@
 (defvar *odata-base*)
 
 (defun odata-get (url &key $filter $expand)
-  (let ((url* url))
+  (let ((url* (if (stringp url)
+                  (quri:uri url)
+                  url)))
     (when $filter
       (push (cons "$filter" $filter) (quri:uri-query-params url*)))
     (when $expand
@@ -173,6 +175,25 @@
 (defmacro def-entities (metadata)
   `(progn ,@(%def-entities metadata)))
 
+(defun generate-odata-function (node)
+  ;; TODO
+  `(defun ,(camel-case-to-lisp (odata/metamodel::name node))
+       ,(loop for parameter in (odata/metamodel::parameters node)
+           collect (camel-case-to-lisp (odata/metamodel::name parameter)))
+     (let ,(loop
+              for parameter in (odata/metamodel::parameters node)
+              for param-name = (camel-case-to-lisp (odata/metamodel::name parameter))
+              ))))
+
+(defun %def-functions (metadata)
+  (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
+     appending
+       (loop for function in (odata/metamodel::element-types schema 'odata/metamodel::odata-function)
+          collect (generate-odata-function function))))
+
+(defmacro def-functions (metadata)
+  `(progn ,@(%def-functions metadata)))
+
 (defgeneric entity-name (class))
 
 (defgeneric serialize (object stream))
@@ -318,5 +339,9 @@
   )
 
 (defmethod def-service (service (singleton odata/metamodel::function-import))
+  ;; TODO
+  )
+
+(defmethod def-service (service (singleton odata/metamodel::action-import))
   ;; TODO
   )
