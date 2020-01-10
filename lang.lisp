@@ -7,7 +7,9 @@
            :$filter
            :$expand
            :get-collection
-           :id))
+           :id
+           :$skip
+           :$top))
 
 (in-package :odata/lang)
 
@@ -43,10 +45,10 @@
 (defun $expand (url exp)
   (parameter url "$expand" (odata::compile-$expand exp)))
 
-(defun top (url top)
+(defun $top (url top)
   (check-type top integer)
-  (parameter url "top" top))
+  (parameter url "$top" top))
 
-(defun skip (url skip)
+(defun $skip (url skip)
   (check-type skip integer)
-  (parameter url "skip" skip))
+  (parameter url "$skip" skip))

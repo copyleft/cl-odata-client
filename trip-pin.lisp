@@ -28,6 +28,8 @@
 (defparameter +trip-pin-service-spec+
   (json:decode-json-from-source (drakma:http-request +trip-pin-base+)))
 
+(setf drakma:*header-stream* *standard-output*)
+
 (odata::def-packages #.+trip-pin-metadata+)
 
 (odata::def-enums #.+trip-pin-metadata+)
@@ -95,6 +97,12 @@
 (-> +trip-pin-modify+
     (collection "Airports")
     ($filter '(:contains ("Location" "Address") "San Francisco"))
+    (get-collection))
+
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($skip 2)
+    ($top 3)
     (get-collection))
 
 (odata::with-odata-base +trip-pin-modify+
