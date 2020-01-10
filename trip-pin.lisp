@@ -9,7 +9,7 @@
 ;; https://services.odata.org/V4/TripPinServiceRW
 
 (defpackage :odata.trip-pin
-  (:use :cl :odata :cl-arrows :access))
+  (:use :cl :odata :odata/lang :cl-arrows :access))
 
 (in-package :odata.trip-pin)
 
@@ -42,28 +42,39 @@
 
 (-> +trip-pin-modify+
     (collection "People")
-    (odata::get*))
+    (get*))
 
 ;; See: https://www.odata.org/getting-started/advanced-tutorial/
 ;; get singleton
 (-> +trip-pin-modify+
     (singleton "Me")
-    (odata::get*))
+    (get*))
 
 ;; request property
 (-> +trip-pin-modify+
     (singleton "Me")
-    (odata::property "AddressInfo")
-    (odata::get*))
+    (property "AddressInfo")
+    (get*))
 
 ;; update singleton
 
 ;; get collection
 (-> +trip-pin-modify+
-    (odata::collection "People")
-    (odata::get-collection))
+    (collection "People")
+    (get-collection))
 
+;; filtered collection
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter "FirstName eq 'Scott'")
+    (get-collection)
+    (first))
 
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter '(:= "FirstName" "Scott"))
+    (get-collection)
+    (first))
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
