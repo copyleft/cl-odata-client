@@ -6,7 +6,8 @@
            :collection
            :$filter
            :$expand
-           :get-collection))
+           :get-collection
+           :id))
 
 (in-package :odata/lang)
 
@@ -27,6 +28,9 @@
 
 (defun get-collection (url)
   (access (get* url) :value))
+
+(defun id (url id)
+  (quri:uri (format nil "~a('~a')" url id)))
 
 (defun parameter (url param value)
   (push (cons param value)

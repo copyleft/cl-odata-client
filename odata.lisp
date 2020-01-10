@@ -283,7 +283,8 @@
     (return-from compile-$filter exp))
   (ecase (first exp)
     (:eq (format nil "~a eq '~a'" (second exp) (third exp)))
-    (:= (format nil "~a eq '~a'" (second exp) (third exp)))))
+    (:= (format nil "~a eq '~a'" (second exp) (third exp)))
+    (:contains (format nil "contains(~a, '~a')" (second exp) (third exp)))))
 
 (defun compile-$expand (exp)
   (cond

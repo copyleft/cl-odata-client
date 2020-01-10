@@ -44,6 +44,12 @@
     (collection "People")
     (get*))
 
+;; get by id
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (get*))
+
 ;; See: https://www.odata.org/getting-started/advanced-tutorial/
 ;; get singleton
 (-> +trip-pin-modify+
@@ -76,6 +82,16 @@
     (get-collection)
     (first))
 
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($filter "contains(Location/Address, 'San Francisco')")
+    (get-collection))
+
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($filter '(:contains "Location/Address" "San Francisco"))
+    (get-collection))
+
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
 
@@ -87,7 +103,7 @@
   (fetch-airlines))
 
 (odata::with-odata-base +trip-pin-modify+
-  (fetch-airlines :$filter "contains(Location/Address, 'San Francisco')"))
+  (fetch-airports :$filter "contains(Location/Address, 'San Francisco')"))
 
 (odata::with-odata-base +trip-pin-modify+
   (fetch-people :$filter "FirstName eq 'Scott'"))
