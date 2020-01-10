@@ -9,7 +9,7 @@
 ;; https://services.odata.org/V4/TripPinServiceRW
 
 (defpackage :odata.trip-pin
-  (:use :cl :odata))
+  (:use :cl :odata :cl-arrows :access))
 
 (in-package :odata.trip-pin)
 
@@ -32,10 +32,38 @@
 
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
+(odata::def-functions #.+trip-pin-metadata+)
 
 (odata::def-service-model-functions
     #.+trip-pin-service-spec+
     #.+trip-pin-metadata+)
+
+;; See: https://www.odata.org/getting-started/basic-tutorial/
+
+(-> +trip-pin-modify+
+    (collection "People")
+    (odata::get*))
+
+;; See: https://www.odata.org/getting-started/advanced-tutorial/
+;; get singleton
+(-> +trip-pin-modify+
+    (singleton "Me")
+    (odata::get*))
+
+;; request property
+(-> +trip-pin-modify+
+    (singleton "Me")
+    (odata::property "AddressInfo")
+    (odata::get*))
+
+;; update singleton
+
+;; get collection
+(-> +trip-pin-modify+
+    (odata::collection "People")
+    (odata::get-collection))
+
+
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))

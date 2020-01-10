@@ -8,7 +8,8 @@
   :serial t
   :components ((:file "package")
                (:file "metamodel")
-               (:file "odata"))
+               (:file "odata")
+               (:file "lang"))
   :depends-on (:cxml :drakma :cl-arrows :cl-json
                      :access :defenum :cl-change-case
                      :anaphora :quri))
