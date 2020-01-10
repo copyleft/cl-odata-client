@@ -92,6 +92,11 @@
     ($filter '(:contains "Location/Address" "San Francisco"))
     (get-collection))
 
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($filter '(:contains ("Location" "Address") "San Francisco"))
+    (get-collection))
+
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
 

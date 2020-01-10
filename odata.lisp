@@ -284,7 +284,7 @@
   (ecase (first exp)
     (:eq (format nil "~a eq '~a'" (second exp) (third exp)))
     (:= (format nil "~a eq '~a'" (second exp) (third exp)))
-    (:contains (format nil "contains(~a, '~a')" (second exp) (third exp)))))
+    (:contains (format nil "contains(~a, '~a')" (compile-path (second exp)) (third exp)))))
 
 (defun compile-$expand (exp)
   (cond
@@ -298,14 +298,14 @@
        (loop for x in (rest exp)
           do
             (princ "," s)
-            (princ (compile-$expand-path x) s))))))
+            (princ (compile-path x) s))))))
 
-(defun compile-$expand-path (path)
+(defun compile-path (path)
   (cond
     ((stringp path) path)
     (t
      (with-output-to-string (s)
-       (princ (compile-$expand (first path)) s)
+       (princ (first path) s)
        (loop for x in (rest path)
           do
             (princ "/" s)
