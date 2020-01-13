@@ -44,7 +44,7 @@
 
 (-> +trip-pin-modify+
     (collection "People")
-    (fetch))
+    (fetch :collection))
 
 ;; get by id
 (-> +trip-pin-modify+
@@ -95,14 +95,12 @@
 (-> +trip-pin-modify+
     (collection "People")
     ($filter "FirstName eq 'Scott'")
-    (fetch :collection)
-    (first))
+    (fetch :collection))
 
 (-> +trip-pin-modify+
     (collection "People")
     ($filter '(:= "FirstName" "Scott"))
-    (fetch :collection)
-    (first))
+    (fetch :collection))
 
 (-> +trip-pin-modify+
     (collection "Airports")
