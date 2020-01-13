@@ -8,7 +8,9 @@
            :$expand
            :id
            :$skip
-           :$top))
+           :$top
+           :$value
+           :$orderby))
 
 (in-package :odata/lang)
 
@@ -23,8 +25,9 @@
     (t (odata::odata-get url))))
 
 (defun property (url name)
-  (quri:uri (format nil "~a/~a" url (if (stringp name) name
-                              (lisp-to-camel-case (string name))))))
+  (quri:uri (format nil "~a/~a" url
+                    (if (stringp name) name
+                        (lisp-to-camel-case (string name))))))
 
 (defun collection (url name)
   (quri:uri (format nil "~a/~a" url (if (stringp name) name
@@ -51,3 +54,11 @@
 (defun $skip (url skip)
   (check-type skip integer)
   (parameter url "$skip" skip))
+
+(defun $value (url)
+  (property url "$value"))
+
+(defun $orderby (url property &optional (order :asc))
+  (check-type order (member :asc :desc))
+  (parameter url "$orderby" (format nil "~a ~a" property
+                                    (string-downcase (princ-to-string order)))))

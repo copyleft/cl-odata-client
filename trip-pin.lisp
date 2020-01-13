@@ -77,6 +77,13 @@
     (property "Name")
     (fetch :value))
 
+(-> +trip-pin-modify+
+    (collection "Airports")
+    (id "KSFO")
+    (property "Name")
+    ($value)
+    (fetch))
+
 ;; update singleton
 
 ;; get collection
@@ -133,6 +140,13 @@
     (fetch :collection)
     (first))
 
+;; orderby
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "scottketchum")
+    (property "Trips")
+    ($orderby "EndsAt" :desc)
+    (fetch :collection))
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
