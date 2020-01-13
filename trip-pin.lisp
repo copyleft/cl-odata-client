@@ -69,7 +69,13 @@
 (-> +trip-pin-modify+
     (singleton "Me")
     (property "AddressInfo")
-    (fetch))
+    (fetch :value))
+
+(-> +trip-pin-modify+
+    (collection "Airports")
+    (id "KSFO")
+    (property "Name")
+    (fetch :value))
 
 ;; update singleton
 
@@ -126,6 +132,7 @@
     ($expand :all)
     (fetch :collection)
     (first))
+
 
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))

@@ -17,9 +17,10 @@
                              (lisp-to-camel-case (string name))))))
 
 (defun fetch (url &optional type)
-  (if (eql type :collection)
-      (access (fetch url) :value)
-      (odata::odata-get url)))
+  (case type
+    (:collection (access (fetch url) :value))
+    (:value (access (fetch url) :value))
+    (t (odata::odata-get url))))
 
 (defun property (url name)
   (quri:uri (format nil "~a/~a" url (if (stringp name) name
