@@ -105,6 +105,21 @@
     ($top 3)
     (get-collection))
 
+;; expand
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter '(:= "FirstName" "Scott"))
+    ($expand '("Photo" "Trips"))
+    (get-collection)
+    (first))
+
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter '(:= "FirstName" "Scott"))
+    ($expand :all)
+    (get-collection)
+    (first))
+
 (odata::with-odata-base +trip-pin-modify+
   (odata::odata-get* "People"))
 
