@@ -65,11 +65,25 @@
                                               (string-upcase name)))
                          value))))
 
+(defun generate-odata-enum-name (node)
+  (let ((enum-name (camel-case-to-lisp (odata/metamodel::name node))))
+    `(progn
+       ,@(loop for (name . value) in (odata/metamodel::members node)
+            collect `(defparameter ,(intern (format nil "+~a/~a+"
+                                                    enum-name
+                                                    (string-upcase name)))
+                       ',(make-symbol (format nil "~a.~a'~a'"
+                                              (odata/metamodel::namespace node)
+                                              (odata/metamodel::name node)
+                                              name)))))))
+
 (defun %def-enums (metadata)
   (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
      appending
-       (loop for enum in (odata/metamodel::enums schema)
-          collect (generate-odata-enum enum))))
+       (loop
+          for enum in (odata/metamodel::enums schema)
+          collect (generate-odata-enum enum)
+          collect (generate-odata-enum-name enum))))
 
 (defmacro def-enums (metadata)
   `(progn ,@(%def-enums metadata)))
@@ -108,7 +122,7 @@
 (defun generate-entity-navigation-method (navigation-property entity)
   `(defmethod ,(intern (camel-case-to-lisp
                         (concatenate 'string (odata/metamodel::name entity)
-                                     "." (odata/metamodel::name navigation-property))) 
+                                     "." (odata/metamodel::name navigation-property)))
                        (intern (odata/metamodel::namespace entity)))
        (entity &rest args &key $filter $expand)
      (let ((data (apply #'odata-get (quri:uri (concatenate 'string (odata-id entity) "/" ,(odata/metamodel::name navigation-property))) args)))
@@ -183,7 +197,7 @@
      (let ,(loop
               for parameter in (odata/metamodel::parameters node)
               for param-name = (camel-case-to-lisp (odata/metamodel::name parameter))
-              ))))
+                ))))
 
 (defun %def-functions (metadata)
   (loop for schema in (odata/metamodel::schemas (odata/metamodel::data-services metadata))
@@ -282,9 +296,15 @@
   (when (stringp exp)
     (return-from compile-$filter exp))
   (ecase (first exp)
-    (:eq (format nil "~a eq '~a'" (second exp) (third exp)))
-    (:= (format nil "~a eq '~a'" (second exp) (third exp)))
-    (:contains (format nil "contains(~a, '~a')" (compile-path (second exp)) (third exp)))))
+    (:eq (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
+    (:= (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
+    (:contains (format nil "contains(~a, ~a)" (compile-path (second exp)) (format-arg (third exp))))))
+
+(defun format-arg (arg)
+  (cond
+    ((stringp arg) (format nil "'~a'" arg))
+    ((symbolp arg) (symbol-name arg))
+    (t (princ-to-string arg))))
 
 (defun compile-$expand (exp)
   (cond

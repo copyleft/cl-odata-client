@@ -58,6 +58,13 @@
     (singleton "Me")
     (fetch))
 
+;; enums
+
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter `(:eq "Gender" ,+person-gender/female+))
+    (fetch :collection))
+
 ;; request property
 (-> +trip-pin-modify+
     (singleton "Me")
