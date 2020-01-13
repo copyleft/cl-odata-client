@@ -1,12 +1,11 @@
 (defpackage :odata/lang
   (:use :cl :odata :access)
   (:export :singleton
-           :get*
+           :fetch
            :property
            :collection
            :$filter
            :$expand
-           :get-collection
            :id
            :$skip
            :$top))
@@ -17,8 +16,10 @@
   (quri:uri (format nil "~a~a" url (if (stringp name) name
                              (lisp-to-camel-case (string name))))))
 
-(defun get* (url)
-  (odata::odata-get url))
+(defun fetch (url &optional type)
+  (if (eql type :collection)
+      (access (fetch url) :value)
+      (odata::odata-get url)))
 
 (defun property (url name)
   (quri:uri (format nil "~a/~a" url (if (stringp name) name
@@ -26,10 +27,7 @@
 
 (defun collection (url name)
   (quri:uri (format nil "~a/~a" url (if (stringp name) name
-                              (lisp-to-camel-case (string name))))))
-
-(defun get-collection (url)
-  (access (get* url) :value))
+                                        (lisp-to-camel-case (string name))))))
 
 (defun id (url id)
   (quri:uri (format nil "~a('~a')" url id)))

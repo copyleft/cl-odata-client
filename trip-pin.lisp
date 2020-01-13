@@ -44,80 +44,80 @@
 
 (-> +trip-pin-modify+
     (collection "People")
-    (get*))
+    (fetch))
 
 ;; get by id
 (-> +trip-pin-modify+
     (collection "People")
     (id "russellwhyte")
-    (get*))
+    (fetch))
 
 ;; See: https://www.odata.org/getting-started/advanced-tutorial/
 ;; get singleton
 (-> +trip-pin-modify+
     (singleton "Me")
-    (get*))
+    (fetch))
 
 ;; request property
 (-> +trip-pin-modify+
     (singleton "Me")
     (property "AddressInfo")
-    (get*))
+    (fetch))
 
 ;; update singleton
 
 ;; get collection
 (-> +trip-pin-modify+
     (collection "People")
-    (get-collection))
+    (fetch :collection))
 
 ;; filtered collection
 (-> +trip-pin-modify+
     (collection "People")
     ($filter "FirstName eq 'Scott'")
-    (get-collection)
+    (fetch :collection)
     (first))
 
 (-> +trip-pin-modify+
     (collection "People")
     ($filter '(:= "FirstName" "Scott"))
-    (get-collection)
+    (fetch :collection)
     (first))
 
 (-> +trip-pin-modify+
     (collection "Airports")
     ($filter "contains(Location/Address, 'San Francisco')")
-    (get-collection))
+    (fetch :collection))
 
 (-> +trip-pin-modify+
     (collection "Airports")
     ($filter '(:contains "Location/Address" "San Francisco"))
-    (get-collection))
+    (fetch :collection))
 
 (-> +trip-pin-modify+
     (collection "Airports")
     ($filter '(:contains ("Location" "Address") "San Francisco"))
-    (get-collection))
+    (fetch :collection))
 
 (-> +trip-pin-modify+
     (collection "Airports")
     ($skip 2)
     ($top 3)
-    (get-collection))
+    (fetch :collection))
 
 ;; expand
 (-> +trip-pin-modify+
     (collection "People")
     ($filter '(:= "FirstName" "Scott"))
     ($expand '("Photo" "Trips"))
-    (get-collection)
+    (fetch :collection)
     (first))
 
 (-> +trip-pin-modify+
     (collection "People")
     ($filter '(:= "FirstName" "Scott"))
     ($expand :all)
-    (get-collection)
+    (fetch :collection)
     (first))
 
 (odata::with-odata-base +trip-pin-modify+
