@@ -10,7 +10,8 @@
            :$skip
            :$top
            :$value
-           :$orderby))
+           :$orderby
+           :$select))
 
 (in-package :odata/lang)
 
@@ -46,6 +47,9 @@
 
 (defun $expand (url exp)
   (parameter url "$expand" (odata::compile-$expand exp)))
+
+(defun $select (url exp)
+  (parameter url "$select" (odata::compile-$select exp)))
 
 (defun $top (url top)
   (check-type top integer)

@@ -517,3 +517,60 @@ The $expand system query option specifies the related resources to be included i
    (:emails "Marshall@example.com" "Marshall@contoso.com") (:address-info)
    (:gender . "Male") (:concurrency . 637147089402046779))))
 #+end_example
+
+System Query Option $select
+
+The $select system query option allows the clients to requests a limited set of properties for each entity or complex type. The request below returns Name and IcaoCode of all Airports.
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($select '("Name" "IcaoCode"))
+    (fetch :collection))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KSFO')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KSFO')")
+  (:name . "San Francisco International Airport") (:icao-code . "KSFO"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KLAX')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KLAX')")
+  (:name . "Los Angeles International Airport") (:icao-code . "KLAX"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZSSS')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZSSS')")
+  (:name . "Shanghai Hongqiao International Airport") (:icao-code . "ZSSS"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZBAA')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZBAA')")
+  (:name . "Beijing Capital International Airport") (:icao-code . "ZBAA"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KJFK')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KJFK')")
+  (:name . "John F. Kennedy International Airport") (:icao-code . "KJFK"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('LIRA')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('LIRA')")
+  (:name . "Rome Ciampino Airport") (:icao-code . "LIRA"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('CYYZ')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('CYYZ')")
+  (:name . "Toronto Pearson International Airport") (:icao-code . "CYYZ"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('YSSY')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('YSSY')")
+  (:name . "Sydney Airport") (:icao-code . "YSSY")))
+#+end_example
+
