@@ -396,5 +396,124 @@ The $orderby system query option allows clients to request resources in either a
   (:tags "Trip in New York" "business" "sightseeing")))
 #+end_example
 
+*** System Query Option $top and $skip
 
+The $top system query option requests the number of items in the queried collection to be included in the result. The $skip query option requests the number of items in the queried collection that are to be skipped and not included in the result.
+The request below returns the first two people of the People entity set.
 
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    ($top 2) 
+    (fetch :collection))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('russellwhyte')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('russellwhyte')")
+  (:user-name . "russellwhyte") (:first-name . "Russell")
+  (:last-name . "Whyte") (:emails "Russell@example.com" "Russell@contoso.com")
+  (:address-info
+   ((:address . "187 Suffolk Ln.")
+    (:city (:country-region . "United States") (:name . "Boise")
+     (:region . "ID"))))
+  (:gender . "Male") (:concurrency . 637147089402046779))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637147089402046779)))
+#+end_example
+
+The request below returns people starting with the 19th people of the entity set People
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    ($skip 18) 
+    (fetch :collection))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('genevievereeves')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('genevievereeves')")
+  (:user-name . "genevievereeves") (:first-name . "Genevieve")
+  (:last-name . "Reeves")
+  (:emails "Genevieve@example.com" "Genevieve@contoso.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637147089402046779))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('kristakemp')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('kristakemp')")
+  (:user-name . "kristakemp") (:first-name . "Krista") (:last-name . "Kemp")
+  (:emails "Krista@example.com") (:address-info) (:gender . "Female")
+  (:concurrency . 637147089402046779)))
+#+end_example
+
+*** System Query Option $count
+
+The $count system query option allows clients to request a count of the matching resources included with the resources in the response.
+The request below returns the total number of people in the collection.
+
+*** System Query Option $expand
+
+The $expand system query option specifies the related resources to be included in line with retrieved resources. The request below returns people with navigation property Friends of a Person
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "keithpinckney")
+    ($expand "Friends")
+    (fetch))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/$metadata#People/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('keithpinckney')")
+ (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('keithpinckney')")
+ (:user-name . "keithpinckney") (:first-name . "Keith")
+ (:last-name . "Pinckney") (:emails "Keith@example.com" "Keith@contoso.com")
+ (:address-info) (:gender . "Male") (:concurrency . 637147089402046779)
+ (:friends
+  ((:odata-id
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('clydeguess')")
+   (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+   (:odata-edit-link
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('clydeguess')")
+   (:user-name . "clydeguess") (:first-name . "Clyde") (:last-name . "Guess")
+   (:emails "Clyde@example.com") (:address-info) (:gender . "Male")
+   (:concurrency . 637147089402046779))
+  ((:odata-id
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('marshallgaray')")
+   (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+   (:odata-edit-link
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('marshallgaray')")
+   (:user-name . "marshallgaray") (:first-name . "Marshall")
+   (:last-name . "Garay")
+   (:emails "Marshall@example.com" "Marshall@contoso.com") (:address-info)
+   (:gender . "Male") (:concurrency . 637147089402046779))))
+#+end_example
