@@ -34,7 +34,7 @@
 
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
-(odata::def-functions #.+trip-pin-metadata+)
+;; (odata::def-functions #.+trip-pin-metadata+)
 
 (odata::def-service-model-functions
     #.+trip-pin-service-spec+

@@ -367,3 +367,34 @@ The request below returns all female People of entity type Person. The Gender is
   (:last-name . "Bright") (:emails "Ursula@example.com" "Ursula@contoso.com")
   (:address-info) (:gender . "Female") (:concurrency . 637145265160790083)))
 #+end_example
+
+*** System Query Option $orderby
+
+The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. If asc or desc not specified, then the resources will be ordered in ascending order. The request below orders Trips on property EndsAt in descending order.
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "scottketchum")
+    (property "Trips")
+    ($orderby "EndsAt" :desc)
+    (fetch :collection))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+(((:trip-id . 2004) (:share-id . "f94e9116-8bdd-4dac-ab61-08438d0d9a71")
+  (:description . "Trip from Shanghai to Beijing") (:name . "Trip in Beijing")
+  (:budget . 11000) (:starts-at . "2014-02-01T00:00:00Z")
+  (:ends-at . "2014-02-04T00:00:00Z") (:tags "Travel" "Beijing"))
+ ((:trip-id . 0) (:share-id . "9d9b2fa0-efbf-490e-a5e3-bac8f7d47354")
+  (:description
+   . "Trip from San Francisco to New York City. Nice trip with two friends. It is a 4 days' trip. We actually had a client meeting, but we also took one to go sightseeings in New York.")
+  (:name . "Trip in US") (:budget . 3000) (:starts-at . "2014-01-01T00:00:00Z")
+  (:ends-at . "2014-01-04T00:00:00Z")
+  (:tags "Trip in New York" "business" "sightseeing")))
+#+end_example
+
+
+
