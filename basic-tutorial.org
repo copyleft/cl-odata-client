@@ -597,7 +597,7 @@ Updatable OData services support Create, Update and Delete operation for some or
 
 To create an entity in a collection, the client sends a POST request to that collection's URL. The POST body MUST contain a single valid entity representation. The request below creates a Person which contains complex type and collection property. 
 
-#+BEGIN_SRC lisp :exports both :results pp :session 
+#+BEGIN_SRC lisp :exports both :results output :session 
 
 (defparameter *p* '(("@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
                               ("UserName" . "teresa")
@@ -605,13 +605,32 @@ To create an entity in a collection, the client sends a POST request to that col
                               ("LastName" . "Gilbert")
                               ("Gender" . "Female")
                               ("Emails" . ("teresa@example.com" "teresa@contoso.com"))
-                              ("AddressInfo" . (("Address" . "1 Suffolk Ln.")
+                              ("AddressInfo" . ((("Address" . "1 Suffolk Ln.")
                                                 ("City" . (("CountryRegion" . "United States")
                                                            ("Name" . "Boise")
-                                                           ("Region" . "ID")))))))
+                                                           ("Region" . "ID"))))))))
 
-(-> +trip-pin-modify+
+(princ 
+  (-> +trip-pin-modify+
     (collection "People")
-    (post *p*))
+    (post *p*)))
 
 #+END_SRC
+
+#+RESULTS:
+#+begin_example
+((odata-context
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/$metadata#People/$entity)
+ (odata-id
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('teresa'))
+ (odata-etag . W/"08D799ECFD4995C4")
+ (odata-edit-link
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('teresa'))
+ (user-name . teresa) (first-name . Teresa) (last-name . Gilbert)
+ (emails teresa@example.com teresa@contoso.com)
+ (address-info
+  ((address . 1 Suffolk Ln.)
+   (city (country-region . United States) (name . Boise) (region . ID))))
+ (gender . Female) (concurrency . 637147115437004228))
+#+end_example
+
