@@ -45,6 +45,20 @@
         (error "OData request error (~a): ~a" status (accesses json :error :message)))
       json)))
 
+(defun odata-patch (uri data &key (json-encode t))
+  (multiple-value-bind (response status)
+      (drakma:http-request (quri:render-uri uri)
+                           :preserve-uri t
+                           :content (if json-encode
+                                        (json:encode-json-to-string data)
+                                        data)
+                           :additional-headers '(("OData-Version" . "4.0"))
+                           :content-type "application/json;odata.metadata=minimal"
+                           :accept "application/json"
+                           :method :patch)
+    (when (>= status 400)
+      (error "OData request error (~a)" status))))
+
 (defun call-with-odata-base (base func)
   (let ((*odata-base* base))
     (funcall func)))

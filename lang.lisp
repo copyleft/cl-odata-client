@@ -3,6 +3,10 @@
   (:export :singleton
            :fetch
            :post
+           :create
+           :del
+           :update
+           :patch
            :property
            :collection
            :$filter
@@ -28,6 +32,18 @@
 
 (defun post (url data)
   (odata::odata-post url data))
+
+(defun create (url data)
+  (post url data))
+
+(defun del (url)
+  (drakma:http-request (quri:render-uri url) :method :delete))
+
+(defun patch (url data)
+  (odata::odata-patch url data))
+
+(defun update (url data)
+  (patch url data))
 
 (defun property (url name)
   (quri:uri (format nil "~a/~a" url

@@ -634,3 +634,30 @@ To create an entity in a collection, the client sends a POST request to that col
  (gender . Female) (concurrency . 637147115437004228))
 #+end_example
 
+*** Remove an Entity
+
+The request below deletes the Person with UserName 'vincentcalabrese'.
+DELETE serviceRoot/People('vincentcalabrese') 
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "vincentcalabrese")
+    (del))
+#+END_SRC
+
+#+RESULTS:
+: 
+: nil
+
+*** Update an Entity
+
+The OData services SHOULD support PATCH as the preferred means of updating an entity. But also services MAY additionally support PUT. The request below update the Emails of a person using PATCH. 
+
+#+BEGIN_SRC lisp :exports both :results output :session 
+(-> +trip-pin-modify+
+   (collection "People")
+   (id "russellwhyte")
+   (update '(("@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
+             ("Emails" . ("Russell@example.com" "Russell@contoso.com" "newRussell@contoso.com")))))
+#+END_SRC
