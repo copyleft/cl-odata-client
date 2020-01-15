@@ -574,3 +574,44 @@ The $select system query option allows the clients to requests a limited set of 
   (:name . "Sydney Airport") (:icao-code . "YSSY")))
 #+end_example
 
+*** System Query Option $search
+
+The $search system query option restricts the result to include only those entities matching the specified search expression. The definition of what it means to match is dependent upon the implementation. The request below get all People who has 'Boise' in their contents.
+
+serviceRoot/People?$search=Boise
+
+
+*** Lambda Operators
+
+OData defines two operators any and all that evaluate a Boolean expression on a collection. They can work on either collection properties or collection of entities.
+
+The request below returns People with Emails containing "ll@contoso.com". The Emails is a collection of primitive type string.
+
+GET serviceRoot/People?$filter=Emails/any(s:endswith(s, 'contoso.com'))
+
+** Data Modification
+
+Updatable OData services support Create, Update and Delete operation for some or all exposed entities.
+
+*** Create an Entity
+
+To create an entity in a collection, the client sends a POST request to that collection's URL. The POST body MUST contain a single valid entity representation. The request below creates a Person which contains complex type and collection property. 
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+
+(defparameter *p* '(("@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
+                              ("UserName" . "teresa")
+                              ("FirstName" . "Teresa")
+                              ("LastName" . "Gilbert")
+                              ("Gender" . "Female")
+                              ("Emails" . ("teresa@example.com" "teresa@contoso.com"))
+                              ("AddressInfo" . (("Address" . "1 Suffolk Ln.")
+                                                ("City" . (("CountryRegion" . "United States")
+                                                           ("Name" . "Boise")
+                                                           ("Region" . "ID")))))))
+
+(-> +trip-pin-modify+
+    (collection "People")
+    (post *p*))
+
+#+END_SRC

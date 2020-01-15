@@ -2,6 +2,7 @@
   (:use :cl :odata :access)
   (:export :singleton
            :fetch
+           :post
            :property
            :collection
            :$filter
@@ -24,6 +25,9 @@
     (:collection (access (fetch url) :value))
     (:value (access (fetch url) :value))
     (t (odata::odata-get url))))
+
+(defun post (url data)
+  (odata::odata-post url data))
 
 (defun property (url name)
   (quri:uri (format nil "~a/~a" url

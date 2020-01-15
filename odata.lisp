@@ -29,6 +29,22 @@
   (apply #'odata-get (quri:merge-uris uri *odata-base*)
          args))
 
+(defun odata-post (uri data &key (json-encode t))
+  (multiple-value-bind (response status)
+      (drakma:http-request (quri:render-uri uri)
+                           :preserve-uri t
+                           :content (if json-encode
+                                        (json:encode-json-to-string data)
+                                        data)
+                           :additional-headers '(("OData-Version" . "4.0"))
+                           :content-type "application/json;odata.metadata=minimal"
+                           :accept "application/json"
+                           :method :post)
+    (let ((json (json:decode-json-from-string response)))
+      (when (>= status 400)
+        (error "OData request error (~a): ~a" status (accesses json :error :message)))
+      json)))
+
 (defun call-with-odata-base (base func)
   (let ((*odata-base* base))
     (funcall func)))
