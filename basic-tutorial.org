@@ -518,7 +518,7 @@ The $expand system query option specifies the related resources to be included i
    (:gender . "Male") (:concurrency . 637147089402046779))))
 #+end_example
 
-System Query Option $select
+*** System Query Option $select
 
 The $select system query option allows the clients to requests a limited set of properties for each entity or complex type. The request below returns Name and IcaoCode of all Airports.
 
