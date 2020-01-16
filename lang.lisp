@@ -21,6 +21,7 @@
            :$value
            :$orderby
            :$select
+           :$search
            :$ref))
 
 (in-package :odata/lang)
@@ -99,6 +100,9 @@
 
 (defun $select (url exp)
   (parameter url "$select" (odata::compile-$select exp)))
+
+(defun $search (url exp)
+  (parameter url "$search" (odata::compile-$search exp)))
 
 (defun $top (url top)
   (check-type top integer)

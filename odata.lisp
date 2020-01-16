@@ -383,6 +383,9 @@
 ;; (compile-$select "foo,bar")
 ;; (compile-$select '("foo" "bar"))
 
+(defun compile-$search (exp)
+  exp)
+
 (defmethod def-service (service (entity-set odata/metamodel::entity-set))
   (let ((fetch-fn-name (intern (format nil "FETCH-~a" (string-upcase (odata/metamodel::name entity-set)))))
         (fetch-fn-by-id-name (intern (format nil "FETCH-~a-BY-ID"
