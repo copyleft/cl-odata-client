@@ -35,7 +35,7 @@
     (:value (access (fetch url) :value))
     (t (odata::odata-get url))))
 
-(defun post (url data)
+(defun post (url &optional data)
   (odata::odata-post url data))
 
 (defun link (url data)

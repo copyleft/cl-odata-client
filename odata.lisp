@@ -40,6 +40,8 @@
                            :content-type "application/json;odata.metadata=minimal"
                            :accept "application/json"
                            :method :post)
+    (if (= status 204) ;; no content
+        (return-from odata-post nil))
     (let ((json (json:decode-json-from-string response)))
       (when (>= status 400)
         (error "OData request error (~a): ~a" status (accesses json :error :message)))

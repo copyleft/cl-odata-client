@@ -756,3 +756,25 @@ The request below returns the favorite airline of a person, in TripPin service, 
 :   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airlines('AA')")
 :  (:airline-code . "AA") (:name . "American Airlines"))
 
+
+*** Invoking Unbound Actions
+
+TripPin currently has no scenario supported for unbound actions.
+
+*** Invoking Bound Actions
+
+The action below shares a trip to one of his friend. In TripPin service, by "share a trip" we mean that the owner and his friend now both have the trip and the trip share the same ShareId property.
+
+#+BEGIN_SRC lisp :exports both :results pp :session
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (path "Microsoft.OData.SampleService.Models.TripPin.ShareTrip")
+    (post '(("userName" . "scottketchum")
+            ("tripId" . 0))))
+#+END_SRC
+
+#+RESULTS:
+: 
+: nil
+
