@@ -661,3 +661,23 @@ The OData services SHOULD support PATCH as the preferred means of updating an en
    (update '(("@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
              ("Emails" . ("Russell@example.com" "Russell@contoso.com" "newRussell@contoso.com")))))
 #+END_SRC
+
+*** Relationship Operations
+
+Relationships from one entity to another are represented as navigation properties.
+Link to Related Entities
+
+A successful POST request to a navigation property's references collection adds a relationship to an existing entity. The request below adds 'vincentcalabrese' to friends of 'scottketchum'.
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+   (collection "People") (id "scottketchum")
+   (property "Friends") ($ref)
+   (link `(("@odata.context" . ,(quri:render-uri +trip-pin-modify+))
+           ("@odata.id" . "People('vincentcalabrese')"))))
+#+END_SRC
+
+#+RESULTS:
+: 
+: nil
+

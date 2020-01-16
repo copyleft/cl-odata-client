@@ -7,6 +7,7 @@
            :del
            :update
            :patch
+           :link
            :property
            :collection
            :$filter
@@ -16,7 +17,8 @@
            :$top
            :$value
            :$orderby
-           :$select))
+           :$select
+           :$ref))
 
 (in-package :odata/lang)
 
@@ -33,11 +35,24 @@
 (defun post (url data)
   (odata::odata-post url data))
 
+(defun link (url data)
+  (multiple-value-bind (response status)
+      (drakma:http-request (quri:render-uri url)
+                           :method :post
+                           :preserve-uri t
+                           :content (json:encode-json-to-string data)
+                           :content-type "application/json"
+                           :accept "application/json")
+    (when (>= status 400)
+      (error "Error ~a: ~a" status (accesses (json:decode-json-from-string response) :error :message)))))
+  
+
 (defun create (url data)
   (post url data))
 
 (defun del (url)
-  (drakma:http-request (quri:render-uri url) :method :delete))
+  (drakma:http-request (quri:render-uri url) :method :delete
+                       :preserve-uri t))
 
 (defun patch (url data)
   (odata::odata-patch url data))
@@ -86,3 +101,6 @@
   (check-type order (member :asc :desc))
   (parameter url "$orderby" (format nil "~a ~a" property
                                     (string-downcase (princ-to-string order)))))
+
+(defun $ref (url)
+  (property url "$ref"))
