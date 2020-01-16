@@ -681,3 +681,18 @@ A successful POST request to a navigation property's references collection adds 
 : 
 : nil
 
+*** Change a Link
+
+A successful PUT request to a single-valued navigation property’s reference resource changes the related entity. The request below change the Airline of a Flight.
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+              (collection "People")
+              (id "russellwhyte")
+              (path "Trips(0)"
+                    "PlanItems(11)"
+                    "Microsoft.OData.SampleService.Models.TripPin.Flight"
+                    "Airline")
+              (update-link `(("@odata.context" . ,(quri:render-uri +trip-pin-modify+))
+           ("@odata.id" . "Airlines('FM')"))))
+#+END_SRC

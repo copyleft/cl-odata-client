@@ -8,6 +8,8 @@
            :update
            :patch
            :link
+           :path
+           :update-link
            :property
            :collection
            :$filter
@@ -39,6 +41,17 @@
   (multiple-value-bind (response status)
       (drakma:http-request (quri:render-uri url)
                            :method :post
+                           :preserve-uri t
+                           :content (json:encode-json-to-string data)
+                           :content-type "application/json"
+                           :accept "application/json")
+    (when (>= status 400)
+      (error "Error ~a: ~a" status (accesses (json:decode-json-from-string response) :error :message)))))
+
+(defun update-link (url data)
+  (multiple-value-bind (response status)
+      (drakma:http-request (quri:render-uri url)
+                           :method :put
                            :preserve-uri t
                            :content (json:encode-json-to-string data)
                            :content-type "application/json"
@@ -104,3 +117,10 @@
 
 (defun $ref (url)
   (property url "$ref"))
+
+(defun path (url &rest path)
+  (let ((uri url))
+    (loop
+       for x in path
+       do (setf uri (property uri x)))
+    uri))
