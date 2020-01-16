@@ -734,3 +734,25 @@ The function below returns the nearest airport with the input geography point.
    (:crs (:type . "name") (:properties (:name . "EPSG:4326"))))))
 #+end_example
 
+*** Invoking Bound Functions
+
+The request below returns the favorite airline of a person, in TripPin service, "favorite airline" means airline which user choose most times. The function GetFavoriteAirline() is bound to Person.
+
+#+BEGIN_SRC lisp :exports both :results pp :session
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (fcall "Microsoft.OData.SampleService.Models.TripPin.GetFavoriteAirline")
+    (fetch))
+#+END_SRC
+
+#+RESULTS:
+: 
+: ((:odata-context
+:   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/$metadata#Airlines/$entity")
+:  (:odata-id
+:   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airlines('AA')")
+:  (:odata-edit-link
+:   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airlines('AA')")
+:  (:airline-code . "AA") (:name . "American Airlines"))
+
