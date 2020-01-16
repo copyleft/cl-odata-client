@@ -12,6 +12,7 @@
            :update-link
            :property
            :collection
+           :fcall
            :$filter
            :$expand
            :id
@@ -124,3 +125,23 @@
        for x in path
        do (setf uri (property uri x)))
     uri))
+
+(defun fcall (url name &rest args)
+  (property url
+            (with-output-to-string (s)
+              (flet ((print-arg (arg)
+                       (princ (odata::lisp-to-camel-case (string (car arg))) s)
+                       (princ "=" s)
+                       (princ (cdr arg) s)))
+                (princ (if (stringp name) name
+                           (string-upcase (odata::lisp-to-camel-case (string name)) :end 1))
+                       s)
+                (princ "(" s)
+                (when args
+                  (let ((args (alexandria:plist-alist args)))
+                    (print-arg (first args))
+                    (loop
+                       for arg in (rest args)
+                       do (princ "," s)
+                       do (print-arg arg))))
+                (princ ")" s)))))

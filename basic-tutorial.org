@@ -696,3 +696,41 @@ A successful PUT request to a single-valued navigation property’s reference re
               (update-link `(("@odata.context" . ,(quri:render-uri +trip-pin-modify+))
            ("@odata.id" . "Airlines('FM')"))))
 #+END_SRC
+
+#+RESULTS:
+: 
+: nil
+
+*** Functions and Actions
+
+OData supports custom operations (Actions and Functions). Functions are operations exposed by an OData service that MUST return data and MUST have no observable side effects. Actions are operations exposed by an OData service that MAY have side effects when invoked. Functions and actions both MAY bound to an entity type, primitive type, complex type, or a collection.
+
+**** Invoking Unbound Functions
+
+The function below returns the nearest airport with the input geography point.
+
+
+#+BEGIN_SRC lisp :exports both :results pp :session 
+(-> +trip-pin-modify+
+    (fcall 'get-nearest-airport :lat 33 :lon -118)
+    (fetch))
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/$metadata#Airports/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airports('KLAX')")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airports('KLAX')")
+ (:icao-code . "KLAX") (:name . "Los Angeles International Airport")
+ (:iata-code . "LAX")
+ (:location (:address . "1 World Way, Los Angeles, CA, 90045")
+  (:city (:country-region . "United States") (:name . "Los Angeles")
+   (:region . "California"))
+  (:loc (:type . "Point") (:coordinates -118.40806 33.9425)
+   (:crs (:type . "name") (:properties (:name . "EPSG:4326"))))))
+#+end_example
+
