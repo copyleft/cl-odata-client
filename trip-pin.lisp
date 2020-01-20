@@ -46,11 +46,20 @@
     (collection "People")
     (fetch :collection))
 
+(-> +trip-pin-modify+
+    (collection "People")
+    (fetch '(:collection-of |Microsoft.OData.SampleService.Models.TripPin|:person)))
+
 ;; get by id
 (-> +trip-pin-modify+
     (collection "People")
     (id "russellwhyte")
     (fetch))
+
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (fetch '|Microsoft.OData.SampleService.Models.TripPin|:person))
 
 ;; See: https://www.odata.org/getting-started/advanced-tutorial/
 ;; get singleton

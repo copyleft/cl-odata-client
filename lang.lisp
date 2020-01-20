@@ -31,10 +31,17 @@
                              (lisp-to-camel-case (string name))))))
 
 (defun fetch (url &optional type)
-  (case type
-    (:collection (access (fetch url) :value))
-    (:value (access (fetch url) :value))
-    (t (odata::odata-get url))))
+  (let ((data (odata::odata-get url)))
+    (cond
+      ((eql type :collection) (access data :value))
+      ((eql type :value) (access data :value))
+      ((and (listp type)
+            (eql (first type) :collection-of))
+       (loop for li in (access data :value)
+          collect (unserialize li (second type))))
+      ((symbolp type)
+       (unserialize data type))
+      (t data))))
 
 (defun post (url &optional data)
   (odata::odata-post url data))
@@ -149,3 +156,10 @@
                        do (princ "," s)
                        do (print-arg arg))))
                 (princ ")" s)))))
+
+(defun serialize (object)
+  (with-output-to-string (s)
+    (odata::serialize object s)))
+
+(defun unserialize (data type)
+  (odata::unserialize data type))
