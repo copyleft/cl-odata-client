@@ -14,7 +14,7 @@ OData services support requests for data via HTTP GET requests.
 
 The request below returns the the collection of Person People.
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports both :results pp :session 
 (-> +trip-pin-modify+
     (collection "People")
     (fetch :collection))
@@ -108,7 +108,7 @@ The request below returns the the collection of Person People.
 
 Also, it is possible to unserialize the data to metamodels:
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports both :results pp :session 
 (-> +trip-pin-modify+
     (collection "People")
     (fetch '(:collection-of |Microsoft.OData.SampleService.Models.TripPin|:person))))
