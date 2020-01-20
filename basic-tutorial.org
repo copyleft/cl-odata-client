@@ -105,6 +105,25 @@ The request below returns the the collection of Person People.
   (:address-info) (:gender . "Male") (:concurrency . 637145265160790083)))
 #+end_example
 
+Also, it is possible to unserialize the data to metamodels:
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (fetch '(:collection-of |Microsoft.OData.SampleService.Models.TripPin|:person))))
+#+END_SRC
+
+#+RESULTS:
+: 
+: (#<|Microsoft.OData.SampleService.Models.TripPin|:person {1007A5D2D3}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007A6DD13}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007ACED63}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007ADA043}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AEB4E3}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AECB13}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AFD983}>
+:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AFEFA3}>)
+
 ** Requesting an Individual Entity by ID
 
 The request below returns an individual entity of type Person by the given UserName "russellwhyte"
@@ -134,6 +153,19 @@ The request below returns an individual entity of type Person by the given UserN
     (:region . "ID"))))
  (:gender . "Male") (:concurrency . 637145265160790083))
 #+end_example
+
+And unserialize it to a model object:
+
+#+BEGIN_SRC lisp :exports both :results pp :session  
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (fetch '|Microsoft.OData.SampleService.Models.TripPin|:person))
+#+END_SRC
+
+#+RESULTS:
+: 
+: #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007C0CEB3}>
 
 ** Requesting an Individual Property
 
