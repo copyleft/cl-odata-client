@@ -9,7 +9,8 @@ The Open Data Protocol (OData) is a data access protocol built on core protocols
 ** Requesting Data
 
 OData services support requests for data via HTTP GET requests.
-Requesting Entity Collections
+
+*** Requesting Entity Collections
 
 The request below returns the the collection of Person People.
 
