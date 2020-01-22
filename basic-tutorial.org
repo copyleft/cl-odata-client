@@ -16,7 +16,7 @@ The Open Data Protocol (OData) is a data access protocol built on core protocols
 
 We start by defining a package:
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (defpackage :odata.trip-pin
   (:use :cl :odata :odata/lang :cl-arrows :access))
 
@@ -24,13 +24,13 @@ We start by defining a package:
 #+END_SRC
 
 and declaring the service urls:
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (defparameter +trip-pin-base+ "https://services.odata.org/V4/TripPinServiceRW")
 #+END_SRC
 
 TripPin services uses a special url for read/write, so we get that:
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (defparameter +trip-pin-modify+
   (multiple-value-bind (response status headers modify-url)
       (drakma:http-request +trip-pin-base+)
@@ -39,7 +39,7 @@ TripPin services uses a special url for read/write, so we get that:
 
 Then we load the service metadata:
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (defparameter +trip-pin-metadata+
   (odata/metamodel::parse-metamodel
    (probe-file
@@ -50,7 +50,7 @@ We are loading it from a file. Metadata is available at @odata.context url of th
 
 CL-OData generates code from the service metadata:
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (odata::def-packages #.+trip-pin-metadata+)
 (odata::def-enums #.+trip-pin-metadata+)
 (odata::def-entities #.+trip-pin-metadata+)
@@ -60,7 +60,7 @@ CL-OData generates code from the service metadata:
 The result of that is a declaration of a new package based on the schema namespace, and CLOS objects, and methods and functions based on the metadata spec. 
 
 In this case: 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (progn
  (defpackage |Microsoft.OData.SampleService.Models.TripPin|
    (:export :metadata
@@ -93,7 +93,7 @@ In this case:
 
 And functions for fetching data are generated (fetch-<entities> and fetch-<entities>-by-id):
 
-#+BEGIN_SRC lisp :exports source :results pp :session 
+#+BEGIN_SRC lisp :exports code :results pp :session 
 (defun fetch-photos (&key odata::$filter odata::$expand)
     (odata::odata-get-entities "Photos"
                                '|Microsoft.OData.SampleService.Models.TripPin|:photo
