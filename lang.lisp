@@ -33,6 +33,7 @@
 (defun fetch (url &optional type)
   (let ((data (odata::odata-get url)))
     (cond
+      ((null type) data)
       ((eql type :collection) (access data :value))
       ((eql type :value) (access data :value))
       ((and (listp type)
