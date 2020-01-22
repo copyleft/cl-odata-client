@@ -403,7 +403,8 @@
           ,(access service :url)
           ',(intern (camel-case-to-lisp (getf (odata/metamodel::entity-type entity-set) :type))
                     (intern (getf (odata/metamodel::entity-type entity-set) :namespace)))
-          id)))))
+          id))
+       (export '(,fetch-fn-name ,fetch-fn-by-id-name)))))
 
 (defmethod def-service (service (singleton odata/metamodel::singleton))
   ;; TODO

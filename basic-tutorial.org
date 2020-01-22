@@ -2,9 +2,113 @@
 
 This is CL-ODATA version of TripPin tutorial. See the original tutorial at: https://www.odata.org/getting-started/basic-tutorial/
 
+The tutorial uses a sample service called TripPin based on OData V4. Generally speaking, TripPin provides a service that can manage people's trips. The service is designed for below purposes:
+
+Build a service that will cover as many features for OData V4 as possible.
+Build a more real world service, and will use it to build an end-to-end ecosystem.
+Make a service reference for developers to follow when they try to build an OData service.
+
+https://services.odata.org/V4/TripPinServiceRW
+
 ** Introduction
 
 The Open Data Protocol (OData) is a data access protocol built on core protocols like HTTP and commonly accepted methodologies like REST for the web. There are various kinds of libraries and tools can be used to consume OData services. But for beginners and those who want to write their own libraries, the pure HTTP requests and responses are also very important. This documentation will not cover every feature details for OData V4 services but will try to cover various typical scenarios. If you want to have a more detailed understanding, please refer to OData Documentation.
+
+We start by defining a package:
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(defpackage :odata.trip-pin
+  (:use :cl :odata :odata/lang :cl-arrows :access))
+
+(in-package :odata.trip-pin)
+#+END_SRC
+
+and declaring the service urls:
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(defparameter +trip-pin-base+ "https://services.odata.org/V4/TripPinServiceRW")
+#+END_SRC
+
+TripPin services uses a special url for read/write, so we get that:
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(defparameter +trip-pin-modify+
+  (multiple-value-bind (response status headers modify-url)
+      (drakma:http-request +trip-pin-base+)
+    (quri:uri (princ-to-string modify-url))))
+#+END_SRC
+
+Then we load the service metadata:
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(defparameter +trip-pin-metadata+
+  (odata/metamodel::parse-metamodel
+   (probe-file
+    (asdf:system-relative-pathname :odata "TripPin.xml"))))
+#+END_SRC
+
+We are loading it from a file. Metadata is available at @odata.context url of the service spec.
+
+CL-OData generates code from the service metadata:
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(odata::def-packages #.+trip-pin-metadata+)
+(odata::def-enums #.+trip-pin-metadata+)
+(odata::def-entities #.+trip-pin-metadata+)
+;; (odata::def-functions #.+trip-pin-metadata+)
+#+END_SRC
+
+The result of that is a declaration of a new package based on the schema namespace, and CLOS objects, and methods and functions based on the metadata spec. 
+
+In this case: 
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(progn
+ (defpackage |Microsoft.OData.SampleService.Models.TripPin|
+   (:export :metadata
+            :person-gender
+            :city
+            :location
+            :event-location
+            :airport-location
+            :photo
+            :person
+            :airline
+            :airport
+            :plan-item
+            :public-transportation
+            :flight
+            :event
+            :trip
+            :get-favorite-airline
+            :get-involved-people
+            :get-friends-trips
+            :get-nearest-airport
+            :reset-data-source
+            :share-trip
+            :default-container
+            :||))
+ (setf (symbol-value
+        (intern "METADATA" '|Microsoft.OData.SampleService.Models.TripPin|))
+         #<odata/metamodel::schema {10082FEAC3}>))
+#+END_SRC
+
+And functions for fetching data are generated (fetch-<entities> and fetch-<entities>-by-id):
+
+#+BEGIN_SRC lisp :exports source :results pp :session 
+(defun fetch-photos (&key odata::$filter odata::$expand)
+    (odata::odata-get-entities "Photos"
+                               '|Microsoft.OData.SampleService.Models.TripPin|:photo
+                               :$filter
+                               (when odata::$filter
+                                 (odata::compile-$filter odata::$filter))
+                               :$expand
+                               (when odata::$expand
+                                 (odata::compile-$expand odata::$expand))))
+
+(defun fetch-photo-by-id (odata::id &rest odata::args)
+    (odata::odata-get-entity-by-id "Photos"
+                                   '|Microsoft.OData.SampleService.Models.TripPin|:photo
+                                   odata::id))
+#+END_SRC
 
 ** Requesting Data
 
