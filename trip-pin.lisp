@@ -25,8 +25,13 @@
    (probe-file
     (asdf:system-relative-pathname :odata "TripPin.xml"))))
 
+;; Load service spec from url
+#+nil(defparameter +trip-pin-service-spec+
+       (json:decode-json-from-source (drakma:http-request +trip-pin-base+)))
+
+;; Load service spec from file
 (defparameter +trip-pin-service-spec+
-  (json:decode-json-from-source (drakma:http-request +trip-pin-base+)))
+  (json:decode-json-from-source (asdf:system-relative-pathname :odata "TripPin.json")))
 
 (setf drakma:*header-stream* *standard-output*)
 

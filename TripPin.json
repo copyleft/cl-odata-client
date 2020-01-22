@@ -1,0 +1,36 @@
+{
+    "@odata.context": "http://services.odata.org/V4/(S(ql133ucw0iwda5toaztamuir))/TripPinServiceRW/$metadata",
+    "value": [
+        {
+            "name": "Photos",
+            "kind": "EntitySet",
+            "url": "Photos"
+        },
+        {
+            "name": "People",
+            "kind": "EntitySet",
+            "url": "People"
+        },
+        {
+            "name": "Airlines",
+            "kind": "EntitySet",
+            "url": "Airlines"
+        },
+        {
+            "name": "Airports",
+            "kind": "EntitySet",
+            "url": "Airports"
+        },
+        {
+            "name": "Me",
+            "kind": "Singleton",
+            "url": "Me"
+        },
+        {
+            "name": "GetNearestAirport",
+            "kind": "FunctionImport",
+            "url": "GetNearestAirport"
+        }
+    ]
+
+}
