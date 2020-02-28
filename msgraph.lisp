@@ -3,6 +3,13 @@
 
 (in-package :msgraph)
 
+(defvar +appid+)
+(defvar +tenantid+)
+(defvar +appname+)
+(defvar +appname+)
+(defvar +client-secret+)
+(defvar +redirect-uri+)
+
 (defparameter +msgraph-metadata+
   (odata/metamodel::parse-metamodel
    (probe-file (asdf:system-relative-pathname :odata "msgraph.xml"))))

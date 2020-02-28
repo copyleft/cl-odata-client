@@ -6,7 +6,7 @@
 (load (asdf:system-relative-pathname :odata "msgraph.lisp"))
 
 (defpackage :contacts-app
-  (:use :cl :odata/lang :easy-routes :cl-who :msgraph :cl-arrows))
+  (:use :cl :odata/lang :easy-routes :cl-who :msgraph :cl-arrows :access))
 
 (in-package :contacts-app)
 
@@ -30,7 +30,7 @@
     (path "contacts")
     (fetch :collection)))
 
-(defun get-contact (id)
+(defun get-contact (user id)
   (-> msgraph::+msgraph+
     (path "users" user)
     (path "contacts" id)
@@ -49,8 +49,8 @@
 
 (defroute show-contact ("/contacts/:id")
     (&path (id 'integer))
-  (who:with-html-output ()
-    (get-contact id)))
+  (who:with-html-output (*html*)
+    (get-contact +mariano+ id)))
 
 (defun show-contacts-list (user)
   (who:with-html-output (*html*)
@@ -58,6 +58,9 @@
      (loop
         for contact in (get-contacts user)
         do
-          (who:htm (:li (:a :href (genurl 'show-contact (access contact :id))
+          (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id))
                             (who:str (access contact :given-name))
                             (who:str (access contact :surname)))))))))
+
+(defun start-app ()
+  (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
