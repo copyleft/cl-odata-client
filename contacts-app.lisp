@@ -48,9 +48,16 @@
         (str "New contact"))))
 
 (defroute show-contact ("/contacts/:id")
-    (&path (id 'integer))
-  (who:with-html-output (*html*)
-    (get-contact +mariano+ id)))
+    (&path (id 'string))
+  (let ((contact (get-contact +mariano+ id)))
+    (with-html-page
+      (:form
+       (:label "Name") (:label (str (access contact :given-name))) (:br)
+       (:label "Surname") (:label (str (access contact :surname))) (:br)
+       (:label "Email") (:label (str (accesses contact :email-addresses 'first :address)))(:br)
+       (:label "Phone") (:label (str (accesses contact :business-phones 'first)))
+       
+    ))))
 
 (defroute create-contact-page ("/contacts/new")
     ()
