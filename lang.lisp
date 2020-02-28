@@ -27,8 +27,9 @@
 (in-package :odata/lang)
 
 (defun singleton (url name)
-  (quri:uri (format nil "~a~a" url (if (stringp name) name
-                             (lisp-to-camel-case (string name))))))
+  (quri:uri (format nil "~a~a" url
+                    (if (stringp name) name
+                        (lisp-to-camel-case (string name))))))
 
 (defun fetch (url &optional type)
   (let ((data (odata::odata-get url)))

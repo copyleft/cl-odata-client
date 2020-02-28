@@ -9,6 +9,7 @@
       'camel-case-to-lisp)
 
 (defvar *odata-base*)
+(defvar *access-token*)
 
 (defun odata-get (url &key $filter $expand)
   (let ((url* (if (stringp url)
@@ -19,7 +20,13 @@
     (when $expand
       (push (cons "$expand" $expand) (quri:uri-query-params url*)))
     (multiple-value-bind (response status)
-        (drakma:http-request (quri:render-uri url*) :preserve-uri t)
+        (drakma:http-request (quri:render-uri url*)
+                             :preserve-uri t
+                             :additional-headers (when *access-token*
+                                                   (list (cons "Authorization"
+                                                               (format nil "~a ~a"
+                                                                       (access:access *access-token* :token-type)
+                                                                       (access:access *access-token* :access-token))))))
       (let ((json (json:decode-json-from-string response)))
         (when (>= status 400)
           (error "OData request error (~a): ~a" status (accesses json :error :message)))
@@ -36,7 +43,11 @@
                            :content (if json-encode
                                         (json:encode-json-to-string data)
                                         data)
-                           :additional-headers '(("OData-Version" . "4.0"))
+                           :additional-headers (when *access-token*
+                                                 (list (cons "Authorization"
+                                                             (format nil "~a ~a"
+                                                                     (access:access *access-token* :token-type)
+                                                                     (access:access *access-token* :access-token)))))
                            :content-type "application/json;odata.metadata=minimal"
                            :accept "application/json"
                            :method :post)
