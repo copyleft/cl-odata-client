@@ -22,8 +22,6 @@
 
 (defparameter +mariano+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
 
-(setf odata::*access-token* (msgraph::get-msgraph-api-token :tenant msgraph::+tenantid+))
-
 (defun get-contacts (user)
   (-> msgraph::+msgraph+
     (path "users" user)
@@ -63,4 +61,5 @@
                             (who:str (access contact :surname)))))))))
 
 (defun start-app ()
+  (setf odata::*access-token* (msgraph::get-msgraph-api-token :tenant msgraph::+tenantid+))
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
