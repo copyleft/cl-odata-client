@@ -43,12 +43,35 @@
 (defroute home ("/")
     ()
   (with-html-page
-    (show-contacts-list +mariano+)))
+    (show-contacts-list +mariano+)
+    (:a :href (genurl 'create-contact-page)
+        (str "New contact"))))
 
 (defroute show-contact ("/contacts/:id")
     (&path (id 'integer))
   (who:with-html-output (*html*)
     (get-contact +mariano+ id)))
+
+(defroute create-contact-page ("/contacts/new")
+    ()
+  (with-html-page
+    (:form :method "POST"
+     (:label "Name") (:input :name "name") (:br)
+     (:label "Surname") (:input :name "surname") (:br)
+     (:label "Email") (:input :name "email")(:br)
+     (:label "Phone") (:input :name "phone")(:br)
+     (:input :type "submit" :value "Create"))))
+
+(defroute save-contact ("/contacts/new" :method :post)
+    (&post name surname email phone)
+  (create-contact +mariano+
+                  `((:given-name . ,name)
+                    (:surname . ,surname)
+                    (:email-addresses
+                     ((:address . ,email)
+                      (:name . ,(concatenate 'string name " " surname))))
+                    (:businessPhones . (,phone))))
+  (redirect (genurl 'home)))
 
 (defun show-contacts-list (user)
   (who:with-html-output (*html*)
