@@ -1,9 +1,11 @@
 (defpackage :contacts-app
-  (:use :cl :msgraph :odata/lang :easy-routes :cl-who :cl-arrows :access))
+  (:use :cl :msgraph :odata/lang :easy-routes :cl-who :cl-arrows :access)
+  (:export :start-app))
 
 (in-package :contacts-app)
 
 (defvar *html*)
+(defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
 
 (defmacro with-html-page (&body body)
   `(who:with-html-output-to-string (*html*)
@@ -12,8 +14,6 @@
        (:title "Contacts"))
       (:body
        ,@body))))
-
-(defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
 
 (defun get-contacts (user)
   (-> msgraph::+msgraph+
