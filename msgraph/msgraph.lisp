@@ -75,6 +75,7 @@
    (lambda (token)
      (odata::odata-post
       url
+      data
       :authorization (format nil "~a ~a"
                              (access:access *ms-token* :token-type)
                              (access:access *ms-token* :access-token))

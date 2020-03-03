@@ -11,27 +11,32 @@
   `(who:with-html-output-to-string (*html*)
      (:html
       (:head
-       (:title "Contacts"))
+       (:title "Contacts")
+       (:link :rel "stylesheet" :href "https://unpkg.com/purecss@1.0.1/build/pure-min.css" :integrity "sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" :crossorigin"anonymous"))
       (:body
        ,@body))))
 
 (defun get-contacts (user)
   (-> msgraph::+msgraph+
-    (path "users" user)
-    (path "contacts")
-    (fetch :collection)))
+      (collection "users")
+      (id user)
+      (collection "contacts")
+      (fetch :collection)))
 
 (defun get-contact (user id)
   (-> msgraph::+msgraph+
-    (path "users" user)
-    (path "contacts" id)
-    (fetch)))
+      (collection "users")
+      (id user)
+      (collection "contacts")
+      (id id)
+      (fetch)))
 
 (defun create-contact (user contact)
   (-> msgraph::+msgraph+
-    (path "users" user)
-    (path "contacts")
-    (post contact)))
+      (collection "users")
+      (id user)
+      (collection "contacts")
+      (post contact)))
 
 (defroute home ("/")
     ()
@@ -44,23 +49,33 @@
     (&path (id 'string))
   (let ((contact (get-contact +appuser+ id)))
     (with-html-page
-      (:form
-       (:label "Name") (:label (str (access contact :given-name))) (:br)
-       (:label "Surname") (:label (str (access contact :surname))) (:br)
-       (:label "Email") (:label (str (accesses contact :email-addresses 'first :address)))(:br)
-       (:label "Phone") (:label (str (accesses contact :business-phones 'first)))
-       
-    ))))
+      (:form :class "pure-form pure-form-stacked"
+             (:fieldset
+              (:label "Name")
+              (:label (str (access contact :given-name)))
+              (:label "Surname") (:label (str (access contact :surname)))
+              (:label "Email") (:label (str (accesses contact :email-addresses 'first :address)))
+              (:label "Phone")
+              (:label (str (accesses contact :business-phones 'first)))))
+
+       )))
 
 (defroute create-contact-page ("/contacts/new")
     ()
   (with-html-page
-    (:form :method "POST"
-     (:label "Name") (:input :name "name") (:br)
-     (:label "Surname") (:input :name "surname") (:br)
-     (:label "Email") (:input :name "email")(:br)
-     (:label "Phone") (:input :name "phone")(:br)
-     (:input :type "submit" :value "Create"))))
+    (:form :class "pure-form pure-form-aligned"
+           :method "POST"
+           (:legend "Create contact")
+           (:fieldset
+            (:div :class "pure-control-group"
+                  (:label "Name") (:input :name "name"))
+            (:div :class "pure-control-group"
+                  (:label "Surname") (:input :name "surname"))
+            (:div :class "pure-control-group"
+                  (:label "Email") (:input :name "email"))
+            (:div :class "pure-control-group"
+                  (:label "Phone") (:input :name "phone")))
+           (:input :type "submit" :value "Create"))))
 
 (defroute save-contact ("/contacts/new" :method :post)
     (&post name surname email phone)
@@ -70,7 +85,7 @@
                     (:email-addresses
                      ((:address . ,email)
                       (:name . ,(concatenate 'string name " " surname))))
-                    (:businessPhones . (,phone))))
+                    (:business-phones . (,phone))))
   (redirect (genurl 'home)))
 
 (defun show-contacts-list (user)
@@ -81,6 +96,7 @@
         do
           (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id))
                             (who:str (access contact :given-name))
+                            (who:str " ")
                             (who:str (access contact :surname)))))))))
 
 (defun start-app ()
