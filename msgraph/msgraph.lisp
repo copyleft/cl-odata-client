@@ -1,11 +1,6 @@
 (in-package :msgraph)
 
-(defvar +appid+)
-(defvar +tenantid+)
-(defvar +appname+)
-(defvar +appname+)
-(defvar +client-secret+)
-(defvar +redirect-uri+)
+(defvar *credentials*)
 
 (odata::def-enums #.+msgraph-metadata+)
 
@@ -18,24 +13,15 @@
 ;;(odata::def-packages #.+msgraph-metadata+)
 ;;(odata::def-entities #.+msgraph-metadata+)
 
-(defun authorize ()
-  (drakma:http-request "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-                       :parameters `(("client_id" . ,+appid+)
-                                     ("response_type" . "code")
-                                     ("redirect_uri" . ,+redirect-uri+)
-                                     ("response_mode" . "query")
-                                     ("scope" . "user.read")
-                                     ("state" . "12345"))))
-
 (defun get-msgraph-api-token (&key tenant scope)
   (json:decode-json-from-string
    (drakma:http-request
     (format nil "https://login.microsoftonline.com/~a/oauth2/v2.0/token"
             (or tenant "common"))
     :method :post
-    :parameters `(("client_id" . ,+appid+)
+    :parameters `(("client_id" . ,(getf *credentials* :appid))
                   ("scope" . ,(or scope "https://graph.microsoft.com/.default"))
-                  ("client_secret" . ,+client-secret+)
+                  ("client_secret" . ,(getf *credentials* :client-secret))
                   ("grant_type" . "client_credentials")))))
 
 (defun api-request (url token &rest args &key additional-headers &allow-other-keys)
@@ -56,7 +42,7 @@
 (defparameter *ms-token* nil)
 
 (defun get-msgraph-token ()
-  (setf *ms-token* (get-msgraph-api-token :tenant +tenantid+)))
+  (setf *ms-token* (get-msgraph-api-token :tenant (getf *credentials* :tenantid))))
 
 ;; OData wrappers for Microsoft API
 
@@ -71,7 +57,7 @@
       (when (equalp (odata::http-status e) 401)
         ;; Invalid token? Fetch another one
         (setf *ms-token* (get-msgraph-token))
-        (call-with-ms-token func :retries retries)))))
+        (call-with-ms-token func :retries (1- retries))))))
 
 (defun odata-get (url &rest args &key $filter $expand)
   (call-with-ms-token
