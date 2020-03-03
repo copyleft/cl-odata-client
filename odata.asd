@@ -3,7 +3,7 @@
 (asdf:defsystem #:odata
   :description "Common Lisp client library for OData"
   :author "Mariano Montone <marianomontone@gmail.com>"
-  :license  "Specify license here"
+  :license  "MIT"
   :version "0.0.1"
   :serial t
   :components ((:file "package")

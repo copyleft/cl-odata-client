@@ -1,6 +1,3 @@
-(defpackage msgraph
-  (:use :cl :cl-arrows :odata/lang :access))
-
 (in-package :msgraph)
 
 (defvar +appid+)
@@ -9,10 +6,6 @@
 (defvar +appname+)
 (defvar +client-secret+)
 (defvar +redirect-uri+)
-
-(defparameter +msgraph-metadata+
-  (odata/metamodel::parse-metamodel
-   (probe-file (asdf:system-relative-pathname :odata "msgraph.xml"))))
 
 (odata::def-enums #.+msgraph-metadata+)
 
@@ -58,5 +51,51 @@
 
 (defparameter +msgraph+ "https://graph.microsoft.com/v1.0")
 
-(defun msgraph-login ()
-  (setf odata::*access-token* (get-msgraph-api-token :tenant +tenantid+)))
+;; Special fetch/post for Microsoft API
+
+(defparameter *ms-token* nil)
+
+(defun get-msgraph-token ()
+  (setf *ms-token* (get-msgraph-api-token :tenant +tenantid+)))
+
+;; OData wrappers for Microsoft API
+
+(defun call-with-ms-token (func &key (retries 3))
+  (when (zerop retries)
+    (return-from call-with-ms-token))
+  (when (null *ms-token*)
+    (setf *ms-token* (get-msgraph-token)))
+  (handler-case
+      (funcall func *ms-token*)
+    (odata::odata-request-error (e)
+      (when (equalp (odata::http-status e) 401)
+        ;; Invalid token? Fetch another one
+        (setf *ms-token* (get-msgraph-token))
+        (call-with-ms-token func :retries retries)))))
+
+(defun odata-get (url &rest args &key $filter $expand)
+  (call-with-ms-token
+   (lambda (token)
+     (odata::odata-get
+      url
+      :$filter $filter
+      :$expand $expand
+      :authorization (format nil "~a ~a"
+                             (access:access token :token-type)
+                             (access:access token :access-token))))))
+
+(defun odata-post (url data &key (json-encode t))
+  (call-with-ms-token
+   (lambda (token)
+     (odata::odata-post
+      url
+      :authorization (format nil "~a ~a"
+                             (access:access *ms-token* :token-type)
+                             (access:access *ms-token* :access-token))
+      :json-encode t))))
+
+(defun fetch (url &optional type)
+  (odata/lang::read-odata-response (odata-get url) type))
+
+(defun post (url data)
+  (odata-post url data))

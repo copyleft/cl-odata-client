@@ -31,19 +31,22 @@
                     (if (stringp name) name
                         (lisp-to-camel-case (string name))))))
 
+(defun read-odata-response (data type)
+  (cond
+    ((null type) data)
+    ((eql type :collection) (access data :value))
+    ((eql type :value) (access data :value))
+    ((and (listp type)
+          (eql (first type) :collection-of))
+     (loop for li in (access data :value)
+        collect (unserialize li (second type))))
+    ((symbolp type)
+     (unserialize data type))
+    (t data)))
+
 (defun fetch (url &optional type)
   (let ((data (odata::odata-get url)))
-    (cond
-      ((null type) data)
-      ((eql type :collection) (access data :value))
-      ((eql type :value) (access data :value))
-      ((and (listp type)
-            (eql (first type) :collection-of))
-       (loop for li in (access data :value)
-          collect (unserialize li (second type))))
-      ((symbolp type)
-       (unserialize data type))
-      (t data))))
+    (read-odata-response data type)))
 
 (defun post (url &optional data)
   (odata::odata-post url data))

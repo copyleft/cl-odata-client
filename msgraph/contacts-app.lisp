@@ -1,12 +1,5 @@
-(require :hunchentoot)
-(require :easy-routes)
-(require :cl-who)
-(require :odata)
-
-(load (asdf:system-relative-pathname :odata "msgraph.lisp"))
-
 (defpackage :contacts-app
-  (:use :cl :odata/lang :easy-routes :cl-who :msgraph :cl-arrows :access))
+  (:use :cl :msgraph :odata/lang :easy-routes :cl-who :cl-arrows :access))
 
 (in-package :contacts-app)
 
@@ -20,7 +13,7 @@
       (:body
        ,@body))))
 
-(defparameter +mariano+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
+(defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
 
 (defun get-contacts (user)
   (-> msgraph::+msgraph+
@@ -43,13 +36,13 @@
 (defroute home ("/")
     ()
   (with-html-page
-    (show-contacts-list +mariano+)
+    (show-contacts-list +appuser+)
     (:a :href (genurl 'create-contact-page)
         (str "New contact"))))
 
 (defroute show-contact ("/contacts/:id")
     (&path (id 'string))
-  (let ((contact (get-contact +mariano+ id)))
+  (let ((contact (get-contact +appuser+ id)))
     (with-html-page
       (:form
        (:label "Name") (:label (str (access contact :given-name))) (:br)
@@ -71,7 +64,7 @@
 
 (defroute save-contact ("/contacts/new" :method :post)
     (&post name surname email phone)
-  (create-contact +mariano+
+  (create-contact +appuser+
                   `((:given-name . ,name)
                     (:surname . ,surname)
                     (:email-addresses
@@ -91,5 +84,4 @@
                             (who:str (access contact :surname)))))))))
 
 (defun start-app ()
-  (setf odata::*access-token* (msgraph::get-msgraph-api-token :tenant msgraph::+tenantid+))
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))

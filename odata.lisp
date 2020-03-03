@@ -2,6 +2,9 @@
 
 (in-package #:odata)
 
+(define-condition odata-request-error (simple-error)
+  ((http-status :initarg :http-status :accessor http-status)))
+
 (push '("application" . "json") drakma:*text-content-types*)
 (setf json:*lisp-identifier-name-to-json*
       'lisp-to-camel-case)
@@ -11,7 +14,7 @@
 (defvar *odata-base*)
 (defvar *access-token*)
 
-(defun odata-get (url &key $filter $expand)
+(defun odata-get (url &key $filter $expand authorization)
   (let ((url* (if (stringp url)
                   (quri:uri url)
                   url)))
@@ -22,32 +25,31 @@
     (multiple-value-bind (response status)
         (drakma:http-request (quri:render-uri url*)
                              :preserve-uri t
-                             :additional-headers (when *access-token*
+                             :additional-headers (when authorization
                                                    (list (cons "Authorization"
-                                                               (format nil "~a ~a"
-                                                                       (access:access *access-token* :token-type)
-                                                                       (access:access *access-token* :access-token))))))
+                                                               authorization))))
       (let ((json (json:decode-json-from-string response)))
         (when (>= status 400)
-          (error "OData request error (~a): ~a" status (accesses json :error :message)))
+          (error 'odata-request-error
+               :http-status status
+               :format-control "OData request error (~a): ~a"
+               :format-arguments (list status (accesses json :error :message))))
         json))))
 
 (defun odata-get* (uri &rest args &key $filter $expand)
   (apply #'odata-get (quri:merge-uris uri *odata-base*)
          args))
 
-(defun odata-post (uri data &key (json-encode t))
+(defun odata-post (uri data &key (json-encode t) authorization)
   (multiple-value-bind (response status)
       (drakma:http-request (quri:render-uri uri)
                            :preserve-uri t
                            :content (if json-encode
                                         (json:encode-json-to-string data)
                                         data)
-                           :additional-headers (when *access-token*
+                           :additional-headers (when authorization
                                                  (list (cons "Authorization"
-                                                             (format nil "~a ~a"
-                                                                     (access:access *access-token* :token-type)
-                                                                     (access:access *access-token* :access-token)))))
+                                                             authorization)))
                            :content-type "application/json;odata.metadata=minimal"
                            :accept "application/json"
                            :method :post)
@@ -55,22 +57,33 @@
         (return-from odata-post nil))
     (let ((json (json:decode-json-from-string response)))
       (when (>= status 400)
-        (error "OData request error (~a): ~a" status (accesses json :error :message)))
+        (error 'odata-request-error
+               :http-status status
+               :format-control "OData request error (~a): ~a"
+               :format-arguments (list status (accesses json :error :message))))
       json)))
 
-(defun odata-patch (uri data &key (json-encode t))
+(defun odata-patch (uri data &key (json-encode t) authorization)
   (multiple-value-bind (response status)
       (drakma:http-request (quri:render-uri uri)
                            :preserve-uri t
                            :content (if json-encode
                                         (json:encode-json-to-string data)
                                         data)
-                           :additional-headers '(("OData-Version" . "4.0"))
+                           :additional-headers (when authorization
+                                                 (list (cons "Authorization"
+                                                             authorization)))
                            :content-type "application/json;odata.metadata=minimal"
                            :accept "application/json"
                            :method :patch)
-    (when (>= status 400)
-      (error "OData request error (~a)" status))))
+    (if (= status 204) ;; no content
+        (return-from odata-patch nil))
+    (let ((json (json:decode-json-from-string response)))
+      (when (>= status 400)
+        (error 'odata-request-error
+               :http-status status
+               :format-control "OData request error (~a): ~a"
+               :format-arguments (list status (accesses json :error :message)))))))
 
 (defun call-with-odata-base (base func)
   (let ((*odata-base* base))
