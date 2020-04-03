@@ -47,7 +47,8 @@
       (id user)
       (collection "messages")
       (id id)
-      (fcall "send")))
+      (fcall "send")
+      (post)))
 
 (defroute home ("/")
     ()
