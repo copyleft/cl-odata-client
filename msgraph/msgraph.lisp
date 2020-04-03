@@ -86,5 +86,5 @@
 (defun fetch (url &optional type)
   (odata/lang::read-odata-response (odata-get url) type))
 
-(defun post (url data)
+(defun post (url &optional data)
   (odata-post url data))
