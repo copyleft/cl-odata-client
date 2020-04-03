@@ -76,9 +76,21 @@
               (:label "Subject")
               (:label (str (@ message :subject)))
               (:label "Body")
-              (write-string (@ message :body :content) *html*)
+              (write-string (@ message :body :content) *html*)))
+      (when (@ message :is-draft)
+        (who:htm
+         (:p
+          (who:str "This message is a DRAFT")
+          (:form :action (genurl 'send-message-action :id id)
+                 :method :post
+                (:input :type "submit" :value "Send")))))
+      
+      )))
 
-              )))))
+(defroute send-message-action ("/messages/:id/send" :method :post)
+    ()
+  (send-message +appuser+ id)
+  (redirect (genurl 'home)))
 
 (defroute create-message-page ("/messages/new")
     ()
@@ -123,7 +135,9 @@
         for message in (get-messages user)
         do
           (who:htm (:li (:a :href (genurl 'show-message :id (@ message :id))
-                            (who:str (@ message :subject)))))))))
+                            (who:str (@ message :subject)))
+                        (when (@ message :is-draft)
+                          (who:str "(DRAFT)"))))))))
 
 (defun start-app ()
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
