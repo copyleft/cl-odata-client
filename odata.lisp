@@ -30,7 +30,8 @@
                                                                authorization))))
       (let ((json (json:decode-json-from-string response)))
         (when (>= status 400)
-          (error 'simple-error
+          (error 'odata-request-error
+               :http-status status
                :format-control "OData request error (~a): ~a"
                :format-arguments (list status (accesses json :error :message))))
         json))))
@@ -56,7 +57,8 @@
         (return-from odata-post nil))
     (let ((json (json:decode-json-from-string response)))
       (when (>= status 400)
-        (error 'simple-error
+        (error 'odata-request-error
+               :http-status status
                :format-control "OData request error (~a): ~a"
                :format-arguments (list status (accesses json :error :message))))
       json)))
