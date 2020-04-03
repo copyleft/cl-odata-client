@@ -1,11 +1,14 @@
-(defpackage :contacts-app
+(defpackage :msgraph.demo.contacts
   (:use :cl :msgraph :odata/lang :easy-routes :cl-who :cl-arrows :access)
   (:export :start-app))
 
-(in-package :contacts-app)
+(in-package :msgraph.demo.contacts)
 
 (defvar *html*)
 (defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
+
+(defun @ (obj &rest keys)
+    (apply #'accesses obj keys))
 
 (defmacro with-html-page (&body body)
   `(who:with-html-output-to-string (*html*)
@@ -52,11 +55,11 @@
       (:form :class "pure-form pure-form-stacked"
              (:fieldset
               (:label "Name")
-              (:label (str (access contact :given-name)))
-              (:label "Surname") (:label (str (access contact :surname)))
-              (:label "Email") (:label (str (accesses contact :email-addresses 'first :address)))
+              (:label (str (@ contact :given-name)))
+              (:label "Surname") (:label (str (@ contact :surname)))
+              (:label "Email") (:label (str (@ contact :email-addresses 'first :address)))
               (:label "Phone")
-              (:label (str (accesses contact :business-phones 'first)))))
+              (:label (str (@ contact :business-phones 'first)))))
 
        )))
 
@@ -94,10 +97,10 @@
      (loop
         for contact in (get-contacts user)
         do
-          (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id))
-                            (who:str (access contact :given-name))
+          (who:htm (:li (:a :href (genurl 'show-contact :id (@ contact :id))
+                            (who:str (@ contact :given-name))
                             (who:str " ")
-                            (who:str (access contact :surname)))))))))
+                            (who:str (@ contact :surname)))))))))
 
 (defun start-app ()
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
