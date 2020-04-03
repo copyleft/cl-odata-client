@@ -69,16 +69,16 @@
               (:label "To")
               (:label (loop for recipient in (@ message :to-recipients)
                          do
-                           (who:htm 
-                           (who:str (@ recipient :email-address :name))
-                           (:a :href (format nil "mailto:~a" (@ recipient :email-address :address))
-                                   (who:fmt "&lt;~a&gt;" (@ recipient :email-address :address))))))
+                           (who:htm
+                            (who:str (@ recipient :email-address :name))
+                            (:a :href (format nil "mailto:~a" (@ recipient :email-address :address))
+                                (who:fmt "&lt;~a&gt;" (@ recipient :email-address :address))))))
               (:label "Subject")
               (:label (str (@ message :subject)))
               (:label "Body")
               (write-string (@ message :body :content) *html*)
 
-       )))))
+              )))))
 
 (defroute create-message-page ("/messages/new")
     ()
@@ -97,22 +97,24 @@
                   (:label "Body") (:textarea :name "body"))
             (:input :type "submit" :value "Create")))))
 
+(defun parse-recipient (str)
+  (multiple-value-bind (address at name)
+      (darts.lib.email-address:parse-rfc5322-mailbox str)
+    `((:email-address . ((:address . ,(format nil "~a@~a" address at))
+                         (:name . ,(or name address)))))))
+
+(defun parse-recipients (str)
+  (loop for rstr in (split-sequence:split-sequence #\, str)
+     collect (parse-recipient rstr)))
+
 (defroute save-message ("/messages/new" :method :post)
     (&post from to subject body)
-  (labels ((parse-recipient (str)
-             (multiple-value-bind (address at name)
-                 (darts.lib.email-address:parse-rfc5322-mailbox str)
-               `((:address . ,(format nil "~a@~a" address at))
-                 (:name . ,(or name address)))))
-           (parse-recipients (str)
-             (loop for rstr in (split-sequence:split-sequence #\, str)
-                collect (parse-recipient rstr))))
-    (create-message +appuser+
-                    `((:subject . ,subject)
-                      (:body . ,body)
-                      (:from . ,(parse-recipients from))
-                      (:recipients . ,(parse-recipients to))))
-    (redirect (genurl 'home))))
+  (create-message +appuser+
+                  `((:subject . ,subject)
+                    (:body . ,body)
+                    (:from . ,(first (parse-recipients from)))
+                    (:recipients . ,(parse-recipients to))))
+  (redirect (genurl 'home)))
 
 (defun show-messages (user)
   (who:with-html-output (*html*)
