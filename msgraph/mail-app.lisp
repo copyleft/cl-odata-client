@@ -64,12 +64,15 @@
              (:fieldset
               (:label "From") (:label
                                (who:str (@ message :from :email-address :name))
-                               (who:fmt " <~a>" (@ message :from :email-address :address)))
+                               (:a :href (format nil "mailto:~a" (@ message :from :email-address :address))
+                                   (who:fmt "&lt;~a&gt;" (@ message :from :email-address :address))))
               (:label "To")
-              (:label (loop for recipient in (@ message :recipients)
+              (:label (loop for recipient in (@ message :to-recipients)
                          do
+                           (who:htm 
                            (who:str (@ recipient :email-address :name))
-                           (who:fmt " <~a> " (@ recipient :email-address :address))))
+                           (:a :href (format nil "mailto:~a" (@ recipient :email-address :address))
+                                   (who:fmt "&lt;~a&gt;" (@ recipient :email-address :address))))))
               (:label "Subject")
               (:label (str (@ message :subject)))
               (:label "Body")
