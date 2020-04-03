@@ -54,10 +54,12 @@
   (handler-case
       (funcall func *ms-token*)
     (odata::odata-request-error (e)
-      (when (equalp (odata::http-status e) 401)
-        ;; Invalid token? Fetch another one
-        (setf *ms-token* (get-msgraph-token))
-        (call-with-ms-token func :retries (1- retries))))))
+      (if (equalp (odata::http-status e) 401)
+          ;; Invalid token? Fetch another one
+          (progn
+            (setf *ms-token* (get-msgraph-token))
+            (call-with-ms-token func :retries (1- retries)))
+          (error e)))))
 
 (defun odata-get (url &rest args &key $filter $expand)
   (call-with-ms-token
