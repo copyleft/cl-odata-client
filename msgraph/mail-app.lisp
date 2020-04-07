@@ -124,9 +124,10 @@
     (&post from to subject body)
   (create-message +appuser+
                   `((:subject . ,subject)
-                    (:body . ,body)
+                    (:body . ((:content-type . "text")
+                              (:content . ,body)))
                     (:from . ,(first (parse-recipients from)))
-                    (:recipients . ,(parse-recipients to))))
+                    (:to-recipients . ,(parse-recipients to))))
   (redirect (genurl 'home)))
 
 (defun show-messages (user)
