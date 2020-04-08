@@ -7,9 +7,6 @@
 (defvar *html*)
 (defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
 
-(defun @ (obj &rest keys)
-    (apply #'accesses obj keys))
-
 (defmacro with-html-page (&body body)
   `(who:with-html-output-to-string (*html*)
      (:html
@@ -50,18 +47,19 @@
 
 (defroute show-contact ("/contacts/:id")
     (&path (id 'string))
-  (let ((contact (get-contact +appuser+ id)))
-    (with-html-page
-      (:form :class "pure-form pure-form-stacked"
-             (:fieldset
-              (:label "Name")
-              (:label (str (@ contact :given-name)))
-              (:label "Surname") (:label (str (@ contact :surname)))
-              (:label "Email") (:label (str (@ contact :email-addresses 'first :address)))
-              (:label "Phone")
-              (:label (str (@ contact :business-phones 'first)))))
+  (access:with-dot ()
+    (let ((contact (get-contact +appuser+ id)))
+      (with-html-page
+        (:form :class "pure-form pure-form-stacked"
+               (:fieldset
+                (:label "Name")
+                (:label (str contact.given-name))
+                (:label "Surname") (:label (str contact.surname))
+                (:label "Email") (:label (str contact.email-addresses.first.address))
+                (:label "Phone")
+                (:label (str contact.business-phones.first))))
 
-       )))
+        ))))
 
 (defroute create-contact-page ("/contacts/new")
     ()
@@ -92,15 +90,16 @@
   (redirect (genurl 'home)))
 
 (defun show-contacts-list (user)
-  (who:with-html-output (*html*)
-    (:ul
-     (loop
-        for contact in (get-contacts user)
-        do
-          (who:htm (:li (:a :href (genurl 'show-contact :id (@ contact :id))
-                            (who:str (@ contact :given-name))
-                            (who:str " ")
-                            (who:str (@ contact :surname)))))))))
+  (access:with-dot ()
+    (who:with-html-output (*html*)
+      (:ul
+       (loop
+          for contact in (get-contacts user)
+          do
+            (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id))
+                              (who:str contact.given-name)
+                              (who:str " ")
+                              (who:str contact.surname)))))))))
 
 (defun start-app ()
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
