@@ -5,10 +5,6 @@
 (in-package :msgraph.demo.mail)
 
 (defvar *html*)
-(defparameter +appuser+ "77d37ed0-173e-474e-a477-371f4bbdd1a2")
-
-(defun @ (obj &rest keys)
-    (apply #'accesses obj keys))
 
 (defmacro with-html-page (&body body)
   `(who:with-html-output-to-string (*html*)
@@ -19,17 +15,25 @@
       (:body
        ,@body))))
 
+(defun get-user (id)
+  (-> msgraph::+msgraph+
+      (collection "users")
+      (id id)
+      (fetch)))
+
+(defparameter +appuser+ (get-user "77d37ed0-173e-474e-a477-371f4bbdd1a2"))
+
 (defun get-messages (user)
   (-> msgraph::+msgraph+
       (collection "users")
-      (id user)
+      (id (access user :id))
       (collection "messages")
       (fetch :collection)))
 
 (defun get-message (user id)
   (-> msgraph::+msgraph+
       (collection "users")
-      (id user)
+      (id (access user :id))
       (collection "messages")
       (id id)
       (fetch)))
@@ -37,14 +41,14 @@
 (defun create-message (user message)
   (-> msgraph::+msgraph+
       (collection "users")
-      (id user)
+      (id (access user :id))
       (collection "messages")
       (post message)))
 
 (defun send-message (user id)
   (-> msgraph::+msgraph+
       (collection "users")
-      (id user)
+      (id (access user :id))
       (collection "messages")
       (id id)
       (fcall "send")
@@ -60,33 +64,34 @@
 (defroute show-message ("/messages/:id")
     (&path (id 'string))
   (let ((message (get-message +appuser+ id)))
-    (with-html-page
-      (:form :class "pure-form pure-form-stacked"
-             (:fieldset
-              (:label "From") (:label
-                               (who:str (@ message :from :email-address :name))
-                               (:a :href (format nil "mailto:~a" (@ message :from :email-address :address))
-                                   (who:fmt "&lt;~a&gt;" (@ message :from :email-address :address))))
-              (:label "To")
-              (:label (loop for recipient in (@ message :to-recipients)
-                         do
-                           (who:htm
-                            (who:str (@ recipient :email-address :name))
-                            (:a :href (format nil "mailto:~a" (@ recipient :email-address :address))
-                                (who:fmt "&lt;~a&gt;" (@ recipient :email-address :address))))))
-              (:label "Subject")
-              (:label (str (@ message :subject)))
-              (:label "Body")
-              (write-string (@ message :body :content) *html*)))
-      (when (@ message :is-draft)
-        (who:htm
-         (:p
-          (who:str "This message is a DRAFT")
-          (:form :action (genurl 'send-message-action :id id)
-                 :method :post
-                (:input :type "submit" :value "Send")))))
-      
-      )))
+    (access:with-dot ()
+      (with-html-page
+        (:form :class "pure-form pure-form-stacked"
+               (:fieldset
+                (:label "From") (:label
+                                 (who:str message.from.email-address.name)
+                                 (:a :href (format nil "mailto:~a" message.from.email-address.address)
+                                     (who:fmt "&lt;~a&gt;" message.from.email-address.address)))
+                (:label "To")
+                (:label (loop for recipient in message.to-recipients
+                           do
+                             (who:htm
+                              (who:str recipient.email-address.name)
+                              (:a :href (format nil "mailto:~a" recipient.email-address.address)
+                                  (who:fmt "&lt;~a&gt;" recipient.email-address.address)))))
+                (:label "Subject")
+                (:label (str message.subject))
+                (:label "Body")
+                (write-string message.body.content *html*)))
+        (when message.is-draft
+          (who:htm
+           (:p
+            (who:str "This message is a DRAFT")
+            (:form :action (genurl 'send-message-action :id id)
+                   :method :post
+                   (:input :type "submit" :value "Send")))))
+
+        ))))
 
 (defroute send-message-action ("/messages/:id/send" :method :post)
     ()
@@ -95,20 +100,23 @@
 
 (defroute create-message-page ("/messages/new")
     ()
-  (with-html-page
-    (:form :class "pure-form pure-form-aligned"
-           :method "POST"
-           (:legend "Create message")
-           (:fieldset
-            (:div :class "pure-control-group"
-                  (:label "From") (:input :name "from"))
-            (:div :class "pure-control-group"
-                  (:label "To") (:input :name "to"))
-            (:div :class "pure-control-group"
-                  (:label "Subject") (:input :name "subject"))
-            (:div :class "pure-control-group"
-                  (:label "Body") (:textarea :name "body"))
-            (:input :type "submit" :value "Create")))))
+  (access:with-dot ()
+    (with-html-page
+      (:form :class "pure-form pure-form-aligned"
+             :method "POST"
+             (:legend "Create message")
+             (:fieldset
+              (:div :class "pure-control-group"
+                    (:label "From") (:input :name "from"
+                                            :readonly t
+                                            :value +appuser+.mail))
+              (:div :class "pure-control-group"
+                    (:label "To") (:input :name "to"))
+              (:div :class "pure-control-group"
+                    (:label "Subject") (:input :name "subject"))
+              (:div :class "pure-control-group"
+                    (:label "Body") (:textarea :name "body"))
+              (:input :type "submit" :value "Create"))))))
 
 (defun parse-recipient (str)
   (multiple-value-bind (address at name)
@@ -131,15 +139,16 @@
   (redirect (genurl 'home)))
 
 (defun show-messages (user)
-  (who:with-html-output (*html*)
-    (:ul
-     (loop
-        for message in (get-messages user)
-        do
-          (who:htm (:li (:a :href (genurl 'show-message :id (@ message :id))
-                            (who:str (@ message :subject)))
-                        (when (@ message :is-draft)
-                          (who:str "(DRAFT)"))))))))
+  (access:with-dot ()
+    (who:with-html-output (*html*)
+      (:ul
+       (loop
+          for message in (get-messages user)
+          do
+            (who:htm (:li (:a :href (genurl 'show-message :id (access message :id))
+                              (who:str message.subject))
+                          (when message.is-draft
+                            (who:str "(DRAFT)")))))))))
 
 (defun start-app ()
   (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
