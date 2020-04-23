@@ -2,17 +2,6 @@
 
 (defvar *credentials*)
 
-(odata::def-enums #.+msgraph-metadata+)
-
-(defclass microsoft.graph.entity ()
-  ())
-
-(defclass microsoft.graph.outlook-item ()
-  ())
-
-;;(odata::def-packages #.+msgraph-metadata+)
-;;(odata::def-entities #.+msgraph-metadata+)
-
 (defun get-msgraph-api-token (&key tenant scope)
   (json:decode-json-from-string
    (drakma:http-request
@@ -53,8 +42,8 @@
     (setf *ms-token* (get-msgraph-token)))
   (handler-case
       (funcall func *ms-token*)
-    (odata::odata-request-error (e)
-      (if (equalp (odata::http-status e) 401)
+    (odata-client::odata-request-error (e)
+      (if (equalp (odata-client::http-status e) 401)
           ;; Invalid token? Fetch another one
           (progn
             (setf *ms-token* (get-msgraph-token))
@@ -64,7 +53,7 @@
 (defun odata-get (url &rest args &key $filter $expand)
   (call-with-ms-token
    (lambda (token)
-     (odata::odata-get
+     (odata-client::odata-get
       url
       :$filter $filter
       :$expand $expand
@@ -75,7 +64,7 @@
 (defun odata-post (url data &key (json-encode t))
   (call-with-ms-token
    (lambda (token)
-     (odata::odata-post
+     (odata-client::odata-post
       url
       data
       :authorization (format nil "~a ~a"

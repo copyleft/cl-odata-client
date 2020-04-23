@@ -4,6 +4,6 @@
   :license  "MIT"
   :version "0.0.1"
   :serial t
-  :depends-on (:msgraph :odata :access :easy-routes :hunchentoot :cl-who :darts.lib.email-address)
+  :depends-on (:msgraph :access :easy-routes :hunchentoot :cl-who :darts.lib.email-address)
   :components ((:file "credentials")
                (:file "mail-app")))
