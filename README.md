@@ -1,10 +1,10 @@
-# cl-odata
+# cl-odata-client
 
 Common Lisp OData client library
 
 ## Documentation
 
-See `basic-tutorial.org`
+See [the tutorial](basic-tutorial.org)
 
 ## License
 

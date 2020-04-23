@@ -1,6 +1,6 @@
-* CL-ODATA Basic Tutorial
+* CL-ODATA-CLIENT Basic Tutorial
 
-This is CL-ODATA version of TripPin tutorial. See the original tutorial at: https://www.odata.org/getting-started/basic-tutorial/
+This is CL-ODATA-CLIENT version of TripPin tutorial. See the original tutorial at: https://www.odata.org/getting-started/basic-tutorial/
 
 The tutorial uses a sample service called TripPin based on OData V4. Generally speaking, TripPin provides a service that can manage people's trips. The service is designed for below purposes:
 
@@ -18,7 +18,7 @@ We start by defining a package:
 
 #+BEGIN_SRC lisp :exports code :results pp :session 
 (defpackage :odata.trip-pin
-  (:use :cl :odata :odata/lang :cl-arrows :access))
+  (:use :cl :odata-client :odata/lang :cl-arrows :access))
 
 (in-package :odata.trip-pin)
 #+END_SRC
@@ -35,79 +35,6 @@ TripPin services uses a special url for read/write, so we get that:
   (multiple-value-bind (response status headers modify-url)
       (drakma:http-request +trip-pin-base+)
     (quri:uri (princ-to-string modify-url))))
-#+END_SRC
-
-Then we load the service metadata:
-
-#+BEGIN_SRC lisp :exports code :results pp :session 
-(defparameter +trip-pin-metadata+
-  (odata/metamodel::parse-metamodel
-   (probe-file
-    (asdf:system-relative-pathname :odata "TripPin.xml"))))
-#+END_SRC
-
-We are loading it from a file. Metadata is available at @odata.context url of the service spec.
-
-CL-OData generates code from the service metadata:
-
-#+BEGIN_SRC lisp :exports code :results pp :session 
-(odata::def-packages #.+trip-pin-metadata+)
-(odata::def-enums #.+trip-pin-metadata+)
-(odata::def-entities #.+trip-pin-metadata+)
-;; (odata::def-functions #.+trip-pin-metadata+)
-#+END_SRC
-
-The result of that is a declaration of a new package based on the schema namespace, and CLOS objects, and methods and functions based on the metadata spec. 
-
-In this case: 
-#+BEGIN_SRC lisp :exports code :results pp :session 
-(progn
- (defpackage |Microsoft.OData.SampleService.Models.TripPin|
-   (:export :metadata
-            :person-gender
-            :city
-            :location
-            :event-location
-            :airport-location
-            :photo
-            :person
-            :airline
-            :airport
-            :plan-item
-            :public-transportation
-            :flight
-            :event
-            :trip
-            :get-favorite-airline
-            :get-involved-people
-            :get-friends-trips
-            :get-nearest-airport
-            :reset-data-source
-            :share-trip
-            :default-container
-            :||))
- (setf (symbol-value
-        (intern "METADATA" '|Microsoft.OData.SampleService.Models.TripPin|))
-         #<odata/metamodel::schema {10082FEAC3}>))
-#+END_SRC
-
-And functions for fetching data are generated (fetch-<entities> and fetch-<entities>-by-id):
-
-#+BEGIN_SRC lisp :exports code :results pp :session 
-(defun fetch-photos (&key odata::$filter odata::$expand)
-    (odata::odata-get-entities "Photos"
-                               '|Microsoft.OData.SampleService.Models.TripPin|:photo
-                               :$filter
-                               (when odata::$filter
-                                 (odata::compile-$filter odata::$filter))
-                               :$expand
-                               (when odata::$expand
-                                 (odata::compile-$expand odata::$expand))))
-
-(defun fetch-photo-by-id (odata::id &rest odata::args)
-    (odata::odata-get-entity-by-id "Photos"
-                                   '|Microsoft.OData.SampleService.Models.TripPin|:photo
-                                   odata::id))
 #+END_SRC
 
 ** Requesting Data
@@ -210,25 +137,6 @@ The request below returns the the collection of Person People.
   (:address-info) (:gender . "Male") (:concurrency . 637145265160790083)))
 #+end_example
 
-Also, it is possible to unserialize the data to metamodels:
-
-#+BEGIN_SRC lisp :exports both :results pp :session 
-(-> +trip-pin-modify+
-    (collection "People")
-    (fetch '(:collection-of |Microsoft.OData.SampleService.Models.TripPin|:person))))
-#+END_SRC
-
-#+RESULTS:
-: 
-: (#<|Microsoft.OData.SampleService.Models.TripPin|:person {1007A5D2D3}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007A6DD13}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007ACED63}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007ADA043}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AEB4E3}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AECB13}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AFD983}>
-:  #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007AFEFA3}>)
-
 ** Requesting an Individual Entity by ID
 
 The request below returns an individual entity of type Person by the given UserName "russellwhyte"
@@ -258,19 +166,6 @@ The request below returns an individual entity of type Person by the given UserN
     (:region . "ID"))))
  (:gender . "Male") (:concurrency . 637145265160790083))
 #+end_example
-
-And unserialize it to a model object:
-
-#+BEGIN_SRC lisp :exports both :results pp :session  
-(-> +trip-pin-modify+
-    (collection "People")
-    (id "russellwhyte")
-    (fetch '|Microsoft.OData.SampleService.Models.TripPin|:person))
-#+END_SRC
-
-#+RESULTS:
-: 
-: #<|Microsoft.OData.SampleService.Models.TripPin|:person {1007C0CEB3}>
 
 ** Requesting an Individual Property
 
@@ -947,18 +842,6 @@ The function below returns the nearest airport with the input geography point.
    (:crs (:type . "name") (:properties (:name . "EPSG:4326"))))))
 #+end_example
 
-Again, we can unserialize the results:
-
-#+BEGIN_SRC lisp :exports both :results pp :session 
-(-> +trip-pin-modify+
-    (fcall 'get-nearest-airport :lat 33 :lon -118)
-    (fetch '|Microsoft.OData.SampleService.Models.TripPin|:airport))
-#+END_SRC
-
-#+RESULTS:
-: 
-: #<|Microsoft.OData.SampleService.Models.TripPin|:airport {1007DDC323}>
-
 *** Invoking Bound Functions
 
 The request below returns the favorite airline of a person, in TripPin service, "favorite airline" means airline which user choose most times. The function GetFavoriteAirline() is bound to Person.
@@ -1002,4 +885,3 @@ The action below shares a trip to one of his friend. In TripPin service, by "sha
 #+RESULTS:
 : 
 : nil
-

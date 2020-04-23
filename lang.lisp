@@ -1,55 +1,50 @@
 (defpackage :odata/lang
-  (:use :cl :odata :access)
-  (:export :singleton
-           :fetch
-           :post
-           :create
-           :del
-           :update
-           :patch
-           :link
-           :path
-           :update-link
-           :property
-           :collection
-           :fcall
-           :$filter
-           :$expand
-           :id
-           :$skip
-           :$top
-           :$value
-           :$orderby
-           :$select
-           :$search
-           :$ref))
+  (:use :cl :access)
+  (:export
+   :singleton
+   :fetch
+   :post
+   :create
+   :del
+   :update
+   :patch
+   :link
+   :path
+   :update-link
+   :property
+   :collection
+   :fcall
+   :$filter
+   :$expand
+   :id
+   :$skip
+   :$top
+   :$value
+   :$orderby
+   :$select
+   :$search
+   :$ref))
 
 (in-package :odata/lang)
 
 (defun singleton (url name)
   (quri:uri (format nil "~a~a" url
                     (if (stringp name) name
-                        (lisp-to-camel-case (string name))))))
+                        (odata-client::lisp-to-camel-case (string name))))))
 
 (defun read-odata-response (data type)
   (cond
     ((null type) data)
     ((eql type :collection) (access data :value))
     ((eql type :value) (access data :value))
-    ((and (listp type)
-          (eql (first type) :collection-of))
-     (loop for li in (access data :value)
-        collect (unserialize li (second type))))
-    ((symbolp type)
-     (unserialize data type))
     (t data)))
 
 (defun fetch (url &optional type)
-  (let ((data (odata::odata-get url)))
+  (let ((data (odata-client:odata-get url)))
     (read-odata-response data type)))
 
 (defun post (url &optional data)
-  (odata::odata-post url data))
+  (odata-client:odata-post url data))
 
 (defun link (url data)
   (multiple-value-bind (response status)
@@ -72,17 +67,17 @@
                            :accept "application/json")
     (when (>= status 400)
       (error "Error ~a: ~a" status (accesses (json:decode-json-from-string response) :error :message)))))
-  
+
 
 (defun create (url data)
   (post url data))
 
 (defun del (url)
   (drakma:http-request (quri:render-uri url) :method :delete
-                       :preserve-uri t))
+                                             :preserve-uri t))
 
 (defun patch (url data)
-  (odata::odata-patch url data))
+  (odata-client::odata-patch url data))
 
 (defun update (url data)
   (patch url data))
@@ -90,11 +85,11 @@
 (defun property (url name)
   (quri:uri (format nil "~a/~a" url
                     (if (stringp name) name
-                        (lisp-to-camel-case (string name))))))
+                        (odata-client::lisp-to-camel-case (string name))))))
 
 (defun collection (url name)
   (quri:uri (format nil "~a/~a" url (if (stringp name) name
-                                        (lisp-to-camel-case (string name))))))
+                                        (odata-client::lisp-to-camel-case (string name))))))
 
 (defun id (url id)
   (quri:uri (format nil "~a('~a')" url id)))
@@ -105,16 +100,16 @@
   url)
 
 (defun $filter (url exp)
-  (parameter url "$filter" (odata::compile-$filter exp)))
+  (parameter url "$filter" (odata-client::compile-$filter exp)))
 
 (defun $expand (url exp)
-  (parameter url "$expand" (odata::compile-$expand exp)))
+  (parameter url "$expand" (odata-client::compile-$expand exp)))
 
 (defun $select (url exp)
-  (parameter url "$select" (odata::compile-$select exp)))
+  (parameter url "$select" (odata-client::compile-$select exp)))
 
 (defun $search (url exp)
-  (parameter url "$search" (odata::compile-$search exp)))
+  (parameter url "$search" (odata-client::compile-$search exp)))
 
 (defun $top (url top)
   (check-type top integer)
@@ -138,33 +133,26 @@
 (defun path (url &rest path)
   (let ((uri url))
     (loop
-       for x in path
-       do (setf uri (property uri x)))
+      for x in path
+      do (setf uri (property uri x)))
     uri))
 
 (defun fcall (url name &rest args)
   (property url
             (with-output-to-string (s)
               (flet ((print-arg (arg)
-                       (princ (odata::lisp-to-camel-case (string (car arg))) s)
+                       (princ (odata-client::lisp-to-camel-case (string (car arg))) s)
                        (princ "=" s)
                        (princ (cdr arg) s)))
                 (princ (if (stringp name) name
-                           (string-upcase (odata::lisp-to-camel-case (string name)) :end 1))
+                           (string-upcase (odata-client::lisp-to-camel-case (string name)) :end 1))
                        s)
                 (princ "(" s)
                 (when args
                   (let ((args (alexandria:plist-alist args)))
                     (print-arg (first args))
                     (loop
-                       for arg in (rest args)
-                       do (princ "," s)
-                       do (print-arg arg))))
+                      for arg in (rest args)
+                      do (princ "," s)
+                      do (print-arg arg))))
                 (princ ")" s)))))
-
-(defun serialize (object)
-  (with-output-to-string (s)
-    (odata::serialize object s)))
-
-(defun unserialize (data type)
-  (odata::unserialize data type))
