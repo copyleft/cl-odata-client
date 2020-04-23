@@ -1,10 +1,10 @@
 # cl-odata-client
 
-Common Lisp OData client library
+Common Lisp OData client library.
 
 ## Documentation
 
-See [the tutorial](basic-tutorial.org)
+Have a look at [the tutorial](basic-tutorial.org) and the [Microsoft Graph demo applications](msgraph).
 
 ## License
 
