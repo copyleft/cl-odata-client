@@ -4,7 +4,11 @@ MSGRAPH is a library for accessing Microsoft Graph API.
 
 It uses CL-OData library.
 
-See `contacts-app.lisp` for an example.
+Have a look at the demo applications:
+
+* [Contacts app](contacts-app.lisp)
+* [Mail app](mail-app.lisp)
+* [Calendar app](calendar-app.lisp)
 
 Some important comments:
 
