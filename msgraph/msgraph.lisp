@@ -27,10 +27,10 @@
          (princ-to-string url)
          (list* :additional-headers
                 (cons (cons "Authorization"
-                                 (format nil "~a ~a"
-                                         (access:access token :token-type)
-                                         (access:access token :access-token)))
-                           additional-headers)
+                            (format nil "~a ~a"
+                                    (access:access token :token-type)
+                                    (access:access token :access-token)))
+                      additional-headers)
                 args)))
 
 (defun get-msgraph-token ()
@@ -47,10 +47,10 @@
       (if (equalp (odata-client::http-status e) 401)
           ;; Invalid token? Fetch another one
           (if (zerop retries)
-	      (error e)
-	      (progn
-		(setf *ms-token* (get-msgraph-token))
-		(call-with-ms-token func :retries (1- retries))))
+              (error e)
+              (progn
+                (setf *ms-token* (get-msgraph-token))
+                (call-with-ms-token func :retries (1- retries))))
           (error e)))))
 
 (defun odata-get (url &rest args &key $filter $expand)
