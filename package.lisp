@@ -1,5 +1,5 @@
 (defpackage #:odata-client
-  (:use #:cl #:cl-arrows #:access)
+  (:use #:cl #:arrows #:access)
   (:export
    :*odata-base*
    :*access-token*
