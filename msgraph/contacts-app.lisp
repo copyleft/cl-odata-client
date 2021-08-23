@@ -1,5 +1,5 @@
 (defpackage :msgraph.demo.contacts
-  (:use :cl :msgraph :odata/lang :easy-routes :cl-who :cl-arrows :access)
+  (:use :cl :msgraph :odata/lang :easy-routes :cl-who :arrows :access)
   (:export :start-app))
 
 (in-package :msgraph.demo.contacts)

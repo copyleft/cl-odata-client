@@ -18,7 +18,7 @@ We start by defining a package:
 
 #+BEGIN_SRC lisp :exports code :results pp :session 
 (defpackage :odata.trip-pin
-  (:use :cl :odata-client :odata/lang :cl-arrows :access))
+  (:use :cl :odata-client :odata/lang :arrows :access))
 
 (in-package :odata.trip-pin)
 #+END_SRC
