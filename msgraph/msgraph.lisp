@@ -2,6 +2,15 @@
 
 (defvar *credentials*)
 
+(defparameter +msgraph+ "https://graph.microsoft.com/v1.0")
+
+;; Special fetch/post for Microsoft API
+
+(defparameter *ms-token* nil)
+
+(defparameter *msgraph-http-requests-retries* 2
+  "How many times to retry an HTTP request to the MS graph api, when a request fails.")
+
 (defun get-msgraph-api-token (&key tenant scope)
   (json:decode-json-from-string
    (drakma:http-request
@@ -24,20 +33,12 @@
                            additional-headers)
                 args)))
 
-(defparameter +msgraph+ "https://graph.microsoft.com/v1.0")
-
-;; Special fetch/post for Microsoft API
-
-(defparameter *ms-token* nil)
-
 (defun get-msgraph-token ()
   (setf *ms-token* (get-msgraph-api-token :tenant (getf *credentials* :tenantid))))
 
 ;; OData wrappers for Microsoft API
 
-(defun call-with-ms-token (func &key (retries 3))
-  (when (zerop retries)
-    (return-from call-with-ms-token))
+(defun call-with-ms-token (func &key (retries (1- *msgraph-http-requests-retries*)))
   (when (null *ms-token*)
     (setf *ms-token* (get-msgraph-token)))
   (handler-case
@@ -45,9 +46,11 @@
     (odata-client::odata-request-error (e)
       (if (equalp (odata-client::http-status e) 401)
           ;; Invalid token? Fetch another one
-          (progn
-            (setf *ms-token* (get-msgraph-token))
-            (call-with-ms-token func :retries (1- retries)))
+          (if (zerop retries)
+	      (error e)
+	      (progn
+		(setf *ms-token* (get-msgraph-token))
+		(call-with-ms-token func :retries (1- retries))))
           (error e)))))
 
 (defun odata-get (url &rest args &key $filter $expand)
