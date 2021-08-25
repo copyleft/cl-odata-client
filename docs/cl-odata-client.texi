@@ -1,7 +1,7 @@
 \input texinfo   @c -*-texinfo-*-
 @comment $Id@w{$}
 @comment %**start of header
-@settitle Common Lisp Documentation Weaver
+@settitle Common Lisp ODATA Client
 @syncodeindex pg cp
 @setfilename cl-odata-client.info
 @include common-lisp.texi
