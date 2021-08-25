@@ -1,6 +1,6 @@
 (in-package :msgraph)
 
-(defvar *credentials*
+(defvar *credentials* nil
   "The credentials for authenticating agains msgraph.
 A property list with :appid, :tenantid, :appname and :client-secret.")
 
@@ -15,18 +15,23 @@ A property list with :appid, :tenantid, :appname and :client-secret.")
 (defparameter *msgraph-http-requests-retries* 2
   "How many times to retry an HTTP request to the MS graph api, when a request fails.")
 
+(defun msgraph-credentials ()
+  "Return the current MSGraph credentials, or error if not setup."
+  (or *credentials* (error "MSGraph credentials not configured. Set *CREDENTIALS*.")))
+
 (defun get-msgraph-api-token (&key tenant scope)
   "Fetch the MS graph api token using *CREDENTIALS*.
 TENANT and SCOPE are optional. If not given, 'common' tenant and default scope are used."
-  (odata-client::decode-json-from-string
-   (odata-client::http-request
-    (format nil "https://login.microsoftonline.com/~a/oauth2/v2.0/token"
-            (or tenant (getf *credentials* :tenantid) "common"))
-    :method :post
-    :parameters `(("client_id" . ,(getf *credentials* :appid))
-                  ("scope" . ,(or scope "https://graph.microsoft.com/.default"))
-                  ("client_secret" . ,(getf *credentials* :client-secret))
-                  ("grant_type" . "client_credentials")))))
+  (let ((credentials (msgraph-credentials)))
+    (odata-client::decode-json-from-string
+     (odata-client::http-request
+      (format nil "https://login.microsoftonline.com/~a/oauth2/v2.0/token"
+              (or tenant (getf credentials :tenantid) "common"))
+      :method :post
+      :parameters `(("client_id" . ,(getf credentials :appid))
+                    ("scope" . ,(or scope "https://graph.microsoft.com/.default"))
+                    ("client_secret" . ,(getf credentials :client-secret))
+                    ("grant_type" . "client_credentials"))))))
 
 (defun api-request (url token &rest args &key additional-headers &allow-other-keys)
   "Make a request to api URL using TOKEN."
@@ -42,7 +47,7 @@ TENANT and SCOPE are optional. If not given, 'common' tenant and default scope a
 
 (defun get-msgraph-token ()
   "Get token for msgraph api using *CREDENTIALS*."
-  (setf *ms-token* (get-msgraph-api-token :tenant (getf *credentials* :tenantid))))
+  (setf *ms-token* (get-msgraph-api-token :tenant (getf (msgraph-credentials) :tenantid))))
 
 ;; OData wrappers for Microsoft API
 
