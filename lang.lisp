@@ -48,25 +48,25 @@
 
 (defun link (url data)
   (multiple-value-bind (response status)
-      (drakma:http-request (quri:render-uri url)
+      (odata-client::http-request (quri:render-uri url)
                            :method :post
                            :preserve-uri t
                            :content (json:encode-json-to-string data)
                            :content-type "application/json"
                            :accept "application/json")
     (when (>= status 400)
-      (error "Error ~a: ~a" status (accesses (json:decode-json-from-string response) :error :message)))))
+      (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
 
 (defun update-link (url data)
   (multiple-value-bind (response status)
-      (drakma:http-request (quri:render-uri url)
+      (odata-client::http-request (quri:render-uri url)
                            :method :put
                            :preserve-uri t
                            :content (json:encode-json-to-string data)
                            :content-type "application/json"
                            :accept "application/json")
     (when (>= status 400)
-      (error "Error ~a: ~a" status (accesses (json:decode-json-from-string response) :error :message)))))
+      (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
 
 
 (defun create (url data)

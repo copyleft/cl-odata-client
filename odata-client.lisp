@@ -1,18 +1,47 @@
 (in-package #:odata-client)
 
-(defvar *odata-base*)
-(defvar *access-token*)
+(defvar *odata-base* nil
+  "ODATA service base url.")
 
-(push '("application" . "json") drakma:*text-content-types*)
-(setf json:*lisp-identifier-name-to-json*
-      'lisp-to-camel-case)
-(setf json:*json-identifier-name-to-lisp*
-      'camel-case-to-lisp)
+(defvar *access-token* nil
+  "ODATA service api token.")
+
+;;------ Utility functions ------------------
+
+(defun camel-case-to-lisp (string)
+  (string-upcase (cl-change-case:param-case string)))
+
+(defun lisp-to-camel-case (string)
+  (cl-change-case:camel-case string))
+
+(defun decode-json-from-source (source)
+  (let ((json:*json-identifier-name-to-lisp* 'camel-case-to-lisp))
+    (json:decode-json-from-source source)))
+
+(defun encode-json-to-string (object)
+  (let ((json:*lisp-identifier-name-to-json* 'lisp-to-camel-case))
+    (json:encode-json-to-string object)))
+
+(defun decode-json-from-string (string)
+  (let ((json:*json-identifier-name-to-lisp* 'camel-case-to-lisp))
+    (json:decode-json-from-string string)))
+
+(defun http-request (url &rest args)
+  (let ((drakma:*text-content-types* (cons (cons "application" "json") drakma:*text-content-types*)))
+    (apply #'drakma:http-request url args)))
+
+;;--- ODATA service accessing ---------------------
 
 (define-condition odata-request-error (simple-error)
   ((http-status :initarg :http-status :accessor http-status)))
 
 (defun odata-get (url &key $filter $expand authorization)
+  "GET request on an ODATA service at URL.
+$filter is an ODATA $filter expression.
+$expand is an ODATA $expand expression.
+AUTHORIZATION is the authorization token.
+
+See: http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part1-protocol/odata-v4.0-errata03-os-part1-protocol-complete.html#_The_$filter_System"
   (let ((url* (if (stringp url)
                   (quri:uri url)
                   url)))
@@ -21,39 +50,43 @@
     (when $expand
       (push (cons "$expand" $expand) (quri:uri-query-params url*)))
     (multiple-value-bind (response status)
-        (drakma:http-request (quri:render-uri url*)
-                             :preserve-uri t
-                             :additional-headers (when authorization
-                                                   (list (cons "Authorization"
-                                                               authorization))))
-      (let ((json (json:decode-json-from-string response)))
+        (http-request (quri:render-uri url*)
+                      :preserve-uri t
+                      :additional-headers (when authorization
+                                            (list (cons "Authorization"
+                                                        authorization)))
+		      :want-stream t)
+      (let ((json (decode-json-from-source response)))
         (when (>= status 400)
           (error 'odata-request-error
-               :http-status status
-               :format-control "OData request error (~a): ~a"
-               :format-arguments (list status (accesses json :error :message))))
+                 :http-status status
+                 :format-control "OData request error (~a): ~a"
+                 :format-arguments (list status (accesses json :error :message))))
         json))))
 
 (defun odata-get* (uri &rest args &key $filter $expand)
+  "Make an ODATA-GET request using *ODATA-BASE* as URL base."
   (apply #'odata-get (quri:merge-uris uri *odata-base*)
          args))
 
 (defun odata-post (uri data &key (json-encode t) authorization)
+  "Make a POST request to ODATA service at URI.
+DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
   (multiple-value-bind (response status)
-      (drakma:http-request (quri:render-uri uri)
-                           :preserve-uri t
-                           :content (if json-encode
-                                        (json:encode-json-to-string data)
-                                        data)
-                           :additional-headers (when authorization
-                                                 (list (cons "Authorization"
-                                                             authorization)))
-                           :content-type "application/json;odata.metadata=minimal"
-                           :accept "application/json"
-                           :method :post)
+      (http-request (quri:render-uri uri)
+                    :preserve-uri t
+                    :content (if json-encode
+                                 (encode-json-to-string data)
+                                 data)
+                    :additional-headers (when authorization
+                                          (list (cons "Authorization"
+                                                      authorization)))
+                    :content-type "application/json;odata.metadata=minimal"
+                    :accept "application/json"
+                    :method :post)
     (if (and (null response) (< status 400)) ;; no content
         (return-from odata-post nil))
-    (let ((json (json:decode-json-from-string response)))
+    (let ((json (decode-json-from-string response)))
       (when (>= status 400)
         (error 'odata-request-error
                :http-status status
@@ -62,21 +95,23 @@
       json)))
 
 (defun odata-patch (uri data &key (json-encode t) authorization)
+  "Make a PATCH request to ODATA service at URI.
+DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
   (multiple-value-bind (response status)
-      (drakma:http-request (quri:render-uri uri)
-                           :preserve-uri t
-                           :content (if json-encode
-                                        (json:encode-json-to-string data)
-                                        data)
-                           :additional-headers (when authorization
-                                                 (list (cons "Authorization"
-                                                             authorization)))
-                           :content-type "application/json;odata.metadata=minimal"
-                           :accept "application/json"
-                           :method :patch)
+      (http-request (quri:render-uri uri)
+                    :preserve-uri t
+                    :content (if json-encode
+                                 (encode-json-to-string data)
+                                 data)
+                    :additional-headers (when authorization
+                                          (list (cons "Authorization"
+                                                      authorization)))
+                    :content-type "application/json;odata.metadata=minimal"
+                    :accept "application/json"
+                    :method :patch)
     (if (and (null response) (< status 400)) ;; no content
         (return-from odata-patch nil))
-    (let ((json (json:decode-json-from-string response)))
+    (let ((json (decode-json-from-string response)))
       (when (>= status 400)
         (error 'odata-request-error
                :http-status status
@@ -95,11 +130,7 @@
              (string= (dom:node-name nd) name))
            (dom:child-nodes node)))
 
-(defun camel-case-to-lisp (string)
-  (string-upcase (cl-change-case:param-case string)))
-
-(defun lisp-to-camel-case (string)
-  (cl-change-case:camel-case string))
+;;---- ODATA DSL --------------------------------------------
 
 (defun compile-$filter (exp)
   (when (stringp exp)
@@ -116,6 +147,16 @@
     (t (princ-to-string arg))))
 
 (defun compile-$expand (exp)
+  "Returns and ODATA $expand expression from Lisp expression EXP.
+
+Examples:
+
+(compile-$expand \"asdf\") => \"asdf\"
+(compile-$expand '(\"asdf\" \"foo\")) => \"asdf,foo\"
+(compile-$expand '(\"asdf\" \"foo\" (\"Bar\" \"Baz\"))) => \"asdf,foo,Bar/Baz\"
+
+See: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventions.html#sec_SystemQueryOptionexpand
+"
   (cond
     ((stringp exp) exp)
     ((eql exp :all) "*")
@@ -123,11 +164,11 @@
     ((null exp) nil)
     (t
      (with-output-to-string (s)
-       (princ (compile-$expand-path (first exp)) s)
+       (princ (compile-path (first exp)) s)
        (loop for x in (rest exp)
-          do
-            (princ "," s)
-            (princ (compile-path x) s))))))
+             do
+                (princ "," s)
+                (princ (compile-path x) s))))))
 
 (defun compile-path (path)
   (cond
@@ -136,14 +177,14 @@
      (with-output-to-string (s)
        (princ (first path) s)
        (loop for x in (rest path)
-          do
-            (princ "/" s)
-            (princ x s))))))
+             do
+                (princ "/" s)
+                (princ x s))))))
 
-;; (odata::compile-$expand "asdf")
-;; (odata::compile-$expand '("asdf"))
-;; (odata::compile-$expand '("asdf" "foo"))
-;; (odata::compile-$expand '("asdf" "foo" ("Bar" "Baz")))
+;; (odata-client::compile-$expand "asdf")
+;; (odata-client::compile-$expand '("asdf"))
+;; (odata-client::compile-$expand '("asdf" "foo"))
+;; (odata-client::compile-$expand '("asdf" "foo" ("Bar" "Baz")))
 
 (defun compile-$select (exp)
   (cond
@@ -153,9 +194,9 @@
      (with-output-to-string (s)
        (princ (first exp) s)
        (loop for x in (rest exp)
-          do
-            (princ "," s)
-            (princ x s))))))
+             do
+                (princ "," s)
+                (princ x s))))))
 
 ;; (compile-$select "foo,bar")
 ;; (compile-$select '("foo" "bar"))

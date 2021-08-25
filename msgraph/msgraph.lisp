@@ -18,8 +18,8 @@ A property list with :appid, :tenantid, :appname and :client-secret.")
 (defun get-msgraph-api-token (&key tenant scope)
   "Fetch the MS graph api token using *CREDENTIALS*.
 TENANT and SCOPE are optional. If not given, 'common' tenant and default scope are used."
-  (json:decode-json-from-string
-   (drakma:http-request
+  (odata-client::decode-json-from-string
+   (odata-client::http-request
     (format nil "https://login.microsoftonline.com/~a/oauth2/v2.0/token"
             (or tenant (getf *credentials* :tenantid) "common"))
     :method :post
@@ -30,7 +30,7 @@ TENANT and SCOPE are optional. If not given, 'common' tenant and default scope a
 
 (defun api-request (url token &rest args &key additional-headers &allow-other-keys)
   "Make a request to api URL using TOKEN."
-  (apply #'drakma:http-request
+  (apply #'odata-client::http-request
          (princ-to-string url)
          (list* :additional-headers
                 (cons (cons "Authorization"
