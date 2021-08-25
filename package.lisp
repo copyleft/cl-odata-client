@@ -8,6 +8,6 @@
    :odata-get*
    :odata-post
    :odata-patch
-   :with-odata-base
-           
-           ))
+   :odata-put
+   :with-odata-base)
+  (:documentation "Provides core functions for interacting with an ODATA service."))

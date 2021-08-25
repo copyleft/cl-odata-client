@@ -118,6 +118,30 @@ DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
                :format-control "OData request error (~a): ~a"
                :format-arguments (list status (accesses json :error :message)))))))
 
+(defun odata-put (uri data &key (json-encode t) authorization)
+  "Make a PUT (update) request to ODATA service at URI.
+DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
+  (multiple-value-bind (response status)
+      (http-request (quri:render-uri uri)
+                    :preserve-uri t
+                    :content (if json-encode
+                                 (encode-json-to-string data)
+                                 data)
+                    :additional-headers (when authorization
+                                          (list (cons "Authorization"
+                                                      authorization)))
+                    :content-type "application/json;odata.metadata=minimal"
+                    :accept "application/json"
+                    :method :patch)
+    (if (and (null response) (< status 400)) ;; no content
+        (return-from odata-put nil))
+    (let ((json (decode-json-from-string response)))
+      (when (>= status 400)
+        (error 'odata-request-error
+               :http-status status
+               :format-control "OData request error (~a): ~a"
+               :format-arguments (list status (accesses json :error :message)))))))
+
 (defun call-with-odata-base (base func)
   (let ((*odata-base* base))
     (funcall func)))
@@ -133,11 +157,25 @@ DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
 ;;---- ODATA DSL --------------------------------------------
 
 (defun compile-$filter (exp)
+  "Compile ODATA $filter expression.
+
+The $filter system query option allows clients to filter a collection of resources that are addressed by a request URL. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.
+
+Syntax:
+(:= exp exp) : Equals.
+(:eq exp exp): Equals.
+(:> exp exp): Greater than.
+(:< exp exp): Lower than.
+(:contains path exp): Contains.
+ 
+See: https://www.odata.org/getting-started/basic-tutorial/#filter"
   (when (stringp exp)
     (return-from compile-$filter exp))
   (ecase (first exp)
     (:eq (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
     (:= (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
+    (:> (format nil "~a gt ~a" (second exp) (format-arg (third exp))))
+    (:< (format nil "~a lt ~a" (second exp) (format-arg (third exp))))
     (:contains (format nil "contains(~a, ~a)" (compile-path (second exp)) (format-arg (third exp))))))
 
 (defun format-arg (arg)
