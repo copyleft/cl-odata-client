@@ -1,0 +1,278 @@
+\input texinfo   @c -*-texinfo-*-
+@comment $Id@w{$}
+@comment %**start of header
+@settitle Common Lisp Documentation Weaver
+@syncodeindex pg cp
+@setfilename cl-odata-client.info
+@include common-lisp.texi
+
+@copying
+
+Copyright @copyright{} 2021 Mariano Montone
+
+@end copying
+
+
+@dircategory Common Lisp
+@direntry
+* CL-ODATA-Client: (cl-odata-client)Common Lisp client for ODATA services.
+@end direntry
+
+@titlepage
+@title Common Lisp ODATA Client
+
+@author Mariano Montone ( @email{marianomontone@@gmail.com} )
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Top
+@cindex odata-client
+@cindex cl-odata-client
+
+@emph{CL-ODATA-CLIENT} is a Common Lisp client for accessing ODATA services.
+
+@menu
+* Introduction::
+* Installation::
+* Usage::
+* API::
+* Index::
+@end menu
+
+@node Introduction
+@chapter Introduction
+@anchor{introduction}
+
+@emph{CL-ODATA-CLIENT} is a Common Lisp client for accessing ODATA services.
+
+@node Installation
+@chapter Installation
+@anchor{installation}
+
+@node Usage
+@chapter Usage
+@anchor{usage}
+
+@node API
+@chapter API
+@anchor{api}
+
+@deftp PACKAGE ODATA-CLIENT
+
+Provides core functions for interacting with an ODATA service.
+
+@end deftp
+
+@heading External definitions
+
+@subheading Variables
+@cldefvar {ODATA-CLIENT, *ACCESS-TOKEN*}
+
+ODATA service api token.
+@endcldefvar
+
+@cldefvar {ODATA-CLIENT, *ODATA-BASE*}
+
+ODATA service base url.
+@endcldefvar
+
+@subheading Macros
+@cldefmacro {ODATA-CLIENT, WITH-ODATA-BASE, (base &body body)}
+
+
+@endcldefmacro
+
+@subheading Functions
+@cldefun {ODATA-CLIENT, ODATA-POST, (uri data &key (json-encode t) authorization)}
+
+Make a POST request to ODATA service at @var{URI}.@*
+@var{DATA} is the @var{data} to be posted. It is encoded using @clref{ODATA-CLIENT, ENCODE-JSON-TO-STRING, function}.
+@endcldefun
+
+@cldefun {ODATA-CLIENT, ODATA-GET*, (uri &rest args &key $filter $expand)}
+
+Make an @clref{ODATA-CLIENT, ODATA-GET, function} request using @clref{ODATA-CLIENT, *ODATA-BASE*, variable} as URL base.
+@endcldefun
+
+@cldefun {ODATA-CLIENT, ODATA-PUT, (uri data &key (json-encode t) authorization)}
+
+Make a PUT (update) request to ODATA service at @var{URI}.@*
+@var{DATA} is the @var{data} to be posted. It is encoded using @clref{ODATA-CLIENT, ENCODE-JSON-TO-STRING, function}.
+@endcldefun
+
+@cldefun {ODATA-CLIENT, ODATA-PATCH, (uri data &key (json-encode t) authorization)}
+
+Make a PATCH request to ODATA service at @var{URI}.@*
+@var{DATA} is the @var{data} to be posted. It is encoded using @clref{ODATA-CLIENT, ENCODE-JSON-TO-STRING, function}.
+@endcldefun
+
+@cldefun {ODATA-CLIENT, ODATA-GET, (url &key $filter $expand authorization)}
+
+@clref{COMMON-LISP, GET, function} request on an ODATA service at @var{URL}.@*
+@var{$filter} is an ODATA @var{$filter} expression.@*
+@var{$expand} is an ODATA @var{$expand} expression.@*
+@var{AUTHORIZATION} is the @var{authorization} token.@*
+@*
+See: @url{http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part1-protocol/odata-v4.0-errata03-os-part1-protocol-complete.html#_The_}$filter_System
+@endcldefun
+
+@subheading Classes
+@cldefclass {ODATA-CLIENT, ODATA-REQUEST-ERROR}
+
+
+
+Class precedence list: @code{odata-request-error, error, serious-condition, condition, t}
+
+@endcldefclass
+
+
+
+@deftp PACKAGE ODATA/LANG
+
+This package exports functions that are meant to be used with arrows syntax to interact with an ODATA service.
+
+@end deftp
+
+@heading External definitions
+
+@subheading Functions
+@cldefun {ODATA/LANG, UPDATE-LINK, (url data)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, ID, (url id)}
+
+Get ODATA resource @var{id}.
+@endcldefun
+
+@cldefun {ODATA/LANG, FCALL, (url name &rest args)}
+
+Call the ODATA action with @var{name} @var{NAME} and arguments @var{ARGS}.@*
+@*
+Actions are operations exposed by an OData service that MAY have side effects when invoked. Actions MAY return data but MUST @clref{COMMON-LISP, NOT, function} be further composed with additional path segments.@*
+@*
+See: @url{https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_Actions}
+@endcldefun
+
+@cldefun {ODATA/LANG, $ORDERBY, (url property &optional (order :asc))}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, PROPERTY, (url name)}
+
+Access the resource property with @var{name} @var{NAME}.
+@endcldefun
+
+@cldefun {ODATA/LANG, $TOP, (url top)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, $FILTER, (url exp)}
+
+Add ODATA filter parameter to the current request.@*
+@*
+The $filter system query option allows clients to filter a collection of resources that are addressed by a request @var{URL}. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.@*
+@*
+See: @clref{ODATA-CLIENT, ODATA-CLIENT::compile-$filter, function}@*
+See: @url{https://www.odata.org/getting-started/basic-tutorial/#filter}
+@endcldefun
+
+@cldefun {ODATA/LANG, $SKIP, (url skip)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, DEL, (url)}
+
+Perform a resource deletion request at ODATA service at @var{URL}.
+@endcldefun
+
+@cldefun {ODATA/LANG, PATH, (url &rest path)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, $VALUE, (url)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, $SEARCH, (url exp)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, $SELECT, (url exp)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, LINK, (url data)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, POST, (msgraph::url &optional msgraph::data)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, FETCH, (msgraph::url &optional type)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, UPDATE, (url data)}
+
+Perform a resource update (PUT request) with @var{DATA} to ODATA service at @var{URL}.
+@endcldefun
+
+@cldefun {ODATA/LANG, SINGLETON, (url name)}
+
+Access the ODATA singleton with @var{name} @var{NAME} at @var{URL}.@*
+See: @url{https://www.odata.org/getting-started/advanced-tutorial/#querySingleton} .
+@endcldefun
+
+@cldefun {ODATA/LANG, COLLECTION, (url name)}
+
+Access the resource collection at @var{NAME}.
+@endcldefun
+
+@cldefun {ODATA/LANG, CREATE, (url data)}
+
+Perform a resource creation request with @var{DATA} at ODATA service at @var{URL}.
+@endcldefun
+
+@cldefun {ODATA/LANG, PATCH, (url data)}
+
+Perform a resource @clref{ODATA/LANG, PATCH, function} request with @var{DATA} to ODATA service at @var{URL}.
+@endcldefun
+
+@cldefun {ODATA/LANG, $REF, (url)}
+
+
+@endcldefun
+
+@cldefun {ODATA/LANG, $EXPAND, (url exp)}
+
+
+@endcldefun
+
+
+
+@node Index
+@chapter Index
+
+@printindex cp
+@printindex vr
+@printindex fn
+
+@bye

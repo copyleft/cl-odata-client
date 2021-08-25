@@ -1,0 +1,76 @@
+\input texinfo   @c -*-texinfo-*-
+@comment $Id@w{$}
+@comment %**start of header
+@settitle Common Lisp Documentation Weaver
+@syncodeindex pg cp
+@setfilename cl-odata-client.info
+@include common-lisp.texi
+
+@copying
+
+Copyright @copyright{} 2021 Mariano Montone
+
+@end copying
+
+
+@dircategory Common Lisp
+@direntry
+* CL-ODATA-Client: (cl-odata-client)Common Lisp client for ODATA services.
+@end direntry
+
+@titlepage
+@title Common Lisp ODATA Client
+
+@author Mariano Montone ( @email{marianomontone@@gmail.com} )
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@contents
+
+@node Top
+@top Top
+@cindex odata-client
+@cindex cl-odata-client
+
+@emph{CL-ODATA-CLIENT} is a Common Lisp client for accessing ODATA services.
+
+@menu
+* Introduction::
+* Installation::
+* Usage::
+* API::
+* Index::
+@end menu
+
+@node Introduction
+@chapter Introduction
+@anchor{introduction}
+
+@emph{CL-ODATA-CLIENT} is a Common Lisp client for accessing ODATA services.
+
+@node Installation
+@chapter Installation
+@anchor{installation}
+
+@node Usage
+@chapter Usage
+@anchor{usage}
+
+@node API
+@chapter API
+@anchor{api}
+
+(@clpackage :odata-client)
+
+(@clpackage :odata/lang)
+
+@node Index
+@chapter Index
+
+@printindex cp
+@printindex vr
+@printindex fn
+
+@bye

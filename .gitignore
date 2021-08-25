@@ -1,2 +1,11 @@
 *.fasl
 *~
+/docs/cl-odata-client.cp
+/docs/cl-odata-client.fn
+/docs/cl-odata-client.fns
+/docs/cl-odata-client.log
+/docs/cl-odata-client.toc
+/docs/cl-odata-client.tp
+/docs/cl-odata-client.tps
+/docs/cl-odata-client.vr
+/docs/cl-odata-client.vrs
