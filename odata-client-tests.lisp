@@ -25,4 +25,126 @@
     (is (listp results))
     (mapcar (lambda (item)
 	      (is (access item :user-name)))
-    results)))
+	    results)))
+
+(deftest fetch-entity-test ()
+  (let ((entity
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (id "russellwhyte")
+	      (fetch))))
+    (is (not (null entity)))
+    (is (access entity :user-name))
+    (is (access entity :first-name))
+    (is (access entity :emails))))
+
+(deftest fetch-property-test ()
+  (let ((name (-> +trip-pin-modify+
+		  (collection "Airports")
+		  (id "KSFO")
+		  (property "Name")
+		  (fetch :value))))
+    (is (stringp name))
+    (is (string= name "San Francisco International Airport"))))
+
+(deftest $filter-test ()
+  (let ((filtered
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      ($filter "FirstName eq 'Scott'")
+	      (fetch :collection))))
+    (mapcar (lambda (user)
+	      (is (string= (access user :first-name) "Scott")))
+	    filtered)))
+
+(deftest compiled-$filter-test ()
+  (let ((filtered
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      ($filter '(:= "FirstName" "Scott"))
+	      (fetch :collection))))
+    (mapcar (lambda (user)
+	      (is (string= (access user :first-name) "Scott")))
+	    filtered)))
+
+(deftest complex-filter-test ()
+  (let ((filtered
+	  (-> +trip-pin-modify+
+	      (collection "Airports")
+	      ($filter "contains(Location/Address, 'San Francisco')")
+	      (fetch :collection))))
+    (mapcar (lambda (airport)
+	      (is (search "San Francisco" (accesses airport :location :address)
+			:test 'string=)))
+	    filtered))
+
+  (let ((filtered
+	  (-> +trip-pin-modify+
+	      (collection "Airports")
+	      ($filter '(:contains ("Location" "Address") "San Francisco"))
+	      (fetch :collection))))
+    (mapcar (lambda (airport)
+	      (is (search "San Francisco" (accesses airport :location :address)
+			:test 'string=)))
+	    filtered))
+  )
+
+(deftest order-by-test ()
+  (let ((trips
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (id "scottketchum")
+	      (property "Trips")
+	      ($orderby "EndsAt" :desc)
+	      (fetch :collection))))
+    (is (listp trips))
+
+    ;; Check that the list is ordered
+    (labels ((zip-lists (l1 l2)
+	       (if (or (null l1)
+		       (null l2))
+		   (return-from zip-lists nil)
+		   (cons (cons l1 l2)
+			 (zip-lists (rest l1) (rest l2))))))
+      (mapcar (lambda (elem)
+		(is (equalp (car elem) (cdr elem))))
+	      (zip-lists
+	       (mapcar (lambda (x)
+			 (alexandria:assoc-value x :trip-id))
+		       trips)
+	       (mapcar (lambda (x)
+			 (alexandria:assoc-value x :trip-id))
+		       (sort trips 'local-time:timestamp> :key
+			     (lambda (trip)
+			       (local-time:parse-timestring (access trip :ends-at)))))))))
+
+  (let ((trips
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (id "scottketchum")
+	      (property "Trips")
+	      ($orderby "EndsAt" :asc)
+	      (fetch :collection))))
+    (is (listp trips))
+
+    ;; Check that the list is ordered
+    (labels ((zip-lists (l1 l2)
+	       (if (or (null l1)
+		       (null l2))
+		   (return-from zip-lists nil)
+		   (cons (cons l1 l2)
+			 (zip-lists (rest l1) (rest l2))))))
+      (mapcar (lambda (elem)
+		(is (equalp (car elem) (cdr elem))))
+	      (zip-lists
+	       (mapcar (lambda (x)
+			 (alexandria:assoc-value x :trip-id))
+		       trips)
+	       (mapcar (lambda (x)
+			 (alexandria:assoc-value x :trip-id))
+		       (sort trips 'local-time:timestamp< :key
+			     (lambda (trip)
+			       (local-time:parse-timestring (access trip :ends-at)))))))))
+
+  )
+
