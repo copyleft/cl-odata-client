@@ -53,7 +53,20 @@ See: https://www.odata.org/getting-started/advanced-tutorial/#querySingleton ."
   (odata-client:odata-post url data))
 
 (defun link (url data)
-  ""
+  "Add a link to a related entity.
+
+Relationships from one entity to another are represented as navigation properties.
+A successful POST request to a navigation property's references collection adds a relationship to an existing entity.
+
+Example: add 'vincentcalabrese' to friends of 'scottketchum'
+
+(-> +trip-pin-modify+
+   (collection \"People\") (id \"scottketchum\")
+   (property \"Friends\") ($ref)
+   (link `((\"@odata.context\" . ,(quri:render-uri +trip-pin-modify+))
+           (\"@odata.id\" . \"People('vincentcalabrese')\"))))
+
+"
   (multiple-value-bind (response status)
       (odata-client::http-request (quri:render-uri url)
                            :method :post
@@ -65,6 +78,22 @@ See: https://www.odata.org/getting-started/advanced-tutorial/#querySingleton ."
       (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
 
 (defun update-link (url data)
+  "Update an already existent link.
+
+A successful PUT request to a single-valued navigation property’s reference resource changes the related entity.
+
+Example: change the Airline of a Flight
+
+(-> +trip-pin-modify+
+              (collection \"People\")
+              (id \"russellwhyte\")
+              (path \"Trips(0)\"
+                    \"PlanItems(11)\"
+                    \"Microsoft.OData.SampleService.Models.TripPin.Flight\"
+                    \"Airline\")
+              (update-link `((\"@odata.context\" . ,(quri:render-uri +trip-pin-modify+))
+           (\"@odata.id\" . \"Airlines('FM')\"))))
+"
   (multiple-value-bind (response status)
       (odata-client::http-request (quri:render-uri url)
                            :method :put
@@ -74,7 +103,6 @@ See: https://www.odata.org/getting-started/advanced-tutorial/#querySingleton ."
                            :accept "application/json")
     (when (>= status 400)
       (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
-
 
 (defun create (url data)
   "Perform a resource creation request with DATA at ODATA service at URL."

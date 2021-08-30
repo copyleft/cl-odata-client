@@ -256,7 +256,24 @@ Previous: <a href="#ODATA_002dCLIENT-package" accesskey="p" rel="prev">ODATA-CLI
 <span id="index-ODATA_002fLANG_003aUPDATE_002dLINK"></span>
 <span id="ODATA_002fLANG_003aUPDATE_002dLINK-function"></span><dl>
 <dt id="index-ODATA_002fLANG_003aUPDATE_002dLINK-1">Function: <strong>ODATA/LANG:UPDATE-LINK</strong> <em>(url data)</em></dt>
-</dl>
+<dd>
+<p>Update an already existent link.<br>
+<br>
+A successful PUT request to a single-valued navigation propertyâs reference resource changes the related entity.<br>
+<br>
+Example: change the Airline of a Flight<br>
+<br>
+(-&gt; +trip-pin-modify+<br>
+              (collection &quot;People&quot;)<br>
+              (id &quot;russellwhyte&quot;)<br>
+              (path &quot;Trips(0)&quot;<br>
+                    &quot;PlanItems(11)&quot;<br>
+                    &quot;Microsoft.OData.SampleService.Models.TripPin.Flight&quot;<br>
+                    &quot;Airline&quot;)<br>
+              (update-link &lsquo;((&quot;@odata.context&quot; . ,(&lsquo;quri:render-uri&rsquo; +trip-pin-modify+))<br>
+           (&quot;@odata.id&quot; . &quot;Airlines(&rsquo;FM&rsquo;)&quot;))))<br>
+</p>
+</dd></dl>
 
 <span id="index-ODATA_002fLANG_003aID"></span>
 <span id="ODATA_002fLANG_003aID-function"></span><dl>
@@ -340,7 +357,22 @@ See: <a href="https://www.odata.org/getting-started/basic-tutorial/#filter">http
 <span id="index-ODATA_002fLANG_003aLINK"></span>
 <span id="ODATA_002fLANG_003aLINK-function"></span><dl>
 <dt id="index-ODATA_002fLANG_003aLINK-1">Function: <strong>ODATA/LANG:LINK</strong> <em>(url data)</em></dt>
-</dl>
+<dd>
+<p>Add a link to a related entity.<br>
+<br>
+Relationships from one entity to another are represented as navigation properties.<br>
+A successful <a href="#ODATA_002fLANG_003aPOST-function">POST</a> request to a navigation property&rsquo;s references collection adds a relationship to an existing entity.<br>
+<br>
+Example: add &rsquo;vincentcalabrese&rsquo; to friends of &rsquo;scottketchum&rsquo;<br>
+<br>
+(-&gt; +trip-pin-modify+<br>
+   (collection &quot;People&quot;) (id &quot;scottketchum&quot;)<br>
+   (property &quot;Friends&quot;) ($ref)<br>
+   (link &lsquo;((&quot;@odata.context&quot; . ,(&lsquo;quri:render-uri&rsquo; +trip-pin-modify+))<br>
+           (&quot;@odata.id&quot; . &quot;People(&rsquo;vincentcalabrese&rsquo;)&quot;))))<br>
+<br>
+</p>
+</dd></dl>
 
 <span id="index-ODATA_002fLANG_003aPOST"></span>
 <span id="ODATA_002fLANG_003aPOST-function"></span><dl>

@@ -178,3 +178,10 @@
 	       "foo,bar"))
   (is (odata-client::compile-$select '("foo" "bar"))
       "foo,bar"))
+
+(deftest links-test ()
+  (-> +trip-pin-modify+
+   (collection "People") (id "scottketchum")
+   (property "Friends") ($ref)
+   (link `(("@odata.context" . ,(quri:render-uri +trip-pin-modify+))
+           ("@odata.id" . "People('vincentcalabrese')"))))
