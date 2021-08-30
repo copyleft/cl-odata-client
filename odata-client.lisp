@@ -235,11 +235,6 @@ See: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventi
                 (princ "/" s)
                 (princ x s))))))
 
-;; (odata-client::compile-$expand "asdf")
-;; (odata-client::compile-$expand '("asdf"))
-;; (odata-client::compile-$expand '("asdf" "foo"))
-;; (odata-client::compile-$expand '("asdf" "foo" ("Bar" "Baz")))
-
 (defun compile-$select (exp)
   (cond
     ((stringp exp) exp)
@@ -251,9 +246,6 @@ See: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventi
              do
                 (princ "," s)
                 (princ x s))))))
-
-;; (compile-$select "foo,bar")
-;; (compile-$select '("foo" "bar"))
 
 (defun compile-$search (exp)
   exp)

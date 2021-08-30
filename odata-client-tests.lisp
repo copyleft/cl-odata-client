@@ -148,7 +148,7 @@
 
   )
 
-(deftest filter-syntax-test ()
+(deftest $filter-syntax-test ()
   (is (string= (odata-client::compile-$filter '(:= "foo" "bar"))
 	       "foo eq 'bar'"))
   (is (string= (odata-client::compile-$filter '(:> "foo" "bar"))
@@ -162,3 +162,19 @@
   (is (string= (odata-client::compile-$filter '(:not (:contains ("Location" "Address") "San Francisco")))
 	       "not contains(Location/Address, 'San Francisco')"
 	       )))
+
+(deftest $compile-syntax-test ()
+  (is (string= (odata-client::compile-$expand "asdf")
+	       "asdf"))
+  (is (string= (odata-client::compile-$expand '("asdf"))
+	       "asdf"))
+  (is (string= (odata-client::compile-$expand '("asdf" "foo"))
+	       "asdf,foo"))
+  (is (string= (odata-client::compile-$expand '("asdf" "foo" ("Bar" "Baz")))
+	       "asdf,foo,Bar/Baz")))
+
+(deftest $select-syntax-test ()
+  (is (string= (odata-client::compile-$select "foo,bar")
+	       "foo,bar"))
+  (is (odata-client::compile-$select '("foo" "bar"))
+      "foo,bar"))
