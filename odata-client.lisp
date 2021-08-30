@@ -161,21 +161,37 @@ DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
 
 The $filter system query option allows clients to filter a collection of resources that are addressed by a request URL. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.
 
+EXP can be either:
+- And s-expression (a list). Should follow the filter mini-language and get compiled to a string.
+- A string. In this case, the string is returned as is.
+
+Return type: string.
+
 Syntax:
 (:= exp exp) : Equals.
 (:eq exp exp): Equals.
 (:> exp exp): Greater than.
 (:< exp exp): Lower than.
 (:contains path exp): Contains.
+And more ...
  
 See: https://www.odata.org/getting-started/basic-tutorial/#filter"
   (when (stringp exp)
     (return-from compile-$filter exp))
   (ecase (first exp)
-    (:eq (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
-    (:= (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
-    (:> (format nil "~a gt ~a" (second exp) (format-arg (third exp))))
-    (:< (format nil "~a lt ~a" (second exp) (format-arg (third exp))))
+    ((:eq :=) (format nil "~a eq ~a" (second exp) (format-arg (third exp))))
+    ((:ne :/=) (format nil "~a ne ~a" (second exp) (format-arg (third exp))))
+    ((:gt :>) (format nil "~a gt ~a" (second exp) (format-arg (third exp))))
+    ((:lt :<) (format nil "~a lt ~a" (second exp) (format-arg (third exp))))
+    ((:ge :>=) (format nil "~a ge ~a" (second exp) (format-arg (third exp))))
+    ((:le :<=) (format nil "~a le ~a" (second exp) (format-arg (third exp))))
+    (:and (format nil "~a and ~a"
+		  (compile-$filter (second exp))
+		  (compile-$filter (third exp))))
+    (:or (format nil "~a or ~a"
+		  (compile-$filter (second exp))
+		  (compile-$filter (third exp))))
+    (:not (format nil "not ~a" (compile-$filter (second exp))))
     (:contains (format nil "contains(~a, ~a)" (compile-path (second exp)) (format-arg (third exp))))))
 
 (defun format-arg (arg)

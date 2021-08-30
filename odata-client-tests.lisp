@@ -148,3 +148,17 @@
 
   )
 
+(deftest filter-syntax-test ()
+  (is (string= (odata-client::compile-$filter '(:= "foo" "bar"))
+	       "foo eq 'bar'"))
+  (is (string= (odata-client::compile-$filter '(:> "foo" "bar"))
+	       "foo gt 'bar'"))
+  (is (string= (odata-client::compile-$filter '(:and (:= "foo" "bar") (:> "foo" "bar")))
+	       "foo eq 'bar' and foo gt 'bar'"))
+  (is (string= (odata-client::compile-$filter '(:or (:= "foo" "bar") (:> "foo" "bar")))
+	       "foo eq 'bar' or foo gt 'bar'"))
+  (is (string= (odata-client::compile-$filter '(:contains ("Location" "Address") "San Francisco" ))
+	       "contains(Location/Address, 'San Francisco')"))
+  (is (string= (odata-client::compile-$filter '(:not (:contains ("Location" "Address") "San Francisco")))
+	       "not contains(Location/Address, 'San Francisco')"
+	       )))
