@@ -62,8 +62,17 @@ Copyright @copyright{} 2021 Mariano Montone
 @chapter API
 @anchor{api}
 
+@menu
+* ODATA-CLIENT package::
+* ODATA/LANG package::
+@end menu
+
+@node ODATA-CLIENT package
+@section ODATA-CLIENT package
 (@clpackage :odata-client)
 
+@node ODATA/LANG package
+@section ODATA/LANG package
 (@clpackage :odata/lang)
 
 @node Index
