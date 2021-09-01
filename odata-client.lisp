@@ -236,6 +236,17 @@ See: http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part2-url-conventi
                 (princ x s))))))
 
 (defun compile-$select (exp)
+  "Return ODATA $select string parameter from EXP.
+
+EXP can be either a string or a list of strings.
+Elements of EXP are just separated by comma.
+
+Examples:
+(compile-$select \"name\") => \"foo\"
+(compile-$select '(\"name\" \"surname\")) => \"name,surname\"
+
+See: https://www.odata.org/getting-started/basic-tutorial/#select
+"
   (cond
     ((stringp exp) exp)
     ((null exp) nil)

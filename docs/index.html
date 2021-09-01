@@ -253,6 +253,97 @@ Previous: <a href="#ODATA_002dCLIENT-package" accesskey="p" rel="prev">ODATA-CLI
 <span id="External-definitions-1"></span><h3 class="heading">External definitions</h3>
 
 <span id="Functions-1"></span><h4 class="subheading">Functions</h4>
+<span id="index-ODATA_002fLANG_003aFETCH"></span>
+<span id="ODATA_002fLANG_003aFETCH-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aFETCH-1">Function: <strong>ODATA/LANG:FETCH</strong> <em>(msgraph::url &amp;optional type)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fLANG_003a_0024FILTER"></span>
+<span id="ODATA_002fLANG_003a_0024FILTER-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024FILTER-1">Function: <strong>ODATA/LANG:$FILTER</strong> <em>(url exp)</em></dt>
+<dd>
+<p>Add ODATA $filter parameter to <var>URL</var>.<br>
+<br>
+The $filter system query option allows clients to filter a collection of resources that are addressed by a request <var>URL</var>. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.<br>
+<br>
+See: &lsquo;ODATA-CLIENT::compile-$filter&rsquo;<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#filter">https://www.odata.org/getting-started/basic-tutorial/#filter</a>
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003a_0024VALUE"></span>
+<span id="ODATA_002fLANG_003a_0024VALUE-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024VALUE-1">Function: <strong>ODATA/LANG:$VALUE</strong> <em>(url)</em></dt>
+<dd>
+<p>Address the raw value of a primitive property.<br>
+<br>
+Example: returns the raw value of property Name of an Airport.<br>
+(-&gt; +trip-pin-modify+<br>
+   (collection &quot;Airports&quot;) (id &quot;KSFO&quot;)<br>
+   (property &quot;Name&quot;) ($value)<br>
+<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#propertyVal">https://www.odata.org/getting-started/basic-tutorial/#propertyVal</a><br>
+</p>
+</dd></dl>
+
+<span id="index-ODATA_002fLANG_003aPROPERTY"></span>
+<span id="ODATA_002fLANG_003aPROPERTY-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aPROPERTY-1">Function: <strong>ODATA/LANG:PROPERTY</strong> <em>(url name)</em></dt>
+<dd>
+<p>Access the resource property with <var>name</var> <var>NAME</var>.
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aCOLLECTION"></span>
+<span id="ODATA_002fLANG_003aCOLLECTION-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aCOLLECTION-1">Function: <strong>ODATA/LANG:COLLECTION</strong> <em>(url name)</em></dt>
+<dd>
+<p>Access the resource collection at <var>NAME</var>.
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003a_0024SKIP"></span>
+<span id="ODATA_002fLANG_003a_0024SKIP-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024SKIP-1">Function: <strong>ODATA/LANG:$SKIP</strong> <em>(url skip)</em></dt>
+<dd>
+<p>The $skip query option requests the number of items in the queried collection that are to be skipped and not included in the result.<br>
+<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#topskip">https://www.odata.org/getting-started/basic-tutorial/#topskip</a>
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aPATCH"></span>
+<span id="ODATA_002fLANG_003aPATCH-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aPATCH-1">Function: <strong>ODATA/LANG:PATCH</strong> <em>(url data)</em></dt>
+<dd>
+<p>Perform a resource <a href="#ODATA_002fLANG_003aPATCH-function">PATCH</a> request with <var>DATA</var> to ODATA service at <var>URL</var>.
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003a_0024TOP"></span>
+<span id="ODATA_002fLANG_003a_0024TOP-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024TOP-1">Function: <strong>ODATA/LANG:$TOP</strong> <em>(url top)</em></dt>
+<dd>
+<p>The $top system query option requests the number of items in the queried collection to be included in the result.<br>
+<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#topskip">https://www.odata.org/getting-started/basic-tutorial/#topskip</a>
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aSINGLETON"></span>
+<span id="ODATA_002fLANG_003aSINGLETON-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aSINGLETON-1">Function: <strong>ODATA/LANG:SINGLETON</strong> <em>(url name)</em></dt>
+<dd>
+<p>Access the ODATA singleton with <var>name</var> <var>NAME</var> at <var>URL</var>.<br>
+See: <a href="https://www.odata.org/getting-started/advanced-tutorial/#querySingleton">https://www.odata.org/getting-started/advanced-tutorial/#querySingleton</a> .
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aPOST"></span>
+<span id="ODATA_002fLANG_003aPOST-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aPOST-1">Function: <strong>ODATA/LANG:POST</strong> <em>(msgraph::url &amp;optional msgraph::data)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fLANG_003a_0024COUNT"></span>
+<span id="ODATA_002fLANG_003a_0024COUNT-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024COUNT-1">Function: <strong>ODATA/LANG:$COUNT</strong> <em>(url)</em></dt>
+<dd>
+<p>The $count system query option allows clients to request a count of the matching resources included with the resources in the response.
+</p></dd></dl>
+
 <span id="index-ODATA_002fLANG_003aUPDATE_002dLINK"></span>
 <span id="ODATA_002fLANG_003aUPDATE_002dLINK-function"></span><dl>
 <dt id="index-ODATA_002fLANG_003aUPDATE_002dLINK-1">Function: <strong>ODATA/LANG:UPDATE-LINK</strong> <em>(url data)</em></dt>
@@ -275,85 +366,6 @@ Example: change the Airline of a Flight<br>
 </p>
 </dd></dl>
 
-<span id="index-ODATA_002fLANG_003aID"></span>
-<span id="ODATA_002fLANG_003aID-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aID-1">Function: <strong>ODATA/LANG:ID</strong> <em>(url id)</em></dt>
-<dd>
-<p>Get ODATA resource <var>id</var>.
-</p></dd></dl>
-
-<span id="index-ODATA_002fLANG_003aFCALL"></span>
-<span id="ODATA_002fLANG_003aFCALL-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aFCALL-1">Function: <strong>ODATA/LANG:FCALL</strong> <em>(url name &amp;rest args)</em></dt>
-<dd>
-<p>Call the ODATA action with <var>name</var> <var>NAME</var> and arguments <var>ARGS</var>.<br>
-<br>
-Actions are operations exposed by an OData service that MAY have side effects when invoked. Actions MAY return data but MUST &lsquo;NOT&rsquo; be further composed with additional path segments.<br>
-<br>
-See: <a href="https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_Actions">https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_Actions</a>
-</p></dd></dl>
-
-<span id="index-ODATA_002fLANG_003a_0024ORDERBY"></span>
-<span id="ODATA_002fLANG_003a_0024ORDERBY-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024ORDERBY-1">Function: <strong>ODATA/LANG:$ORDERBY</strong> <em>(url property &amp;optional (order :asc))</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003aPROPERTY"></span>
-<span id="ODATA_002fLANG_003aPROPERTY-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aPROPERTY-1">Function: <strong>ODATA/LANG:PROPERTY</strong> <em>(url name)</em></dt>
-<dd>
-<p>Access the resource property with <var>name</var> <var>NAME</var>.
-</p></dd></dl>
-
-<span id="index-ODATA_002fLANG_003a_0024TOP"></span>
-<span id="ODATA_002fLANG_003a_0024TOP-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024TOP-1">Function: <strong>ODATA/LANG:$TOP</strong> <em>(url top)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003a_0024FILTER"></span>
-<span id="ODATA_002fLANG_003a_0024FILTER-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024FILTER-1">Function: <strong>ODATA/LANG:$FILTER</strong> <em>(url exp)</em></dt>
-<dd>
-<p>Add ODATA filter parameter to the current request.<br>
-<br>
-The $filter system query option allows clients to filter a collection of resources that are addressed by a request <var>URL</var>. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.<br>
-<br>
-See: &lsquo;ODATA-CLIENT::compile-$filter&rsquo;<br>
-See: <a href="https://www.odata.org/getting-started/basic-tutorial/#filter">https://www.odata.org/getting-started/basic-tutorial/#filter</a>
-</p></dd></dl>
-
-<span id="index-ODATA_002fLANG_003a_0024SKIP"></span>
-<span id="ODATA_002fLANG_003a_0024SKIP-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024SKIP-1">Function: <strong>ODATA/LANG:$SKIP</strong> <em>(url skip)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003aDEL"></span>
-<span id="ODATA_002fLANG_003aDEL-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aDEL-1">Function: <strong>ODATA/LANG:DEL</strong> <em>(url)</em></dt>
-<dd>
-<p>Perform a resource deletion request at ODATA service at <var>URL</var>.
-</p></dd></dl>
-
-<span id="index-ODATA_002fLANG_003aPATH"></span>
-<span id="ODATA_002fLANG_003aPATH-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aPATH-1">Function: <strong>ODATA/LANG:PATH</strong> <em>(url &amp;rest path)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003a_0024VALUE"></span>
-<span id="ODATA_002fLANG_003a_0024VALUE-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024VALUE-1">Function: <strong>ODATA/LANG:$VALUE</strong> <em>(url)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003a_0024SEARCH"></span>
-<span id="ODATA_002fLANG_003a_0024SEARCH-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024SEARCH-1">Function: <strong>ODATA/LANG:$SEARCH</strong> <em>(url exp)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003a_0024SELECT"></span>
-<span id="ODATA_002fLANG_003a_0024SELECT-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024SELECT-1">Function: <strong>ODATA/LANG:$SELECT</strong> <em>(url exp)</em></dt>
-</dl>
-
 <span id="index-ODATA_002fLANG_003aLINK"></span>
 <span id="ODATA_002fLANG_003aLINK-function"></span><dl>
 <dt id="index-ODATA_002fLANG_003aLINK-1">Function: <strong>ODATA/LANG:LINK</strong> <em>(url data)</em></dt>
@@ -374,36 +386,54 @@ Example: add &rsquo;vincentcalabrese&rsquo; to friends of &rsquo;scottketchum&rs
 </p>
 </dd></dl>
 
-<span id="index-ODATA_002fLANG_003aPOST"></span>
-<span id="ODATA_002fLANG_003aPOST-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aPOST-1">Function: <strong>ODATA/LANG:POST</strong> <em>(msgraph::url &amp;optional msgraph::data)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003aFETCH"></span>
-<span id="ODATA_002fLANG_003aFETCH-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aFETCH-1">Function: <strong>ODATA/LANG:FETCH</strong> <em>(msgraph::url &amp;optional type)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003aUPDATE"></span>
-<span id="ODATA_002fLANG_003aUPDATE-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aUPDATE-1">Function: <strong>ODATA/LANG:UPDATE</strong> <em>(url data)</em></dt>
+<span id="index-ODATA_002fLANG_003a_0024ORDERBY"></span>
+<span id="ODATA_002fLANG_003a_0024ORDERBY-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024ORDERBY-1">Function: <strong>ODATA/LANG:$ORDERBY</strong> <em>(url property &amp;optional (order :asc))</em></dt>
 <dd>
-<p>Perform a resource update (PUT request) with <var>DATA</var> to ODATA service at <var>URL</var>.
+<p>The $orderby system query option allows clients to request resources in either ascending <var>order</var> using <var>asc</var> or descending <var>order</var> using desc. If <var>asc</var> or desc not specified, then the resources will be ordered in ascending <var>order</var>.
 </p></dd></dl>
 
-<span id="index-ODATA_002fLANG_003aSINGLETON"></span>
-<span id="ODATA_002fLANG_003aSINGLETON-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aSINGLETON-1">Function: <strong>ODATA/LANG:SINGLETON</strong> <em>(url name)</em></dt>
+<span id="index-ODATA_002fLANG_003aDEL"></span>
+<span id="ODATA_002fLANG_003aDEL-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aDEL-1">Function: <strong>ODATA/LANG:DEL</strong> <em>(url)</em></dt>
 <dd>
-<p>Access the ODATA singleton with <var>name</var> <var>NAME</var> at <var>URL</var>.<br>
-See: <a href="https://www.odata.org/getting-started/advanced-tutorial/#querySingleton">https://www.odata.org/getting-started/advanced-tutorial/#querySingleton</a> .
+<p>Perform a resource deletion request at ODATA service at <var>URL</var>.
 </p></dd></dl>
 
-<span id="index-ODATA_002fLANG_003aCOLLECTION"></span>
-<span id="ODATA_002fLANG_003aCOLLECTION-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aCOLLECTION-1">Function: <strong>ODATA/LANG:COLLECTION</strong> <em>(url name)</em></dt>
+<span id="index-ODATA_002fLANG_003a_0024EXPAND"></span>
+<span id="ODATA_002fLANG_003a_0024EXPAND-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024EXPAND-1">Function: <strong>ODATA/LANG:$EXPAND</strong> <em>(url exp)</em></dt>
 <dd>
-<p>Access the resource collection at <var>NAME</var>.
+<p>Add ODATA $expand parameter to <var>URL</var>.<br>
+<br>
+The $expand system query option specifies the related resources to be included in line with retrieved resources.<br>
+<br>
+<var>EXP</var> is the list of things to expand.<br>
+<br>
+Examples:<br>
+<br>
+&rsquo;(&quot;asdf&quot; &quot;foo&quot;)) =&gt; &quot;asdf,foo&quot;<br>
+&rsquo;(&quot;asdf&quot; &quot;foo&quot; (&quot;Bar&quot; &quot;Baz&quot;)) =&gt; &quot;asdf,foo,Bar/Baz&quot;<br>
+<br>
+See: &lsquo;ODATA-CLIENT::COMPILE-$EXPAND&rsquo; .<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#expand">https://www.odata.org/getting-started/basic-tutorial/#expand</a> .
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aPATH"></span>
+<span id="ODATA_002fLANG_003aPATH-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aPATH-1">Function: <strong>ODATA/LANG:PATH</strong> <em>(url &amp;rest path)</em></dt>
+<dd>
+<p>Access entity in a <var>PATH</var>.<br>
+<br>
+Example:<br>
+<br>
+(-&gt; +trip-pin-modify+<br>
+              (collection &quot;People&quot;)<br>
+              (id &quot;russellwhyte&quot;)<br>
+              (<var>path</var> &quot;Trips(0)&quot;<br>
+                    &quot;PlanItems(11)&quot;<br>
+                    &quot;Microsoft.OData.SampleService.Models.TripPin.Flight&quot;<br>
+                    &quot;Airline&quot;))
 </p></dd></dl>
 
 <span id="index-ODATA_002fLANG_003aCREATE"></span>
@@ -413,22 +443,65 @@ See: <a href="https://www.odata.org/getting-started/advanced-tutorial/#querySing
 <p>Perform a resource creation request with <var>DATA</var> at ODATA service at <var>URL</var>.
 </p></dd></dl>
 
-<span id="index-ODATA_002fLANG_003aPATCH"></span>
-<span id="ODATA_002fLANG_003aPATCH-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003aPATCH-1">Function: <strong>ODATA/LANG:PATCH</strong> <em>(url data)</em></dt>
+<span id="index-ODATA_002fLANG_003a_0024SELECT"></span>
+<span id="ODATA_002fLANG_003a_0024SELECT-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024SELECT-1">Function: <strong>ODATA/LANG:$SELECT</strong> <em>(url exp)</em></dt>
 <dd>
-<p>Perform a resource <a href="#ODATA_002fLANG_003aPATCH-function">PATCH</a> request with <var>DATA</var> to ODATA service at <var>URL</var>.
+<p>Adds ODATA $select parameter to <var>URL</var>.<br>
+<br>
+The $select system query option allows the clients to requests a limited set of properties for each entity.<br>
+<br>
+<var>EXP</var> can be either a string or a list of strings.<br>
+Elements of <var>EXP</var> are just separated by comma.<br>
+<br>
+Examples:<br>
+(compile-$select &quot;name&quot;) =&gt; &quot;foo&quot;<br>
+(compile-$select &rsquo;(&quot;name&quot; &quot;surname&quot;)) =&gt; &quot;name,surname&quot;<br>
+<br>
+See: &lsquo;ODATA-CLIENT::COMPILE-$SELECT&rsquo;<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#select">https://www.odata.org/getting-started/basic-tutorial/#select</a>
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aUPDATE"></span>
+<span id="ODATA_002fLANG_003aUPDATE-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aUPDATE-1">Function: <strong>ODATA/LANG:UPDATE</strong> <em>(url data)</em></dt>
+<dd>
+<p>Perform a resource update (PUT request) with <var>DATA</var> to ODATA service at <var>URL</var>.
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aID"></span>
+<span id="ODATA_002fLANG_003aID-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aID-1">Function: <strong>ODATA/LANG:ID</strong> <em>(url id)</em></dt>
+<dd>
+<p>Get ODATA resource <var>id</var>.
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003aFCALL"></span>
+<span id="ODATA_002fLANG_003aFCALL-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003aFCALL-1">Function: <strong>ODATA/LANG:FCALL</strong> <em>(url name &amp;rest args)</em></dt>
+<dd>
+<p>Call the ODATA action with <var>name</var> <var>NAME</var> and arguments <var>ARGS</var>.<br>
+<br>
+Actions are operations exposed by an OData service that MAY have side effects when invoked. Actions MAY return data but MUST &lsquo;NOT&rsquo; be further composed with additional path segments.<br>
+<br>
+See: <a href="https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_Actions">https://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_Actions</a>
+</p></dd></dl>
+
+<span id="index-ODATA_002fLANG_003a_0024SEARCH"></span>
+<span id="ODATA_002fLANG_003a_0024SEARCH-function"></span><dl>
+<dt id="index-ODATA_002fLANG_003a_0024SEARCH-1">Function: <strong>ODATA/LANG:$SEARCH</strong> <em>(url exp)</em></dt>
+<dd>
+<p>The $search system query option restricts the result to include only those entities matching the specified search expression.<br>
+<br>
+See: <a href="https://www.odata.org/getting-started/basic-tutorial/#search">https://www.odata.org/getting-started/basic-tutorial/#search</a>
 </p></dd></dl>
 
 <span id="index-ODATA_002fLANG_003a_0024REF"></span>
 <span id="ODATA_002fLANG_003a_0024REF-function"></span><dl>
 <dt id="index-ODATA_002fLANG_003a_0024REF-1">Function: <strong>ODATA/LANG:$REF</strong> <em>(url)</em></dt>
-</dl>
-
-<span id="index-ODATA_002fLANG_003a_0024EXPAND"></span>
-<span id="ODATA_002fLANG_003a_0024EXPAND-function"></span><dl>
-<dt id="index-ODATA_002fLANG_003a_0024EXPAND-1">Function: <strong>ODATA/LANG:$EXPAND</strong> <em>(url exp)</em></dt>
-</dl>
+<dd>
+<p>A successful <a href="#ODATA_002fLANG_003aPOST-function">POST</a> request to a navigation property&rsquo;s references collection adds a relationship to an existing entity.
+</p></dd></dl>
 
 
 
@@ -502,6 +575,8 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aODATA_002dPUT-1"><code>ODATA-CLIENT:ODATA-PUT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE"><code>ODATA-CLIENT:WITH-ODATA-BASE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE-1"><code>ODATA-CLIENT:WITH-ODATA-BASE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024COUNT"><code>ODATA/LANG:$COUNT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024COUNT-1"><code>ODATA/LANG:$COUNT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024EXPAND"><code>ODATA/LANG:$EXPAND</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024EXPAND-1"><code>ODATA/LANG:$EXPAND</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024FILTER"><code>ODATA/LANG:$FILTER</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>

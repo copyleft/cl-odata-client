@@ -16,6 +16,7 @@
    :fcall
    :$filter
    :$expand
+   :$count
    :id
    :$skip
    :$top
@@ -144,7 +145,7 @@ Example: change the Airline of a Flight
   url)
 
 (defun $filter (url exp)
-  "Add ODATA filter parameter to the current request.
+  "Add ODATA $filter parameter to URL.
 
 The $filter system query option allows clients to filter a collection of resources that are addressed by a request URL. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response. Resources for which the expression evaluates to false or to null, or which reference properties that are unavailable due to permissions, are omitted from the response.
 
@@ -153,34 +154,95 @@ See: https://www.odata.org/getting-started/basic-tutorial/#filter"
   (parameter url "$filter" (odata-client::compile-$filter exp)))
 
 (defun $expand (url exp)
+  "Add ODATA $expand parameter to URL.
+
+The $expand system query option specifies the related resources to be included in line with retrieved resources.
+
+EXP is the list of things to expand.
+
+Examples:
+
+'(\"asdf\" \"foo\")) => \"asdf,foo\"
+'(\"asdf\" \"foo\" (\"Bar\" \"Baz\")) => \"asdf,foo,Bar/Baz\"
+
+See: ODATA-CLIENT::COMPILE-$EXPAND .
+See: https://www.odata.org/getting-started/basic-tutorial/#expand ."
   (parameter url "$expand" (odata-client::compile-$expand exp)))
 
 (defun $select (url exp)
+  "Adds ODATA $select parameter to URL.
+
+The $select system query option allows the clients to requests a limited set of properties for each entity.
+
+EXP can be either a string or a list of strings.
+Elements of EXP are just separated by comma.
+
+Examples:
+(compile-$select \"name\") => \"foo\"
+(compile-$select '(\"name\" \"surname\")) => \"name,surname\"
+
+See: ODATA-CLIENT::COMPILE-$SELECT
+See: https://www.odata.org/getting-started/basic-tutorial/#select"
   (parameter url "$select" (odata-client::compile-$select exp)))
 
 (defun $search (url exp)
+  "The $search system query option restricts the result to include only those entities matching the specified search expression.
+
+See: https://www.odata.org/getting-started/basic-tutorial/#search"
   (parameter url "$search" (odata-client::compile-$search exp)))
 
 (defun $top (url top)
+  "The $top system query option requests the number of items in the queried collection to be included in the result.
+
+See: https://www.odata.org/getting-started/basic-tutorial/#topskip"
   (check-type top integer)
   (parameter url "$top" top))
 
 (defun $skip (url skip)
+  "The $skip query option requests the number of items in the queried collection that are to be skipped and not included in the result.
+
+See: https://www.odata.org/getting-started/basic-tutorial/#topskip"
   (check-type skip integer)
   (parameter url "$skip" skip))
 
 (defun $value (url)
+  "Address the raw value of a primitive property.
+
+Example: returns the raw value of property Name of an Airport.
+(-> +trip-pin-modify+
+   (collection \"Airports\") (id \"KSFO\")
+   (property \"Name\") ($value)
+
+See: https://www.odata.org/getting-started/basic-tutorial/#propertyVal
+"
   (property url "$value"))
 
 (defun $orderby (url property &optional (order :asc))
+  "The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. If asc or desc not specified, then the resources will be ordered in ascending order."
   (check-type order (member :asc :desc))
   (parameter url "$orderby" (format nil "~a ~a" property
                                     (string-downcase (princ-to-string order)))))
 
+(defun $count (url)
+  "The $count system query option allows clients to request a count of the matching resources included with the resources in the response."
+  (parameter url "$count" "true"))
+
 (defun $ref (url)
+  "A successful POST request to a navigation property's references collection adds a relationship to an existing entity."
   (property url "$ref"))
 
 (defun path (url &rest path)
+  "Access entity in a PATH.
+
+Example:
+
+(-> +trip-pin-modify+
+              (collection \"People\")
+              (id \"russellwhyte\")
+              (path \"Trips(0)\"
+                    \"PlanItems(11)\"
+                    \"Microsoft.OData.SampleService.Models.TripPin.Flight\"
+                    \"Airline\"))"
   (let ((uri url))
     (loop
       for x in path
