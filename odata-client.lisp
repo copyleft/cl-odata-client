@@ -304,3 +304,9 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
 		 :properties (remove-if (lambda (cons)
 					  (find "ODATA-" (symbol-name (car cons)) :test 'string=))
 					data)))
+
+(defmacro with-properties (properties entity &body body)
+  (alexandria:once-only (entity)
+    `(let ,(loop for property in properties
+		 collect `(,property (access (entity-properties ,entity) ',(alexandria:make-keyword (symbol-name property)))))
+       ,@body)))
