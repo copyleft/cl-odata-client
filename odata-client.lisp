@@ -260,3 +260,16 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
 
 (defun compile-$search (exp)
   exp)
+
+;;-------- Entities ---------------------------------
+
+(defclass odata-entity ()
+  ((id :accessor entity-id)
+   (context :accessor odata-context)
+   (etag :accessor odata-etag)
+   (edit-link :accessor odata-edit-link)
+   (properties :accessor entity-properties)))
+
+(defclass odata-collection ()
+  ((context :accessor odata-context)
+   (next-link :accessor odata-next-link)))
