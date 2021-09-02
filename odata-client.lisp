@@ -1,6 +1,6 @@
 (in-package #:odata-client)
 
-(defvar *odata-base* nil
+(defvar *service-root* nil
   "ODATA service base url.")
 
 (defvar *access-token* nil
@@ -65,8 +65,8 @@ See: http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part1-prot
         json))))
 
 (defun odata-get* (uri &rest args &key $filter $expand)
-  "Make an ODATA-GET request using *ODATA-BASE* as URL base."
-  (apply #'odata-get (quri:merge-uris uri *odata-base*)
+  "Make an ODATA-GET request using *SERVICE-ROOT* as URL base."
+  (apply #'odata-get (quri:merge-uris uri *service-root*)
          args))
 
 (defun odata-post (uri data &key (json-encode t) authorization)
@@ -142,12 +142,12 @@ DATA is the data to be posted. It is encoded using ENCODE-JSON-TO-STRING."
                :format-control "OData request error (~a): ~a"
                :format-arguments (list status (accesses json :error :message)))))))
 
-(defun call-with-odata-base (base func)
-  (let ((*odata-base* base))
+(defun call-with-service-root (base func)
+  (let ((*service-root* base))
     (funcall func)))
 
-(defmacro with-odata-base (base &body body)
-  `(call-with-odata-base ,base (lambda () ,@body)))
+(defmacro with-service-root (base &body body)
+  `(call-with-service-root ,base (lambda () ,@body)))
 
 (defun child-node (name node)
   (find-if (lambda (nd)
@@ -263,13 +263,44 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
 
 ;;-------- Entities ---------------------------------
 
-(defclass odata-entity ()
-  ((id :accessor entity-id)
-   (context :accessor odata-context)
-   (etag :accessor odata-etag)
-   (edit-link :accessor odata-edit-link)
-   (properties :accessor entity-properties)))
+(defparameter *schemas* (make-hash-table :test 'equalp)
+  "Cached ODATA schemas")
 
-(defclass odata-collection ()
+(defun fetch-schema (schema-url)
+  (xmls:parse
+   (drakma:http-request
+    (ppcre:regex-replace "serviceRoot" schema-url *service-root*)
+    :want-stream t)))
+
+(defun find-schema (schema-url)
+  (or (gethash schema-url *schemas*)
+      (setf (gethash schema-url *schemas*)
+	    (fetch-schema schema-url))))
+
+(defclass odata-entity ()
+  ((id :accessor odata-id :initarg :id)
+   (context :accessor odata-context :initarg :context)
+   (etag :accessor odata-etag :initarg :etag)
+   (edit-link :accessor odata-edit-link :initarg :edit-link)
+   (properties :accessor entity-properties :initarg :properties))
+  (:documentation "An ODATA entity."))
+
+(defclass odata-entity-set ()
   ((context :accessor odata-context)
-   (next-link :accessor odata-next-link)))
+   (next-link :accessor odata-next-link))
+  (:documentation "And ODATA entity set."))
+
+(defmethod print-object ((entity odata-entity) stream)
+  (print-unreadable-object (entity stream :type nil :identity nil)
+    (format stream "~a" (odata-id entity))))
+
+(defun make-odata-entity (data)
+  "Unserialize data and create an ODATA-ENTITY object."
+  (make-instance 'odata-entity
+		 :id (access data :odata-id)
+		 :context (access data :odata-context)
+		 :etag (access data :odata-etag)
+		 :edit-link (access data :odata-edit-link)
+		 :properties (remove-if (lambda (cons)
+					  (find "ODATA-" (symbol-name (car cons)) :test 'string=))
+					data)))

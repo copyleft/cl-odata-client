@@ -1,33 +1,3 @@
-(defpackage :odata/lang
-  (:use :cl :access)
-  (:export
-   :singleton
-   :fetch
-   :post
-   :create
-   :del
-   :update
-   :patch
-   :link
-   :path
-   :update-link
-   :property
-   :collection
-   :fcall
-   :$filter
-   :$expand
-   :$count
-   :id
-   :$skip
-   :$top
-   :$value
-   :$orderby
-   :$select
-   :$search
-   :$ref)
-  (:documentation
-   "This package exports functions that are meant to be used with arrows syntax to interact with an ODATA service."))
-
 (in-package :odata/lang)
 
 (defun read-odata-response (data type)
@@ -70,11 +40,11 @@ Example: add 'vincentcalabrese' to friends of 'scottketchum'
 "
   (multiple-value-bind (response status)
       (odata-client::http-request (quri:render-uri url)
-                           :method :post
-                           :preserve-uri t
-                           :content (odata-client::encode-json-to-string data)
-                           :content-type "application/json"
-                           :accept "application/json")
+                                  :method :post
+                                  :preserve-uri t
+                                  :content (odata-client::encode-json-to-string data)
+                                  :content-type "application/json"
+                                  :accept "application/json")
     (when (>= status 400)
       (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
 
@@ -97,11 +67,11 @@ Example: change the Airline of a Flight
 "
   (multiple-value-bind (response status)
       (odata-client::http-request (quri:render-uri url)
-                           :method :put
-                           :preserve-uri t
-                           :content (odata-client::encode-json-to-string data)
-                           :content-type "application/json"
-                           :accept "application/json")
+                                  :method :put
+                                  :preserve-uri t
+                                  :content (odata-client::encode-json-to-string data)
+                                  :content-type "application/json"
+                                  :accept "application/json")
     (when (>= status 400)
       (error "Error ~a: ~a" status (accesses (odata-client::decode-json-from-string response) :error :message)))))
 
@@ -112,8 +82,8 @@ Example: change the Airline of a Flight
 (defun del (url)
   "Perform a resource deletion request at ODATA service at URL."
   (odata-client::http-request (quri:render-uri url)
-			     :method :delete
-			     :preserve-uri t))
+                              :method :delete
+                              :preserve-uri t))
 
 (defun patch (url data)
   "Perform a resource PATCH request with DATA to ODATA service at URL."
