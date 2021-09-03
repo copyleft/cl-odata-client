@@ -326,3 +326,10 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
                  :next-link (access data :next-link)
                  :elements (mapcar 'make-odata-entity
                                    (access data :value))))
+
+(defun read-odata-response (data)
+  "Unserializes an ODATA request response."
+  (cond
+    ((access data :value) ;; Can we assume this is a collection?
+     (make-odata-entity-set data))
+    (t (make-odata-entity data))))
