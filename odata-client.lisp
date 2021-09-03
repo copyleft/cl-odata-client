@@ -55,7 +55,7 @@ See: http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part1-prot
                       :additional-headers (when authorization
                                             (list (cons "Authorization"
                                                         authorization)))
-		      :want-stream t)
+                      :want-stream t)
       (let ((json (decode-json-from-source response)))
         (when (>= status 400)
           (error 'odata-request-error
@@ -174,7 +174,7 @@ Syntax:
 (:< exp exp): Lower than.
 (:contains path exp): Contains.
 And more ...
- 
+
 See: https://www.odata.org/getting-started/basic-tutorial/#filter"
   (when (stringp exp)
     (return-from compile-$filter exp))
@@ -186,11 +186,11 @@ See: https://www.odata.org/getting-started/basic-tutorial/#filter"
     ((:ge :>=) (format nil "~a ge ~a" (second exp) (format-arg (third exp))))
     ((:le :<=) (format nil "~a le ~a" (second exp) (format-arg (third exp))))
     (:and (format nil "~a and ~a"
-		  (compile-$filter (second exp))
-		  (compile-$filter (third exp))))
+                  (compile-$filter (second exp))
+                  (compile-$filter (third exp))))
     (:or (format nil "~a or ~a"
-		  (compile-$filter (second exp))
-		  (compile-$filter (third exp))))
+                 (compile-$filter (second exp))
+                 (compile-$filter (third exp))))
     (:not (format nil "not ~a" (compile-$filter (second exp))))
     (:contains (format nil "contains(~a, ~a)" (compile-path (second exp)) (format-arg (third exp))))))
 
@@ -275,7 +275,7 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
 (defun find-schema (schema-url)
   (or (gethash schema-url *schemas*)
       (setf (gethash schema-url *schemas*)
-	    (fetch-schema schema-url))))
+            (fetch-schema schema-url))))
 
 (defclass odata-entity ()
   ((id :accessor odata-id :initarg :id)
@@ -286,27 +286,43 @@ See: https://www.odata.org/getting-started/basic-tutorial/#select
   (:documentation "An ODATA entity."))
 
 (defclass odata-entity-set ()
-  ((context :accessor odata-context)
-   (next-link :accessor odata-next-link))
+  ((context :accessor odata-context :initarg :context)
+   (next-link :accessor odata-next-link :initarg :next-link)
+   (elements :accessor entity-set-elements :initarg :elements))
   (:documentation "And ODATA entity set."))
 
 (defmethod print-object ((entity odata-entity) stream)
   (print-unreadable-object (entity stream :type nil :identity nil)
     (format stream "~a" (odata-id entity))))
 
+(defmethod print-object ((entity-set odata-entity-set) stream)
+  (print-unreadable-object (entity-set stream :type nil :identity nil)
+    (format stream "~a" (odata-context entity-set))))
+
 (defun make-odata-entity (data)
   "Unserialize data and create an ODATA-ENTITY object."
   (make-instance 'odata-entity
-		 :id (access data :odata-id)
-		 :context (access data :odata-context)
-		 :etag (access data :odata-etag)
-		 :edit-link (access data :odata-edit-link)
-		 :properties (remove-if (lambda (cons)
-					  (find "ODATA-" (symbol-name (car cons)) :test 'string=))
-					data)))
+                 :id (access data :odata-id)
+                 :context (access data :odata-context)
+                 :etag (access data :odata-etag)
+                 :edit-link (access data :odata-edit-link)
+                 :properties (remove-if (lambda (cons)
+                                          (eql (position "ODATA-" (symbol-name (car cons)) :test 'string=) 0))
+                                        data)))
+
+(defun get-property (entity property-name)
+  (access (entity-properties entity) property-name))
 
 (defmacro with-properties (properties entity &body body)
   (alexandria:once-only (entity)
     `(let ,(loop for property in properties
-		 collect `(,property (access (entity-properties ,entity) ',(alexandria:make-keyword (symbol-name property)))))
+                 collect `(,property (get-property ,entity ',(alexandria:make-keyword (symbol-name property)))))
        ,@body)))
+
+(defun make-odata-entity-set (data)
+  "Unserialize a collection data and create an ODATA-ENTITY-SET object."
+  (make-instance 'odata-entity-set
+                 :context (access data :odata-context)
+                 :next-link (access data :next-link)
+                 :elements (mapcar 'make-odata-entity
+                                   (access data :value))))
