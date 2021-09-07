@@ -38,6 +38,18 @@
 	      (is (odata/entity:get-property el :user-name)))
 	    (odata/entity:entity-set-elements collection))))
 
+(deftest fetch-entity-relation-test ()
+  (let ((entity
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (id "russellwhyte")
+	      (fetch t))))
+    (let ((friends (-> entity
+		       (property "Friends")
+		       (fetch t))))
+      (is (typep friends 'odata/entity:odata-entity-set))
+      (is (> (length (odata/entity:entity-set-elements friends)) 0)))))
+
 (deftest fetch-raw-entity-test ()
   (let ((entity
 	  (-> +trip-pin-modify+

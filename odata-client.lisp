@@ -55,6 +55,7 @@ See: http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part1-prot
                       :additional-headers (when authorization
                                             (list (cons "Authorization"
                                                         authorization)))
+		      :accept "application/json"
                       :want-stream t)
       (let ((json (decode-json-from-source response)))
         (when (>= status 400)
