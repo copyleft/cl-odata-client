@@ -7,6 +7,8 @@
   :components ((:file "package")
                (:file "odata-client")
                (:file "lang"))
-  :depends-on (:cxml :drakma :arrows :cl-json
-                     :access :cl-change-case
-                     :anaphora :quri))
+  :depends-on (:cxml
+               :drakma :arrows :cl-json
+               :access :cl-change-case
+               :anaphora :quri
+               :xmls))
