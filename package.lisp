@@ -42,5 +42,27 @@
   (:documentation
    "This package exports functions that are meant to be used with arrows syntax to interact with an ODATA service."))
 
+(defpackage odata/entity 
+  (:use :cl :odata-client :access)
+  (:export
+   :odata-entity
+
+   :odata-id
+   :odata-context
+   :odata-etag
+   :odata-edit-link
+
+   :get-property
+   :with-properties
+   
+   :odata-entity-set
+   :entity-set-elements
+   :odata-next-link
+   
+   :fetch-schema
+   :find-schema
+   
+   :read-odata-response))
+
 (defpackage :odata-client-user 
   (:use :cl :odata-client :odata/lang :arrows))

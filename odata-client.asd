@@ -6,6 +6,7 @@
   :serial t
   :components ((:file "package")
                (:file "odata-client")
+	       (:file "entity")
                (:file "lang"))
   :depends-on (:cxml
                :drakma :arrows :cl-json

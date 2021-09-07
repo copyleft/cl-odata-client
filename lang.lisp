@@ -9,11 +9,11 @@
 (defmethod odata-url ((string string))
   (quri:uri string))
 
-(defmethod odata-url ((entity odata-client::odata-entity))
-  (odata-client::odata-id entity))
+(defmethod odata-url ((entity odata/entity:odata-entity))
+  (odata/entity:odata-id entity))
 
-(defmethod odata-url ((entity-set odata-client::odata-entity-set))
-  (odata-client::odata-context entity-set))
+(defmethod odata-url ((entity-set odata/entity:odata-entity-set))
+  (odata/entity:odata-context entity-set))
 
 (defun read-odata-response (data type)
   "Read the ODATA response from DATA.
@@ -22,13 +22,13 @@ TYPE indicates how to do it:
 - If NIL, data is left as it is, an association list (the default).
 - If :COLLECTION, then the collection elements are returned in an association list.
 - If :VALUE, then the property value is returned.
-- If T, then ODATA-CLIENT::READ-ODATA-RESPONSE function is used.
+- If T, then read the response as an ODATA entity. See ODATA/ENTITY:READ-ODATA-RESPONSE.
 " 
   (cond
     ((null type) data)
     ((eql type :collection) (access data :value))
     ((eql type :value) (access data :value))
-    (t (odata-client::read-odata-response data))))
+    (t (odata/entity:read-odata-response data))))
 
 (defun singleton (url name)
   "Access the ODATA singleton with name NAME at URL.

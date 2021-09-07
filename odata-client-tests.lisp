@@ -32,11 +32,11 @@
 	  (-> +trip-pin-modify+
 	      (collection "People")
 	      (fetch t))))
-    (is (typep collection 'odata-client::odata-entity-set))
+    (is (typep collection 'odata/entity:odata-entity-set))
     (mapcar (lambda (el)
-	      (is (typep el 'odata-client::odata-entity))
-	      (is (odata-client::get-property el :user-name)))
-	    (odata-client::entity-set-elements collection))))
+	      (is (typep el 'odata/entity:odata-entity))
+	      (is (odata/entity:get-property el :user-name)))
+	    (odata/entity:entity-set-elements collection))))
 
 (deftest fetch-raw-entity-test ()
   (let ((entity
@@ -56,7 +56,7 @@
 	      (id "russellwhyte")
 	      (fetch t))))
     (is (not (null entity)))
-    (odata-client::with-properties (user-name first-name emails) entity
+    (odata/entity:with-properties (user-name first-name emails) entity
       (is (and user-name first-name emails)))))
 
 (deftest fetch-property-test ()
