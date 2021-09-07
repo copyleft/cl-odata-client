@@ -27,7 +27,18 @@
 	      (is (access item :user-name)))
 	    results)))
 
-(deftest fetch-entity-test ()
+(deftest fetch-entity-set-test ()
+  (let ((collection
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (fetch t))))
+    (is (typep collection 'odata-client::odata-entity-set))
+    (mapcar (lambda (el)
+	      (is (typep el 'odata-client::odata-entity))
+	      (is (odata-client::get-property el :user-name)))
+	    (odata-client::entity-set-elements collection))))
+
+(deftest fetch-raw-entity-test ()
   (let ((entity
 	  (-> +trip-pin-modify+
 	      (collection "People")
@@ -37,6 +48,16 @@
     (is (access entity :user-name))
     (is (access entity :first-name))
     (is (access entity :emails))))
+
+(deftest fetch-entity-test ()
+  (let ((entity
+	  (-> +trip-pin-modify+
+	      (collection "People")
+	      (id "russellwhyte")
+	      (fetch t))))
+    (is (not (null entity)))
+    (odata-client::with-properties (user-name first-name emails) entity
+      (is (and user-name first-name emails)))))
 
 (deftest fetch-property-test ()
   (let ((name (-> +trip-pin-modify+
