@@ -184,4 +184,4 @@
    (collection "People") (id "scottketchum")
    (property "Friends") ($ref)
    (link `(("@odata.context" . ,(quri:render-uri +trip-pin-modify+))
-           ("@odata.id" . "People('vincentcalabrese')"))))
+           ("@odata.id" . "People('vincentcalabrese')")))))

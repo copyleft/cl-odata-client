@@ -1,16 +1,39 @@
 (in-package :odata/lang)
 
+(defgeneric odata-url (object)
+  (:documentation "Get the ODATA service url of OBJECT."))
+
+(defmethod odata-url ((uri quri:uri))
+  uri)
+
+(defmethod odata-url ((string string))
+  (quri:uri string))
+
+(defmethod odata-url ((entity odata-client::odata-entity))
+  (odata-client::odata-id entity))
+
+(defmethod odata-url ((entity-set odata-client::odata-entity-set))
+  (odata-client::odata-context entity-set))
+
 (defun read-odata-response (data type)
+  "Read the ODATA response from DATA.
+
+TYPE indicates how to do it:
+- If NIL, data is left as it is, an association list (the default).
+- If :COLLECTION, then the collection elements are returned in an association list.
+- If :VALUE, then the property value is returned.
+- If T, then ODATA-CLIENT::READ-ODATA-RESPONSE function is used.
+" 
   (cond
     ((null type) data)
     ((eql type :collection) (access data :value))
     ((eql type :value) (access data :value))
-    (t data)))
+    (t (odata-client::read-odata-response data))))
 
 (defun singleton (url name)
   "Access the ODATA singleton with name NAME at URL.
 See: https://www.odata.org/getting-started/advanced-tutorial/#querySingleton ."
-  (quri:uri (format nil "~a~a" url
+  (quri:uri (format nil "~a~a" (odata-url url)
                     (if (stringp name) name
                         (odata-client::lisp-to-camel-case (string name))))))
 
@@ -39,7 +62,7 @@ Example: add 'vincentcalabrese' to friends of 'scottketchum'
 
 "
   (multiple-value-bind (response status)
-      (odata-client::http-request (quri:render-uri url)
+      (odata-client::http-request (quri:render-uri (odata-url url))
                                   :method :post
                                   :preserve-uri t
                                   :content (odata-client::encode-json-to-string data)
@@ -66,7 +89,7 @@ Example: change the Airline of a Flight
            (\"@odata.id\" . \"Airlines('FM')\"))))
 "
   (multiple-value-bind (response status)
-      (odata-client::http-request (quri:render-uri url)
+      (odata-client::http-request (quri:render-uri (odata-url url))
                                   :method :put
                                   :preserve-uri t
                                   :content (odata-client::encode-json-to-string data)
@@ -77,36 +100,37 @@ Example: change the Airline of a Flight
 
 (defun create (url data)
   "Perform a resource creation request with DATA at ODATA service at URL."
-  (post url data))
+  (post (odata-url url) data))
 
 (defun del (url)
   "Perform a resource deletion request at ODATA service at URL."
-  (odata-client::http-request (quri:render-uri url)
+  (odata-client::http-request (quri:render-uri (odata-url url))
                               :method :delete
                               :preserve-uri t))
 
 (defun patch (url data)
   "Perform a resource PATCH request with DATA to ODATA service at URL."
-  (odata-client:odata-patch url data))
+  (odata-client:odata-patch (odata-url url) data))
 
 (defun update (url data)
   "Perform a resource update (PUT request) with DATA to ODATA service at URL."
-  (odata-client::odata-put url data))
+  (odata-client::odata-put (odata-url url) data))
 
 (defun property (url name)
   "Access the resource property with name NAME."
-  (quri:uri (format nil "~a/~a" url
+  (quri:uri (format nil "~a/~a" (odata-url url)
                     (if (stringp name) name
                         (odata-client::lisp-to-camel-case (string name))))))
 
 (defun collection (url name)
   "Access the resource collection at NAME."
-  (quri:uri (format nil "~a/~a" url (if (stringp name) name
-                                        (odata-client::lisp-to-camel-case (string name))))))
+  (quri:uri (format nil "~a/~a" (odata-url url)
+		    (if (stringp name) name
+                        (odata-client::lisp-to-camel-case (string name))))))
 
 (defun id (url id)
   "Get ODATA resource id."
-  (quri:uri (format nil "~a('~a')" url id)))
+  (quri:uri (format nil "~a('~a')" (odata-url url) id)))
 
 (defun parameter (url param value)
   "Add parameter PARAM with VALUE to current request."
@@ -213,7 +237,7 @@ Example:
                     \"PlanItems(11)\"
                     \"Microsoft.OData.SampleService.Models.TripPin.Flight\"
                     \"Airline\"))"
-  (let ((uri url))
+  (let ((uri (odata-url url)))
     (loop
       for x in path
       do (setf uri (property uri x)))
