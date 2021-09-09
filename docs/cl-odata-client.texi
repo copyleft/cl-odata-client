@@ -65,6 +65,7 @@ Copyright @copyright{} 2021 Mariano Montone
 @menu
 * ODATA-CLIENT package::
 * ODATA/LANG package::
+* ODATA/ENTITY package::
 @end menu
 
 @node ODATA-CLIENT package
@@ -83,13 +84,13 @@ Provides core functions for interacting with an ODATA service.
 ODATA service api token.
 @endcldefvar
 
-@cldefvar {ODATA-CLIENT, *ODATA-BASE*}
+@cldefvar {ODATA-CLIENT, *SERVICE-ROOT*}
 
 ODATA service base url.
 @endcldefvar
 
 @subheading Macros
-@cldefmacro {ODATA-CLIENT, WITH-ODATA-BASE, (base &body body)}
+@cldefmacro {ODATA-CLIENT, WITH-SERVICE-ROOT, (base &body body)}
 
 
 @endcldefmacro
@@ -103,7 +104,7 @@ Make a POST request to ODATA service at @var{URI}.@*
 
 @cldefun {ODATA-CLIENT, ODATA-GET*, (uri &rest args &key $filter $expand)}
 
-Make an @clref{ODATA-CLIENT, ODATA-GET, function} request using @clref{ODATA-CLIENT, *ODATA-BASE*, variable} as URL base.
+Make an @clref{ODATA-CLIENT, ODATA-GET, function} request using @clref{ODATA-CLIENT, *SERVICE-ROOT*, variable} as URL base.
 @endcldefun
 
 @cldefun {ODATA-CLIENT, ODATA-PUT, (uri data &key (json-encode t) authorization)}
@@ -355,6 +356,91 @@ See: @url{https://www.odata.org/getting-started/basic-tutorial/#search}
 
 A successful @clref{ODATA/LANG, POST, function} request to a navigation property's references collection adds a relationship to an existing entity.
 @endcldefun
+
+
+
+@node ODATA/ENTITY package
+@section ODATA/ENTITY package
+@deftp PACKAGE ODATA/ENTITY
+
+@end deftp
+
+@heading External definitions
+
+@subheading Macros
+@cldefmacro {ODATA/ENTITY, WITH-PROPERTIES, (properties entity &body body)}
+
+
+@endcldefmacro
+
+@subheading Generic functions
+@cldefgeneric {ODATA/ENTITY, ODATA-CONTEXT, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {ODATA/ENTITY, ODATA-NEXT-LINK, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {ODATA/ENTITY, ODATA-ID, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {ODATA/ENTITY, ENTITY-SET-ELEMENTS, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {ODATA/ENTITY, ODATA-ETAG, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@cldefgeneric {ODATA/ENTITY, ODATA-EDIT-LINK, (sb-pcl::object)}
+
+
+@endcldefgeneric
+
+@subheading Functions
+@cldefun {ODATA/ENTITY, READ-ODATA-RESPONSE, (data)}
+
+Unserializes an ODATA request response.
+@endcldefun
+
+@cldefun {ODATA/ENTITY, FIND-SCHEMA, (schema-url)}
+
+
+@endcldefun
+
+@cldefun {ODATA/ENTITY, FETCH-SCHEMA, (schema-url)}
+
+
+@endcldefun
+
+@cldefun {ODATA/ENTITY, GET-PROPERTY, (entity property-name)}
+
+
+@endcldefun
+
+@subheading Classes
+@cldefclass {ODATA/ENTITY, ODATA-ENTITY-SET}
+
+And ODATA entity set.
+
+Class precedence list: @code{odata-entity-set, standard-object, t}
+
+@endcldefclass
+
+@cldefclass {ODATA/ENTITY, ODATA-ENTITY}
+
+An ODATA entity.
+
+Class precedence list: @code{odata-entity, standard-object, t}
+
+@endcldefclass
 
 
 

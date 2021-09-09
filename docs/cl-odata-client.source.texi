@@ -65,6 +65,7 @@ Copyright @copyright{} 2021 Mariano Montone
 @menu
 * ODATA-CLIENT package::
 * ODATA/LANG package::
+* ODATA/ENTITY package::
 @end menu
 
 @node ODATA-CLIENT package
@@ -74,6 +75,10 @@ Copyright @copyright{} 2021 Mariano Montone
 @node ODATA/LANG package
 @section ODATA/LANG package
 (@clpackage :odata/lang)
+
+@node ODATA/ENTITY package
+@section ODATA/ENTITY package
+(@clpackage :odata/entity)
 
 @node Index
 @chapter Index

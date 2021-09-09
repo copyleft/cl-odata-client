@@ -54,6 +54,7 @@ File: cl-odata-client.info,  Node: API,  Next: Index,  Prev: Usage,  Up: Top
 
 * ODATA-CLIENT package::
 * ODATA/LANG package::
+* ODATA/ENTITY package::
 
 
 File: cl-odata-client.info,  Node: ODATA-CLIENT package,  Next: ODATA/LANG package,  Up: API
@@ -75,14 +76,14 @@ Variables
 
      ODATA service api token.
 
- -- ODATA-CLIENT: *ODATA-BASE*
+ -- ODATA-CLIENT: *SERVICE-ROOT*
 
      ODATA service base url.
 
 Macros
 ------
 
- -- Macro: ODATA-CLIENT:WITH-ODATA-BASE (base &body body)
+ -- Macro: ODATA-CLIENT:WITH-SERVICE-ROOT (base &body body)
 
 Functions
 ---------
@@ -98,8 +99,8 @@ Functions
           $expand)
 
      Make an *note ODATA-GET: ODATA-CLIENT:ODATA-GET function. request
-     using *note *ODATA-BASE*: ODATA-CLIENT:*ODATA-BASE* variable. as
-     URL base.
+     using *note *SERVICE-ROOT*: ODATA-CLIENT:*SERVICE-ROOT* variable.
+     as URL base.
 
  -- Function: ODATA-CLIENT:ODATA-PUT (uri data &key (json-encode t)
           authorization)
@@ -136,7 +137,7 @@ Classes
      serious-condition, condition, t'
 
 
-File: cl-odata-client.info,  Node: ODATA/LANG package,  Prev: ODATA-CLIENT package,  Up: API
+File: cl-odata-client.info,  Node: ODATA/LANG package,  Next: ODATA/ENTITY package,  Prev: ODATA-CLIENT package,  Up: API
 
 4.2 ODATA/LANG package
 ======================
@@ -368,6 +369,65 @@ Functions
      an existing entity.
 
 
+File: cl-odata-client.info,  Node: ODATA/ENTITY package,  Prev: ODATA/LANG package,  Up: API
+
+4.3 ODATA/ENTITY package
+========================
+
+ -- PACKAGE: ODATA/ENTITY
+
+External definitions
+====================
+
+Macros
+------
+
+ -- Macro: ODATA/ENTITY:WITH-PROPERTIES (properties entity &body body)
+
+Generic functions
+-----------------
+
+ -- Generic-Function: ODATA/ENTITY:ODATA-CONTEXT (sb-pcl::object)
+
+ -- Generic-Function: ODATA/ENTITY:ODATA-NEXT-LINK (sb-pcl::object)
+
+ -- Generic-Function: ODATA/ENTITY:ODATA-ID (sb-pcl::object)
+
+ -- Generic-Function: ODATA/ENTITY:ENTITY-SET-ELEMENTS (sb-pcl::object)
+
+ -- Generic-Function: ODATA/ENTITY:ODATA-ETAG (sb-pcl::object)
+
+ -- Generic-Function: ODATA/ENTITY:ODATA-EDIT-LINK (sb-pcl::object)
+
+Functions
+---------
+
+ -- Function: ODATA/ENTITY:READ-ODATA-RESPONSE (data)
+
+     Unserializes an ODATA request response.
+
+ -- Function: ODATA/ENTITY:FIND-SCHEMA (schema-url)
+
+ -- Function: ODATA/ENTITY:FETCH-SCHEMA (schema-url)
+
+ -- Function: ODATA/ENTITY:GET-PROPERTY (entity property-name)
+
+Classes
+-------
+
+ -- Class: ODATA/ENTITY:ODATA-ENTITY-SET
+
+     And ODATA entity set.
+
+     Class precedence list: 'odata-entity-set, standard-object, t'
+
+ -- Class: ODATA/ENTITY:ODATA-ENTITY
+
+     An ODATA entity.
+
+     Class precedence list: 'odata-entity, standard-object, t'
+
+
 File: cl-odata-client.info,  Node: Index,  Prev: API,  Up: Top
 
 5 Index
@@ -383,9 +443,9 @@ File: cl-odata-client.info,  Node: Index,  Prev: API,  Up: Top
 * Menu:
 
 * *ACCESS-TOKEN*:                        ODATA-CLIENT package. (line 16)
-* *ODATA-BASE*:                          ODATA-CLIENT package. (line 20)
+* *SERVICE-ROOT*:                        ODATA-CLIENT package. (line 20)
 * ODATA-CLIENT:*ACCESS-TOKEN*:           ODATA-CLIENT package. (line 16)
-* ODATA-CLIENT:*ODATA-BASE*:             ODATA-CLIENT package. (line 20)
+* ODATA-CLIENT:*SERVICE-ROOT*:           ODATA-CLIENT package. (line 20)
 
  [index ]
 * Menu:
@@ -410,10 +470,54 @@ File: cl-odata-client.info,  Node: Index,  Prev: API,  Up: Top
                                                               (line  46)
 * ODATA-CLIENT:ODATA-PUT <1>:            ODATA-CLIENT package.
                                                               (line  46)
-* ODATA-CLIENT:WITH-ODATA-BASE:          ODATA-CLIENT package.
+* ODATA-CLIENT:WITH-SERVICE-ROOT:        ODATA-CLIENT package.
                                                               (line  27)
-* ODATA-CLIENT:WITH-ODATA-BASE <1>:      ODATA-CLIENT package.
+* ODATA-CLIENT:WITH-SERVICE-ROOT <1>:    ODATA-CLIENT package.
                                                               (line  27)
+* ODATA/ENTITY:ENTITY-SET-ELEMENTS:      ODATA/ENTITY package.
+                                                              (line  25)
+* ODATA/ENTITY:ENTITY-SET-ELEMENTS <1>:  ODATA/ENTITY package.
+                                                              (line  25)
+* ODATA/ENTITY:FETCH-SCHEMA:             ODATA/ENTITY package.
+                                                              (line  40)
+* ODATA/ENTITY:FETCH-SCHEMA <1>:         ODATA/ENTITY package.
+                                                              (line  40)
+* ODATA/ENTITY:FIND-SCHEMA:              ODATA/ENTITY package.
+                                                              (line  38)
+* ODATA/ENTITY:FIND-SCHEMA <1>:          ODATA/ENTITY package.
+                                                              (line  38)
+* ODATA/ENTITY:GET-PROPERTY:             ODATA/ENTITY package.
+                                                              (line  42)
+* ODATA/ENTITY:GET-PROPERTY <1>:         ODATA/ENTITY package.
+                                                              (line  42)
+* ODATA/ENTITY:ODATA-CONTEXT:            ODATA/ENTITY package.
+                                                              (line  19)
+* ODATA/ENTITY:ODATA-CONTEXT <1>:        ODATA/ENTITY package.
+                                                              (line  19)
+* ODATA/ENTITY:ODATA-EDIT-LINK:          ODATA/ENTITY package.
+                                                              (line  29)
+* ODATA/ENTITY:ODATA-EDIT-LINK <1>:      ODATA/ENTITY package.
+                                                              (line  29)
+* ODATA/ENTITY:ODATA-ETAG:               ODATA/ENTITY package.
+                                                              (line  27)
+* ODATA/ENTITY:ODATA-ETAG <1>:           ODATA/ENTITY package.
+                                                              (line  27)
+* ODATA/ENTITY:ODATA-ID:                 ODATA/ENTITY package.
+                                                              (line  23)
+* ODATA/ENTITY:ODATA-ID <1>:             ODATA/ENTITY package.
+                                                              (line  23)
+* ODATA/ENTITY:ODATA-NEXT-LINK:          ODATA/ENTITY package.
+                                                              (line  21)
+* ODATA/ENTITY:ODATA-NEXT-LINK <1>:      ODATA/ENTITY package.
+                                                              (line  21)
+* ODATA/ENTITY:READ-ODATA-RESPONSE:      ODATA/ENTITY package.
+                                                              (line  34)
+* ODATA/ENTITY:READ-ODATA-RESPONSE <1>:  ODATA/ENTITY package.
+                                                              (line  34)
+* ODATA/ENTITY:WITH-PROPERTIES:          ODATA/ENTITY package.
+                                                              (line  14)
+* ODATA/ENTITY:WITH-PROPERTIES <1>:      ODATA/ENTITY package.
+                                                              (line  14)
 * ODATA/LANG:$COUNT:                     ODATA/LANG package.  (line  86)
 * ODATA/LANG:$COUNT <1>:                 ODATA/LANG package.  (line  86)
 * ODATA/LANG:$EXPAND:                    ODATA/LANG package.  (line 142)
@@ -475,41 +579,55 @@ Node: Usage826
 Ref: usage930
 Node: API930
 Ref: api1023
-Node: ODATA-CLIENT package1081
-Ref: ODATA-CLIENT:*ACCESS-TOKEN* variable1388
-Ref: ODATA-CLIENT:*ODATA-BASE* variable1453
-Ref: ODATA-CLIENT:WITH-ODATA-BASE macro1530
-Ref: ODATA-CLIENT:ODATA-POST function1610
-Ref: ODATA-CLIENT:ODATA-GET* function1892
-Ref: ODATA-CLIENT:ODATA-PUT function2136
-Ref: ODATA-CLIENT:ODATA-PATCH function2425
-Ref: ODATA-CLIENT:ODATA-GET function2709
-Ref: ODATA-CLIENT:ODATA-REQUEST-ERROR class3206
-Node: ODATA/LANG package3347
-Ref: ODATA/LANG:FETCH function3701
-Ref: ODATA/LANG:$FILTER function3763
-Ref: ODATA/LANG:$VALUE function4531
-Ref: ODATA/LANG:PROPERTY function4876
-Ref: ODATA/LANG:COLLECTION function4973
-Ref: ODATA/LANG:$SKIP function5067
-Ref: ODATA/LANG:PATCH function5334
-Ref: ODATA/LANG:$TOP function5490
-Ref: ODATA/LANG:SINGLETON function5736
-Ref: ODATA/LANG:POST function5935
-Ref: ODATA/LANG:$COUNT function6005
-Ref: ODATA/LANG:UPDATE-LINK function6191
-Ref: ODATA/LANG:LINK function6813
-Ref: ODATA/LANG:$ORDERBY function7498
-Ref: ODATA/LANG:DEL function7815
-Ref: ODATA/LANG:$EXPAND function7918
-Ref: ODATA/LANG:PATH function8469
-Ref: ODATA/LANG:CREATE function8762
-Ref: ODATA/LANG:$SELECT function8888
-Ref: ODATA/LANG:UPDATE function9494
-Ref: ODATA/LANG:ID function9624
-Ref: ODATA/LANG:FCALL function9691
-Ref: ODATA/LANG:$SEARCH function10151
-Ref: ODATA/LANG:$REF function10406
-Node: Index10610
+Node: ODATA-CLIENT package1106
+Ref: ODATA-CLIENT:*ACCESS-TOKEN* variable1413
+Ref: ODATA-CLIENT:*SERVICE-ROOT* variable1478
+Ref: ODATA-CLIENT:WITH-SERVICE-ROOT macro1557
+Ref: ODATA-CLIENT:ODATA-POST function1639
+Ref: ODATA-CLIENT:ODATA-GET* function1921
+Ref: ODATA-CLIENT:ODATA-PUT function2169
+Ref: ODATA-CLIENT:ODATA-PATCH function2458
+Ref: ODATA-CLIENT:ODATA-GET function2742
+Ref: ODATA-CLIENT:ODATA-REQUEST-ERROR class3239
+Node: ODATA/LANG package3380
+Ref: ODATA/LANG:FETCH function3763
+Ref: ODATA/LANG:$FILTER function3825
+Ref: ODATA/LANG:$VALUE function4593
+Ref: ODATA/LANG:PROPERTY function4938
+Ref: ODATA/LANG:COLLECTION function5035
+Ref: ODATA/LANG:$SKIP function5129
+Ref: ODATA/LANG:PATCH function5396
+Ref: ODATA/LANG:$TOP function5552
+Ref: ODATA/LANG:SINGLETON function5798
+Ref: ODATA/LANG:POST function5997
+Ref: ODATA/LANG:$COUNT function6067
+Ref: ODATA/LANG:UPDATE-LINK function6253
+Ref: ODATA/LANG:LINK function6875
+Ref: ODATA/LANG:$ORDERBY function7560
+Ref: ODATA/LANG:DEL function7877
+Ref: ODATA/LANG:$EXPAND function7980
+Ref: ODATA/LANG:PATH function8531
+Ref: ODATA/LANG:CREATE function8824
+Ref: ODATA/LANG:$SELECT function8950
+Ref: ODATA/LANG:UPDATE function9556
+Ref: ODATA/LANG:ID function9686
+Ref: ODATA/LANG:FCALL function9753
+Ref: ODATA/LANG:$SEARCH function10213
+Ref: ODATA/LANG:$REF function10468
+Node: ODATA/ENTITY package10672
+Ref: ODATA/ENTITY:WITH-PROPERTIES macro10904
+Ref: ODATA/ENTITY:ODATA-CONTEXT function11013
+Ref: ODATA/ENTITY:ODATA-NEXT-LINK function11080
+Ref: ODATA/ENTITY:ODATA-ID function11149
+Ref: ODATA/ENTITY:ENTITY-SET-ELEMENTS function11211
+Ref: ODATA/ENTITY:ODATA-ETAG function11284
+Ref: ODATA/ENTITY:ODATA-EDIT-LINK function11348
+Ref: ODATA/ENTITY:READ-ODATA-RESPONSE function11438
+Ref: ODATA/ENTITY:FIND-SCHEMA function11539
+Ref: ODATA/ENTITY:FETCH-SCHEMA function11592
+Ref: ODATA/ENTITY:GET-PROPERTY function11646
+Ref: ODATA/ENTITY:ODATA-ENTITY-SET class11727
+Ref: ODATA/ENTITY:ODATA-ENTITY class11865
+Node: Index11990
 
 End Tag Table

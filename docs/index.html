@@ -78,6 +78,7 @@ ul.no-bullet {list-style: none}
   <ul class="no-bullet">
     <li><a id="toc-ODATA_002dCLIENT-package-1" href="#ODATA_002dCLIENT-package">4.1 ODATA-CLIENT package</a></li>
     <li><a id="toc-ODATA_002fLANG-package-1" href="#ODATA_002fLANG-package">4.2 ODATA/LANG package</a></li>
+    <li><a id="toc-ODATA_002fENTITY-package-1" href="#ODATA_002fENTITY-package">4.3 ODATA/ENTITY package</a></li>
   </ul></li>
   <li><a id="toc-Index-1" href="#Index" rel="index">5 Index</a></li>
 </ul>
@@ -142,6 +143,8 @@ Next: <a href="#Index" accesskey="n" rel="next">Index</a>, Previous: <a href="#U
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#ODATA_002fLANG-package" accesskey="2">ODATA/LANG package</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#ODATA_002fENTITY-package" accesskey="3">ODATA/ENTITY package</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
 </table>
 
 <hr>
@@ -167,17 +170,17 @@ Next: <a href="#ODATA_002fLANG-package" accesskey="n" rel="next">ODATA/LANG pack
 <p>ODATA service api token.
 </p></dd></dl>
 
-<span id="index-ODATA_002dCLIENT_003a_002aODATA_002dBASE_002a"></span>
-<span id="ODATA_002dCLIENT_003a_002aODATA_002dBASE_002a-variable"></span><dl>
-<dt id="index-_002aODATA_002dBASE_002a">ODATA-CLIENT: <strong>*ODATA-BASE*</strong></dt>
+<span id="index-ODATA_002dCLIENT_003a_002aSERVICE_002dROOT_002a"></span>
+<span id="ODATA_002dCLIENT_003a_002aSERVICE_002dROOT_002a-variable"></span><dl>
+<dt id="index-_002aSERVICE_002dROOT_002a">ODATA-CLIENT: <strong>*SERVICE-ROOT*</strong></dt>
 <dd>
 <p>ODATA service base url.
 </p></dd></dl>
 
 <span id="Macros"></span><h4 class="subheading">Macros</h4>
-<span id="index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE"></span>
-<span id="ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE-macro"></span><dl>
-<dt id="index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE-1">Macro: <strong>ODATA-CLIENT:WITH-ODATA-BASE</strong> <em>(base &amp;body body)</em></dt>
+<span id="index-ODATA_002dCLIENT_003aWITH_002dSERVICE_002dROOT"></span>
+<span id="ODATA_002dCLIENT_003aWITH_002dSERVICE_002dROOT-macro"></span><dl>
+<dt id="index-ODATA_002dCLIENT_003aWITH_002dSERVICE_002dROOT-1">Macro: <strong>ODATA-CLIENT:WITH-SERVICE-ROOT</strong> <em>(base &amp;body body)</em></dt>
 </dl>
 
 <span id="Functions"></span><h4 class="subheading">Functions</h4>
@@ -193,7 +196,7 @@ Next: <a href="#ODATA_002fLANG-package" accesskey="n" rel="next">ODATA/LANG pack
 <span id="ODATA_002dCLIENT_003aODATA_002dGET_002a-function"></span><dl>
 <dt id="index-ODATA_002dCLIENT_003aODATA_002dGET_002a-1">Function: <strong>ODATA-CLIENT:ODATA-GET*</strong> <em>(uri &amp;rest args &amp;key $filter $expand)</em></dt>
 <dd>
-<p>Make an <a href="#ODATA_002dCLIENT_003aODATA_002dGET-function">ODATA-GET</a> request using <a href="#ODATA_002dCLIENT_003a_002aODATA_002dBASE_002a-variable">*ODATA-BASE*</a> as URL base.
+<p>Make an <a href="#ODATA_002dCLIENT_003aODATA_002dGET-function">ODATA-GET</a> request using <a href="#ODATA_002dCLIENT_003a_002aSERVICE_002dROOT_002a-variable">*SERVICE-ROOT*</a> as URL base.
 </p></dd></dl>
 
 <span id="index-ODATA_002dCLIENT_003aODATA_002dPUT"></span>
@@ -240,7 +243,7 @@ See: <a href="http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/p
 <hr>
 <span id="ODATA_002fLANG-package"></span><div class="header">
 <p>
-Previous: <a href="#ODATA_002dCLIENT-package" accesskey="p" rel="prev">ODATA-CLIENT package</a>, Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#ODATA_002fENTITY-package" accesskey="n" rel="next">ODATA/ENTITY package</a>, Previous: <a href="#ODATA_002dCLIENT-package" accesskey="p" rel="prev">ODATA-CLIENT package</a>, Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="ODATA_002fLANG-package-1"></span><h3 class="section">4.2 ODATA/LANG package</h3>
 <dl>
@@ -506,6 +509,101 @@ See: <a href="https://www.odata.org/getting-started/basic-tutorial/#search">http
 
 
 <hr>
+<span id="ODATA_002fENTITY-package"></span><div class="header">
+<p>
+Previous: <a href="#ODATA_002fLANG-package" accesskey="p" rel="prev">ODATA/LANG package</a>, Up: <a href="#API" accesskey="u" rel="up">API</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="ODATA_002fENTITY-package-1"></span><h3 class="section">4.3 ODATA/ENTITY package</h3>
+<dl>
+<dt id="index-ODATA_002fENTITY">PACKAGE: <strong>ODATA/ENTITY</strong></dt>
+</dl>
+
+<span id="External-definitions-2"></span><h3 class="heading">External definitions</h3>
+
+<span id="Macros-1"></span><h4 class="subheading">Macros</h4>
+<span id="index-ODATA_002fENTITY_003aWITH_002dPROPERTIES"></span>
+<span id="ODATA_002fENTITY_003aWITH_002dPROPERTIES-macro"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aWITH_002dPROPERTIES-1">Macro: <strong>ODATA/ENTITY:WITH-PROPERTIES</strong> <em>(properties entity &amp;body body)</em></dt>
+</dl>
+
+<span id="Generic-functions"></span><h4 class="subheading">Generic functions</h4>
+<span id="index-ODATA_002fENTITY_003aODATA_002dCONTEXT"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dCONTEXT-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dCONTEXT-1">Generic-Function: <strong>ODATA/ENTITY:ODATA-CONTEXT</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aODATA_002dNEXT_002dLINK"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dNEXT_002dLINK-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dNEXT_002dLINK-1">Generic-Function: <strong>ODATA/ENTITY:ODATA-NEXT-LINK</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aODATA_002dID"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dID-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dID-1">Generic-Function: <strong>ODATA/ENTITY:ODATA-ID</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aENTITY_002dSET_002dELEMENTS"></span>
+<span id="ODATA_002fENTITY_003aENTITY_002dSET_002dELEMENTS-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aENTITY_002dSET_002dELEMENTS-1">Generic-Function: <strong>ODATA/ENTITY:ENTITY-SET-ELEMENTS</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aODATA_002dETAG"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dETAG-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dETAG-1">Generic-Function: <strong>ODATA/ENTITY:ODATA-ETAG</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aODATA_002dEDIT_002dLINK"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dEDIT_002dLINK-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dEDIT_002dLINK-1">Generic-Function: <strong>ODATA/ENTITY:ODATA-EDIT-LINK</strong> <em>(sb-pcl::object)</em></dt>
+</dl>
+
+<span id="Functions-2"></span><h4 class="subheading">Functions</h4>
+<span id="index-ODATA_002fENTITY_003aREAD_002dODATA_002dRESPONSE"></span>
+<span id="ODATA_002fENTITY_003aREAD_002dODATA_002dRESPONSE-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aREAD_002dODATA_002dRESPONSE-1">Function: <strong>ODATA/ENTITY:READ-ODATA-RESPONSE</strong> <em>(data)</em></dt>
+<dd>
+<p>Unserializes an ODATA request response.
+</p></dd></dl>
+
+<span id="index-ODATA_002fENTITY_003aFIND_002dSCHEMA"></span>
+<span id="ODATA_002fENTITY_003aFIND_002dSCHEMA-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aFIND_002dSCHEMA-1">Function: <strong>ODATA/ENTITY:FIND-SCHEMA</strong> <em>(schema-url)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aFETCH_002dSCHEMA"></span>
+<span id="ODATA_002fENTITY_003aFETCH_002dSCHEMA-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aFETCH_002dSCHEMA-1">Function: <strong>ODATA/ENTITY:FETCH-SCHEMA</strong> <em>(schema-url)</em></dt>
+</dl>
+
+<span id="index-ODATA_002fENTITY_003aGET_002dPROPERTY"></span>
+<span id="ODATA_002fENTITY_003aGET_002dPROPERTY-function"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aGET_002dPROPERTY-1">Function: <strong>ODATA/ENTITY:GET-PROPERTY</strong> <em>(entity property-name)</em></dt>
+</dl>
+
+<span id="Classes-1"></span><h4 class="subheading">Classes</h4>
+<span id="index-ODATA_002fENTITY_003aODATA_002dENTITY_002dSET"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dENTITY_002dSET-class"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dENTITY_002dSET-1">Class: <strong>ODATA/ENTITY:ODATA-ENTITY-SET</strong></dt>
+<dd>
+<p>And ODATA entity set.
+</p>
+<p>Class precedence list: <code>odata-entity-set, standard-object, t</code>
+</p>
+</dd></dl>
+
+<span id="index-ODATA_002fENTITY_003aODATA_002dENTITY"></span>
+<span id="ODATA_002fENTITY_003aODATA_002dENTITY-class"></span><dl>
+<dt id="index-ODATA_002fENTITY_003aODATA_002dENTITY-1">Class: <strong>ODATA/ENTITY:ODATA-ENTITY</strong></dt>
+<dd>
+<p>An ODATA entity.
+</p>
+<p>Class precedence list: <code>odata-entity, standard-object, t</code>
+</p>
+</dd></dl>
+
+
+
+<hr>
 <span id="Index"></span><div class="header">
 <p>
 Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
@@ -543,11 +641,11 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th id="Index_vr_symbol-1">*</th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-_002aACCESS_002dTOKEN_002a"><code>*ACCESS-TOKEN*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-_002aODATA_002dBASE_002a"><code>*ODATA-BASE*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-_002aSERVICE_002dROOT_002a"><code>*SERVICE-ROOT*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 <tr><th id="Index_vr_letter-O">O</th><td></td><td></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003a_002aACCESS_002dTOKEN_002a"><code>ODATA-CLIENT:*ACCESS-TOKEN*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003a_002aODATA_002dBASE_002a"><code>ODATA-CLIENT:*ODATA-BASE*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003a_002aSERVICE_002dROOT_002a"><code>ODATA-CLIENT:*SERVICE-ROOT*</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td colspan="4"> <hr></td></tr>
 </table>
 <table><tr><th valign="top">Jump to: &nbsp; </th><td><a class="summary-letter" href="#Index_vr_symbol-1"><b>*</b></a>
@@ -573,8 +671,30 @@ Previous: <a href="#API" accesskey="p" rel="prev">API</a>, Up: <a href="#Top" ac
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aODATA_002dPOST-1"><code>ODATA-CLIENT:ODATA-POST</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aODATA_002dPUT"><code>ODATA-CLIENT:ODATA-PUT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aODATA_002dPUT-1"><code>ODATA-CLIENT:ODATA-PUT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE"><code>ODATA-CLIENT:WITH-ODATA-BASE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
-<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dODATA_002dBASE-1"><code>ODATA-CLIENT:WITH-ODATA-BASE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dSERVICE_002dROOT"><code>ODATA-CLIENT:WITH-SERVICE-ROOT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002dCLIENT_003aWITH_002dSERVICE_002dROOT-1"><code>ODATA-CLIENT:WITH-SERVICE-ROOT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002dCLIENT-package">ODATA-CLIENT package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aENTITY_002dSET_002dELEMENTS"><code>ODATA/ENTITY:ENTITY-SET-ELEMENTS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aENTITY_002dSET_002dELEMENTS-1"><code>ODATA/ENTITY:ENTITY-SET-ELEMENTS</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aFETCH_002dSCHEMA"><code>ODATA/ENTITY:FETCH-SCHEMA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aFETCH_002dSCHEMA-1"><code>ODATA/ENTITY:FETCH-SCHEMA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aFIND_002dSCHEMA"><code>ODATA/ENTITY:FIND-SCHEMA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aFIND_002dSCHEMA-1"><code>ODATA/ENTITY:FIND-SCHEMA</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aGET_002dPROPERTY"><code>ODATA/ENTITY:GET-PROPERTY</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aGET_002dPROPERTY-1"><code>ODATA/ENTITY:GET-PROPERTY</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dCONTEXT"><code>ODATA/ENTITY:ODATA-CONTEXT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dCONTEXT-1"><code>ODATA/ENTITY:ODATA-CONTEXT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dEDIT_002dLINK"><code>ODATA/ENTITY:ODATA-EDIT-LINK</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dEDIT_002dLINK-1"><code>ODATA/ENTITY:ODATA-EDIT-LINK</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dETAG"><code>ODATA/ENTITY:ODATA-ETAG</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dETAG-1"><code>ODATA/ENTITY:ODATA-ETAG</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dID"><code>ODATA/ENTITY:ODATA-ID</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dID-1"><code>ODATA/ENTITY:ODATA-ID</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dNEXT_002dLINK"><code>ODATA/ENTITY:ODATA-NEXT-LINK</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aODATA_002dNEXT_002dLINK-1"><code>ODATA/ENTITY:ODATA-NEXT-LINK</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aREAD_002dODATA_002dRESPONSE"><code>ODATA/ENTITY:READ-ODATA-RESPONSE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aREAD_002dODATA_002dRESPONSE-1"><code>ODATA/ENTITY:READ-ODATA-RESPONSE</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aWITH_002dPROPERTIES"><code>ODATA/ENTITY:WITH-PROPERTIES</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
+<tr><td></td><td valign="top"><a href="#index-ODATA_002fENTITY_003aWITH_002dPROPERTIES-1"><code>ODATA/ENTITY:WITH-PROPERTIES</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fENTITY-package">ODATA/ENTITY package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024COUNT"><code>ODATA/LANG:$COUNT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024COUNT-1"><code>ODATA/LANG:$COUNT</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
 <tr><td></td><td valign="top"><a href="#index-ODATA_002fLANG_003a_0024EXPAND"><code>ODATA/LANG:$EXPAND</code></a>:</td><td>&nbsp;</td><td valign="top"><a href="#ODATA_002fLANG-package">ODATA/LANG package</a></td></tr>
