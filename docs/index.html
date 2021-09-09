@@ -108,6 +108,7 @@ ul.no-bullet {list-style: none}
       <li><a id="toc-Invoking-Unbound-Actions-1" href="#Invoking-Unbound-Actions">4.6.8 Invoking Unbound Actions</a></li>
       <li><a id="toc-Invoking-Bound-Actions-1" href="#Invoking-Bound-Actions">4.6.9 Invoking Bound Actions</a></li>
     </ul></li>
+    <li><a id="toc-Entities-1" href="#Entities">4.7 Entities</a></li>
   </ul></li>
   <li><a id="toc-API-1" href="#API">5 API</a>
   <ul class="no-bullet">
@@ -197,6 +198,8 @@ Make a service reference for developers to follow when they try to build an ODat
 <tr><td align="left" valign="top">&bull; <a href="#Querying-Data" accesskey="5">Querying Data</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 <tr><td align="left" valign="top">&bull; <a href="#Data-Modification" accesskey="6">Data Modification</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Entities" accesskey="7">Entities</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
@@ -1002,7 +1005,7 @@ Previous: <a href="#System-Query-Option-_0024search" accesskey="p" rel="prev">Sy
 <hr>
 <span id="Data-Modification"></span><div class="header">
 <p>
-Previous: <a href="#Querying-Data" accesskey="p" rel="prev">Querying Data</a>, Up: <a href="#CL_002dODATA_002dCLIENT-Basic-Tutorial" accesskey="u" rel="up">CL-ODATA-CLIENT Basic Tutorial</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="#Entities" accesskey="n" rel="next">Entities</a>, Previous: <a href="#Querying-Data" accesskey="p" rel="prev">Querying Data</a>, Up: <a href="#CL_002dODATA_002dCLIENT-Basic-Tutorial" accesskey="u" rel="up">CL-ODATA-CLIENT Basic Tutorial</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
 </div>
 <span id="Data-Modification-1"></span><h3 class="section">4.6 Data Modification</h3>
 
@@ -1269,6 +1272,99 @@ Previous: <a href="#Invoking-Unbound-Actions" accesskey="p" rel="prev">Invoking 
 <pre class="example">
 
 nil
+</pre></div>
+
+<hr>
+<span id="Entities"></span><div class="header">
+<p>
+Previous: <a href="#Data-Modification" accesskey="p" rel="prev">Data Modification</a>, Up: <a href="#CL_002dODATA_002dCLIENT-Basic-Tutorial" accesskey="u" rel="up">CL-ODATA-CLIENT Basic Tutorial</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<span id="Entities-1"></span><h3 class="section">4.7 Entities</h3>
+
+<p>Instead of working with raw data (Lisp association lists), it is also possible to work with wrapping CLOS objects, available in the ODATA/ENTITY package.
+</p>
+<p>Use <code>T</code> as parameter to <code>fetch</code>. Instead of association lists, we get <code>ENTITY</code> objects:
+</p>
+
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">-&gt; +trip-pin-modify+
+      <span class="paren2">(<span class="lisp-bg">collection <span class="string">&quot;People&quot;</span></span>)</span>
+      <span class="paren2">(<span class="lisp-bg">fetch t</span>)</span></span>)</span>
+</pre></div>
+
+<div class="example">
+<pre class="example">#&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/$metadata#People&gt;
+</pre></div>
+
+
+<p>The elements of an entity set can be accessed with <code>ODATA/ENTITY:ENTITY-SET-ELEMENTS</code>:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg">-&gt; +trip-pin-modify+
+      <span class="paren2">(<span class="lisp-bg">collection <span class="string">&quot;People&quot;</span></span>)</span>
+      <span class="paren2">(<span class="lisp-bg">fetch t</span>)</span>
+      <span class="paren2">(<span class="lisp-bg">odata/entity:entity-set-elements</span>)</span></span>)</span>
+</pre></div>
+
+<div class="example">
+<pre class="example">(#&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('russellwhyte')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('scottketchum')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('ronaldmundy')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('javieralfred')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('willieashmore')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('vincentcalabrese')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('clydeguess')&gt;
+ #&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('keithpinckney')&gt;)
+</pre></div>
+
+
+<p>As you can see, the elements of the entity set are also entities (wrapped objects).
+</p>
+<p>To access entity objects, you can use either ODATA/ENTITY:GET-PROPERTY or ODATA/ENTITY:WITH-PROPERTIES macro:
+</p>
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">russell <span class="paren4">(<span class="lisp-bg">-&gt; +trip-pin-modify+
+                     <span class="paren5">(<span class="lisp-bg">collection <span class="string">&quot;People&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">id <span class="string">&quot;russellwhyte&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">fetch t</span>)</span></span>)</span></span>)</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg">odata/entity:get-property russell <span class="keyword">:user-name</span></span>)</span></span>)</span>
+</pre></div>
+
+<div class="example">
+<pre class="example">russellwhyte
+</pre></div>
+
+
+<div class="lisp">
+<pre class="lisp">  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">russell <span class="paren4">(<span class="lisp-bg">-&gt; +trip-pin-modify+
+                     <span class="paren5">(<span class="lisp-bg">collection <span class="string">&quot;People&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">id <span class="string">&quot;russellwhyte&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">fetch t</span>)</span></span>)</span></span>)</span></span>)</span>
+    <span class="paren2">(<span class="lisp-bg"><i><span class="symbol">odata/entity:with-properties</span></i> <span class="paren3">(<span class="lisp-bg">user-name</span>)</span> russell
+      <span class="paren3">(<span class="lisp-bg">concatenate 'string <span class="string">&quot;Hello &quot;</span> user-name</span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<div class="example">
+<pre class="example">Hello russellwhyte
+</pre></div>
+
+
+<p>One of the advantages of using entities over raw data is that you can call the api using entities as base, like in this example:
+</p>
+<div class="lisp">
+<pre class="lisp">    ;; We get russell user entity first
+  <span class="paren1">(<span class="lisp-bg"><i><span class="symbol">let</span></i> <span class="paren2">(<span class="lisp-bg"><span class="paren3">(<span class="lisp-bg">russell <span class="paren4">(<span class="lisp-bg">-&gt; +trip-pin-modify+
+                     <span class="paren5">(<span class="lisp-bg">collection <span class="string">&quot;People&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">id <span class="string">&quot;russellwhyte&quot;</span></span>)</span>
+                     <span class="paren5">(<span class="lisp-bg">fetch t</span>)</span></span>)</span></span>)</span></span>)</span>
+    <span class="comment">;; Then we use the entity as base for new api call and fetch its friends
+  </span>  <span class="paren2">(<span class="lisp-bg">-&gt; russell
+        <span class="paren3">(<span class="lisp-bg">collection <span class="string">&quot;Friends&quot;</span></span>)</span>
+        <span class="paren3">(<span class="lisp-bg">fetch t</span>)</span></span>)</span></span>)</span>
+</pre></div>
+
+<div class="example">
+<pre class="example">#&lt;http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/$metadata#People&gt;
 </pre></div>
 
 <hr>
@@ -1664,7 +1760,14 @@ Previous: <a href="#ODATA_002fLANG-package" accesskey="p" rel="prev">ODATA/LANG 
 <span id="index-ODATA_002fENTITY_003aWITH_002dPROPERTIES"></span>
 <span id="ODATA_002fENTITY_003aWITH_002dPROPERTIES-macro"></span><dl>
 <dt id="index-ODATA_002fENTITY_003aWITH_002dPROPERTIES-1">Macro: <strong>ODATA/ENTITY:WITH-PROPERTIES</strong> <em>(properties entity &amp;body body)</em></dt>
-</dl>
+<dd>
+<p>Bind <var>PROPERTIES</var> in <var>ENTITY</var>.<br>
+<br>
+Example:<br>
+<br>
+(with-properties (user-name) user<br>
+  (print user-name))
+</p></dd></dl>
 
 <span id="Generic-functions"></span><h4 class="subheading">Generic functions</h4>
 <span id="index-ODATA_002fENTITY_003aODATA_002dCONTEXT"></span>
@@ -1708,17 +1811,23 @@ Previous: <a href="#ODATA_002fLANG-package" accesskey="p" rel="prev">ODATA/LANG 
 <span id="index-ODATA_002fENTITY_003aFIND_002dSCHEMA"></span>
 <span id="ODATA_002fENTITY_003aFIND_002dSCHEMA-function"></span><dl>
 <dt id="index-ODATA_002fENTITY_003aFIND_002dSCHEMA-1">Function: <strong>ODATA/ENTITY:FIND-SCHEMA</strong> <em>(schema-url)</em></dt>
-</dl>
+<dd>
+<p>Return cached schema at <var>SCHEMA-URL</var>, or fetch and add to the cache.
+</p></dd></dl>
 
 <span id="index-ODATA_002fENTITY_003aFETCH_002dSCHEMA"></span>
 <span id="ODATA_002fENTITY_003aFETCH_002dSCHEMA-function"></span><dl>
 <dt id="index-ODATA_002fENTITY_003aFETCH_002dSCHEMA-1">Function: <strong>ODATA/ENTITY:FETCH-SCHEMA</strong> <em>(schema-url)</em></dt>
-</dl>
+<dd>
+<p>Fetch and parse and ODATA schema from <var>SCHEMA-URL</var>.
+</p></dd></dl>
 
 <span id="index-ODATA_002fENTITY_003aGET_002dPROPERTY"></span>
 <span id="ODATA_002fENTITY_003aGET_002dPROPERTY-function"></span><dl>
 <dt id="index-ODATA_002fENTITY_003aGET_002dPROPERTY-1">Function: <strong>ODATA/ENTITY:GET-PROPERTY</strong> <em>(entity property-name)</em></dt>
-</dl>
+<dd>
+<p>Get value of property <var>PROPERTY-NAME</var> in <var>ENTITY</var>.
+</p></dd></dl>
 
 <span id="Classes-1"></span><h4 class="subheading">Classes</h4>
 <span id="index-ODATA_002fENTITY_003aODATA_002dENTITY_002dSET"></span>

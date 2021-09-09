@@ -4,12 +4,14 @@
   "Cached ODATA schemas")
 
 (defun fetch-schema (schema-url)
+  "Fetch and parse and ODATA schema from SCHEMA-URL."
   (xmls:parse
    (drakma:http-request
     (ppcre:regex-replace "serviceRoot" schema-url *service-root*)
     :want-stream t)))
 
 (defun find-schema (schema-url)
+  "Return cached schema at SCHEMA-URL, or fetch and add to the cache."
   (or (gethash schema-url *schemas*)
       (setf (gethash schema-url *schemas*)
             (fetch-schema schema-url))))
@@ -48,9 +50,17 @@
                                         data)))
 
 (defun get-property (entity property-name)
+  "Get value of property PROPERTY-NAME in ENTITY."
   (access (entity-properties entity) property-name))
 
 (defmacro with-properties (properties entity &body body)
+  "Bind PROPERTIES in ENTITY.
+
+Example:
+
+(with-properties (user-name) user
+  (print user-name))"
+  
   (alexandria:once-only (entity)
     `(let ,(loop for property in properties
                  collect `(,property (get-property ,entity ',(alexandria:make-keyword (symbol-name property)))))

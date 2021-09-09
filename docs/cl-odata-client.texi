@@ -373,7 +373,12 @@ A successful @clref{ODATA/LANG, POST, function} request to a navigation property
 @subheading Macros
 @cldefmacro {ODATA/ENTITY, WITH-PROPERTIES, (properties entity &body body)}
 
-
+Bind @var{PROPERTIES} in @var{ENTITY}.@*
+@*
+Example:@*
+@*
+(with-properties (user-name) user@*
+  (print user-name))
 @endcldefmacro
 
 @subheading Generic functions
@@ -415,17 +420,17 @@ Unserializes an ODATA request response.
 
 @cldefun {ODATA/ENTITY, FIND-SCHEMA, (schema-url)}
 
-
+Return cached schema at @var{SCHEMA-URL}, or fetch and add to the cache.
 @endcldefun
 
 @cldefun {ODATA/ENTITY, FETCH-SCHEMA, (schema-url)}
 
-
+Fetch and parse and ODATA schema from @var{SCHEMA-URL}.
 @endcldefun
 
 @cldefun {ODATA/ENTITY, GET-PROPERTY, (entity property-name)}
 
-
+Get value of property @var{PROPERTY-NAME} in @var{ENTITY}.
 @endcldefun
 
 @subheading Classes

@@ -1,21 +1,13 @@
-(@setup :command-prefix #\$ :docsystem :markdown)
+## Build documentation
 
-# CL-DOCWEAVER
+cl-docweaver is needed for building the documentation.
 
-CL-DOCWEAVER is a document weaver for Common Lisp.
+Just run `make`.
 
-Documentation for a Lisp project is written with the user's tool of choice (like Texinfo, Markdown, etc). Then, Common Lisp definitions are expanded into the documentation source using DocWeaver commands.
+## Export tutorial to TexInfo
 
-DOCWEAVER commands give the user control on how definitions are to be expanded, either via command options or by choosing a different set of commands.
+The basic-tutorial.org is in Org format. If it is modified, then it should be exported to TexInfo format and rebuild the documentation.
 
-CL-DOCWEAVER is easy to extend to support different documentation tools.
+In emacs, load the Org TexInfo exporter with `(require 'ox-texinfo)`, then use `C-c C-e` on the basic-tutorial.org to export it (with `body only` option enabled!).
 
-Texinfo and Markdown are the ones with best support at this moment.
-
-## Usage
-
-Plase have a look at the [manual](docs/cl-docweaver.pdf "manual").
-
-## API
-
-($clpackage :docweaver :include-external-definitions t)
+Finally, run `make clean` and `make`.

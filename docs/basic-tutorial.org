@@ -885,3 +885,82 @@ The action below shares a trip to one of his friend. In TripPin service, by "sha
 #+RESULTS:
 : 
 : nil
+
+** Entities
+
+   Instead of working with raw data (Lisp association lists), it is also possible to work with wrapping CLOS objects, available in the ODATA/ENTITY package.
+
+   Use ~T~ as parameter to ~fetch~. Instead of association lists, we get ~ENTITY~ objects:
+
+
+#+BEGIN_SRC lisp :exports both :results value :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (fetch t))
+#+END_SRC
+
+#+RESULTS:
+: #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/$metadata#People>
+
+The elements of an entity set can be accessed with ~ODATA/ENTITY:ENTITY-SET-ELEMENTS~:
+
+#+BEGIN_SRC lisp :exports both :results value :session 
+(-> +trip-pin-modify+
+    (collection "People")
+    (fetch t)
+    (odata/entity:entity-set-elements))
+#+END_SRC   
+
+#+RESULTS:
+: (#<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('russellwhyte')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('scottketchum')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('ronaldmundy')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('javieralfred')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('willieashmore')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('vincentcalabrese')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('clydeguess')>
+:  #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/People('keithpinckney')>)
+
+As you can see, the elements of the entity set are also entities (wrapped objects).
+
+To access entity objects, you can use either ODATA/ENTITY:GET-PROPERTY or ODATA/ENTITY:WITH-PROPERTIES macro:
+
+#+BEGIN_SRC lisp :exports both :results value :session  
+(let ((russell (-> +trip-pin-modify+
+		   (collection "People")
+		   (id "russellwhyte")
+		   (fetch t))))
+  (odata/entity:get-property russell :user-name))
+#+END_SRC
+
+#+RESULTS:
+: russellwhyte
+
+#+BEGIN_SRC lisp :exports both :results value :session  
+(let ((russell (-> +trip-pin-modify+
+		   (collection "People")
+		   (id "russellwhyte")
+		   (fetch t))))
+  (odata/entity:with-properties (user-name) russell
+    (concatenate 'string "Hello " user-name)))
+#+END_SRC
+
+#+RESULTS:
+: Hello russellwhyte
+
+One of the advantages of using entities over raw data is that you can call the api using entities as base, like in this example:
+
+#+BEGIN_SRC lisp :exports both :results value :session
+  ;; We get russell user entity first
+(let ((russell (-> +trip-pin-modify+
+		   (collection "People")
+		   (id "russellwhyte")
+		   (fetch t))))
+  ;; Then we use the entity as base for new api call and fetch its friends
+  (-> russell
+      (collection "Friends")
+      (fetch t)))
+#+END_SRC
+
+#+RESULTS:
+: #<http://services.odata.org/V4/(S(4olvgljic51nt3x0pqp5mpbl))/TripPinServiceRW/$metadata#People>
