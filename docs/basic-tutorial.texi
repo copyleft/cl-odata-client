@@ -1,0 +1,947 @@
+@node CL-ODATA-CLIENT Basic Tutorial
+@chapter CL-ODATA-CLIENT Basic Tutorial
+
+This is CL-ODATA-CLIENT version of TripPin tutorial. See the original tutorial at: @uref{https://www.odata.org/getting-started/basic-tutorial/}
+
+The tutorial uses a sample service called TripPin based on OData V4. Generally speaking, TripPin provides a service that can manage people's trips. The service is designed for below purposes:
+
+Build a service that will cover as many features for OData V4 as possible.
+Build a more real world service, and will use it to build an end-to-end ecosystem.
+Make a service reference for developers to follow when they try to build an OData service.
+
+@uref{https://services.odata.org/V4/TripPinServiceRW}
+
+@menu
+* Introduction::
+* Requesting Data::
+* Requesting an Individual Entity by ID::
+* Requesting an Individual Property::
+* Querying Data::
+* Data Modification::
+@end menu
+
+@node Introduction
+@section Introduction
+
+The Open Data Protocol (OData) is a data access protocol built on core protocols like HTTP and commonly accepted methodologies like REST for the web. There are various kinds of libraries and tools can be used to consume OData services. But for beginners and those who want to write their own libraries, the pure HTTP requests and responses are also very important. This documentation will not cover every feature details for OData V4 services but will try to cover various typical scenarios. If you want to have a more detailed understanding, please refer to OData Documentation.
+
+We start by defining a package:
+
+@lisp
+(defpackage :odata.trip-pin
+  (:use :cl :odata-client :odata/lang :arrows :access))
+
+(in-package :odata.trip-pin)
+@end lisp
+
+and declaring the service urls:
+@lisp
+(defparameter +trip-pin-base+ "https://services.odata.org/V4/TripPinServiceRW")
+@end lisp
+
+TripPin services uses a special url for read/write, so we get that:
+
+@lisp
+(defparameter +trip-pin-modify+
+  (multiple-value-bind (response status headers modify-url)
+      (drakma:http-request +trip-pin-base+)
+    (quri:uri (princ-to-string modify-url))))
+@end lisp
+
+@node Requesting Data
+@section Requesting Data
+
+OData services support requests for data via HTTP GET requests.
+
+@menu
+* Requesting Entity Collections::
+@end menu
+
+@node Requesting Entity Collections
+@subsection Requesting Entity Collections
+
+The request below returns the the collection of Person People.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('russellwhyte')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('russellwhyte')")
+  (:user-name . "russellwhyte") (:first-name . "Russell")
+  (:last-name . "Whyte") (:emails "Russell@@example.com" "Russell@@contoso.com")
+  (:address-info
+   ((:address . "187 Suffolk Ln.")
+    (:city (:country-region . "United States") (:name . "Boise")
+     (:region . "ID"))))
+  (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('ronaldmundy')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('ronaldmundy')")
+  (:user-name . "ronaldmundy") (:first-name . "Ronald") (:last-name . "Mundy")
+  (:emails "Ronald@@example.com" "Ronald@@contoso.com") (:address-info)
+  (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('javieralfred')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('javieralfred')")
+  (:user-name . "javieralfred") (:first-name . "Javier")
+  (:last-name . "Alfred") (:emails "Javier@@example.com" "Javier@@contoso.com")
+  (:address-info
+   ((:address . "89 Jefferson Way Suite 2")
+    (:city (:country-region . "United States") (:name . "Portland")
+     (:region . "WA"))))
+  (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('willieashmore')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('willieashmore')")
+  (:user-name . "willieashmore") (:first-name . "Willie")
+  (:last-name . "Ashmore") (:emails "Willie@@example.com" "Willie@@contoso.com")
+  (:address-info) (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('vincentcalabrese')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('vincentcalabrese')")
+  (:user-name . "vincentcalabrese") (:first-name . "Vincent")
+  (:last-name . "Calabrese")
+  (:emails "Vincent@@example.com" "Vincent@@contoso.com")
+  (:address-info
+   ((:address . "55 Grizzly Peak Rd.")
+    (:city (:country-region . "United States") (:name . "Butte")
+     (:region . "MT"))))
+  (:gender . "Male") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('clydeguess')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('clydeguess')")
+  (:user-name . "clydeguess") (:first-name . "Clyde") (:last-name . "Guess")
+  (:emails "Clyde@@example.com") (:address-info) (:gender . "Male")
+  (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('keithpinckney')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('keithpinckney')")
+  (:user-name . "keithpinckney") (:first-name . "Keith")
+  (:last-name . "Pinckney") (:emails "Keith@@example.com" "Keith@@contoso.com")
+  (:address-info) (:gender . "Male") (:concurrency . 637145265160790083)))
+@end example
+
+@node Requesting an Individual Entity by ID
+@section Requesting an Individual Entity by ID
+
+The request below returns an individual entity of type Person by the given UserName "russellwhyte"
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (fetch))
+@end lisp
+
+@example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/$metadata#People/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('russellwhyte')")
+ (:odata-etag . "W/\"08D7983E303B2043\"")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('russellwhyte')")
+ (:user-name . "russellwhyte") (:first-name . "Russell") (:last-name . "Whyte")
+ (:emails "Russell@@example.com" "Russell@@contoso.com")
+ (:address-info
+  ((:address . "187 Suffolk Ln.")
+   (:city (:country-region . "United States") (:name . "Boise")
+    (:region . "ID"))))
+ (:gender . "Male") (:concurrency . 637145265160790083))
+@end example
+
+@node Requesting an Individual Property
+@section Requesting an Individual Property
+
+To address an entity property clients append a path segment containing property name to the URL of the entity. If the property has a complex type, properties of that value can be addressed by further property name composition.
+First let's take a look at how to get a simple property. The request below returns the Name property of an Airport.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "Airports")
+    (id "KSFO")
+    (property "Name")
+    (fetch :value))
+@end lisp
+
+@example
+
+"San Francisco International Airport"
+@end example
+
+
+Then let's see how to get a property value of a complex type. The request below returns the Address of the complex type Location in an Airport.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "Airports")
+    (id "KSFO")
+    (property "Location")
+    (property "Address")
+    (fetch :value))
+@end lisp
+
+@example
+
+"South McDonnell Road, San Francisco, CA 94128"
+@end example
+
+@node Querying Data
+@section Querying Data
+
+OData supports various kinds of query options for querying data. This section will help you go through the common scenarios for these query options.
+System Query Option $filter
+
+The $filter system query option allows clients to filter a collection of resources that are addressed by a request URL@. The expression specified with $filter is evaluated for each resource in the collection, and only items where the expression evaluates to true are included in the response.
+
+@menu
+* Basic predicates, built-in functions: Basic predicates built-in functions. 
+* Filter on Complex Type::
+* Filter on Enum Properties::
+* System Query Option $orderby::
+* System Query Option $top and $skip::
+* System Query Option $count::
+* System Query Option $expand::
+* System Query Option $select::
+* System Query Option $search::
+* Lambda Operators::
+@end menu
+
+@node Basic predicates built-in functions
+@subsection Basic predicates, built-in functions
+
+There are several kinds of basic predicates and built-in functions for $filter, including logical operators and arithmetic operators. For more detailed information, please refer to OData V4 URL Conventions Document. The request below using $filter to get people with FirstName "Scott".
+
+Just use raw expressions as $filter input.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter "FirstName eq 'Scott'")
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637145265160790083)))
+@end example
+
+Or Lisp based expressions:
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter '(:= "FirstName" "Scott"))
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637145265160790083)))
+@end example
+
+@node Filter on Complex Type
+@subsection Filter on Complex Type
+
+$filter can also work on complex type. The request below returns airports with "San Francisco" contained in its Address. And Address is property of complex type Location.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($filter "contains(Location/Address, 'San Francisco')")
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/Airports('KSFO')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/Airports('KSFO')")
+  (:icao-code . "KSFO") (:name . "San Francisco International Airport")
+  (:iata-code . "SFO")
+  (:location (:address . "South McDonnell Road, San Francisco, CA 94128")
+   (:city (:country-region . "United States") (:name . "San Francisco")
+    (:region . "California"))
+   (:loc (:type . "Point") (:coordinates -122.374725 37.61889)
+    (:crs (:type . "name") (:properties (:name . "EPSG:4326")))))))
+@end example
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($filter '(:contains "Location/Address" "San Francisco"))
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/Airports('KSFO')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/Airports('KSFO')")
+  (:icao-code . "KSFO") (:name . "San Francisco International Airport")
+  (:iata-code . "SFO")
+  (:location (:address . "South McDonnell Road, San Francisco, CA 94128")
+   (:city (:country-region . "United States") (:name . "San Francisco")
+    (:region . "California"))
+   (:loc (:type . "Point") (:coordinates -122.374725 37.61889)
+    (:crs (:type . "name") (:properties (:name . "EPSG:4326")))))))
+@end example
+
+@node Filter on Enum Properties
+@subsection Filter on Enum Properties
+
+The request below returns all female People of entity type Person. The Gender is a property of Enum type.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($filter `(:eq "Gender" ,+person-gender/female+))
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('elainestewart')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('elainestewart')")
+  (:user-name . "elainestewart") (:first-name . "Elaine")
+  (:last-name . "Stewart") (:emails "Elaine@@example.com" "Elaine@@contoso.com")
+  (:address-info) (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('salliesampson')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('salliesampson')")
+  (:user-name . "salliesampson") (:first-name . "Sallie")
+  (:last-name . "Sampson") (:emails "Sallie@@example.com" "Sallie@@contoso.com")
+  (:address-info
+   ((:address . "87 Polk St. Suite 5")
+    (:city (:country-region . "United States") (:name . "San Francisco")
+     (:region . "CA")))
+   ((:address . "89 Chiaroscuro Rd.")
+    (:city (:country-region . "United States") (:name . "Portland")
+     (:region . "OR"))))
+  (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('jonirosales')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('jonirosales')")
+  (:user-name . "jonirosales") (:first-name . "Joni") (:last-name . "Rosales")
+  (:emails "Joni@@example.com" "Joni@@contoso.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('georginabarlow')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('georginabarlow')")
+  (:user-name . "georginabarlow") (:first-name . "Georgina")
+  (:last-name . "Barlow")
+  (:emails "Georgina@@example.com" "Georgina@@contoso.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('angelhuffman')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('angelhuffman')")
+  (:user-name . "angelhuffman") (:first-name . "Angel")
+  (:last-name . "Huffman") (:emails "Angel@@example.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('laurelosborn')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('laurelosborn')")
+  (:user-name . "laurelosborn") (:first-name . "Laurel")
+  (:last-name . "Osborn") (:emails "Laurel@@example.com" "Laurel@@contoso.com")
+  (:address-info) (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('sandyosborn')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('sandyosborn')")
+  (:user-name . "sandyosborn") (:first-name . "Sandy") (:last-name . "Osborn")
+  (:emails "Sandy@@example.com" "Sandy@@contoso.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637145265160790083))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('ursulabright')")
+  (:odata-etag . "W/\"08D7983E303B2043\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(wgkqtxlasrgtwhbtgoqbxc1l))/TripPinServiceRW/People('ursulabright')")
+  (:user-name . "ursulabright") (:first-name . "Ursula")
+  (:last-name . "Bright") (:emails "Ursula@@example.com" "Ursula@@contoso.com")
+  (:address-info) (:gender . "Female") (:concurrency . 637145265160790083)))
+@end example
+
+@node System Query Option $orderby
+@subsection System Query Option $orderby
+
+The $orderby system query option allows clients to request resources in either ascending order using asc or descending order using desc. If asc or desc not specified, then the resources will be ordered in ascending order. The request below orders Trips on property EndsAt in descending order.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "scottketchum")
+    (property "Trips")
+    ($orderby "EndsAt" :desc)
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:trip-id . 2004) (:share-id . "f94e9116-8bdd-4dac-ab61-08438d0d9a71")
+  (:description . "Trip from Shanghai to Beijing") (:name . "Trip in Beijing")
+  (:budget . 11000) (:starts-at . "2014-02-01T00:00:00Z")
+  (:ends-at . "2014-02-04T00:00:00Z") (:tags "Travel" "Beijing"))
+ ((:trip-id . 0) (:share-id . "9d9b2fa0-efbf-490e-a5e3-bac8f7d47354")
+  (:description
+   . "Trip from San Francisco to New York City. Nice trip with two friends. It is a 4 days' trip. We actually had a client meeting, but we also took one to go sightseeings in New York.")
+  (:name . "Trip in US") (:budget . 3000) (:starts-at . "2014-01-01T00:00:00Z")
+  (:ends-at . "2014-01-04T00:00:00Z")
+  (:tags "Trip in New York" "business" "sightseeing")))
+@end example
+
+@node System Query Option $top and $skip
+@subsection System Query Option $top and $skip
+
+The $top system query option requests the number of items in the queried collection to be included in the result. The $skip query option requests the number of items in the queried collection that are to be skipped and not included in the result.
+The request below returns the first two people of the People entity set.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($top 2) 
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('russellwhyte')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('russellwhyte')")
+  (:user-name . "russellwhyte") (:first-name . "Russell")
+  (:last-name . "Whyte") (:emails "Russell@@example.com" "Russell@@contoso.com")
+  (:address-info
+   ((:address . "187 Suffolk Ln.")
+    (:city (:country-region . "United States") (:name . "Boise")
+     (:region . "ID"))))
+  (:gender . "Male") (:concurrency . 637147089402046779))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637147089402046779)))
+@end example
+
+The request below returns people starting with the 19th people of the entity set People
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($skip 18) 
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('genevievereeves')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('genevievereeves')")
+  (:user-name . "genevievereeves") (:first-name . "Genevieve")
+  (:last-name . "Reeves")
+  (:emails "Genevieve@@example.com" "Genevieve@@contoso.com") (:address-info)
+  (:gender . "Female") (:concurrency . 637147089402046779))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('kristakemp')")
+  (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('kristakemp')")
+  (:user-name . "kristakemp") (:first-name . "Krista") (:last-name . "Kemp")
+  (:emails "Krista@@example.com") (:address-info) (:gender . "Female")
+  (:concurrency . 637147089402046779)))
+@end example
+
+@node System Query Option $count
+@subsection System Query Option $count
+
+The $count system query option allows clients to request a count of the matching resources included with the resources in the response.
+The request below returns the total number of people in the collection.
+
+@node System Query Option $expand
+@subsection System Query Option $expand
+
+The $expand system query option specifies the related resources to be included in line with retrieved resources. The request below returns people with navigation property Friends of a Person
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "keithpinckney")
+    ($expand "Friends")
+    (fetch))
+@end lisp
+
+@example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/$metadata#People/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('keithpinckney')")
+ (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('keithpinckney')")
+ (:user-name . "keithpinckney") (:first-name . "Keith")
+ (:last-name . "Pinckney") (:emails "Keith@@example.com" "Keith@@contoso.com")
+ (:address-info) (:gender . "Male") (:concurrency . 637147089402046779)
+ (:friends
+  ((:odata-id
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('clydeguess')")
+   (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+   (:odata-edit-link
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('clydeguess')")
+   (:user-name . "clydeguess") (:first-name . "Clyde") (:last-name . "Guess")
+   (:emails "Clyde@@example.com") (:address-info) (:gender . "Male")
+   (:concurrency . 637147089402046779))
+  ((:odata-id
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('marshallgaray')")
+   (:odata-etag . "W/\"08D799E6ED7BA93B\"")
+   (:odata-edit-link
+    . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('marshallgaray')")
+   (:user-name . "marshallgaray") (:first-name . "Marshall")
+   (:last-name . "Garay")
+   (:emails "Marshall@@example.com" "Marshall@@contoso.com") (:address-info)
+   (:gender . "Male") (:concurrency . 637147089402046779))))
+@end example
+
+@node System Query Option $select
+@subsection System Query Option $select
+
+The $select system query option allows the clients to requests a limited set of properties for each entity or complex type. The request below returns Name and IcaoCode of all Airports.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "Airports")
+    ($select '("Name" "IcaoCode"))
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KSFO')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KSFO')")
+  (:name . "San Francisco International Airport") (:icao-code . "KSFO"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KLAX')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KLAX')")
+  (:name . "Los Angeles International Airport") (:icao-code . "KLAX"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZSSS')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZSSS')")
+  (:name . "Shanghai Hongqiao International Airport") (:icao-code . "ZSSS"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZBAA')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('ZBAA')")
+  (:name . "Beijing Capital International Airport") (:icao-code . "ZBAA"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KJFK')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('KJFK')")
+  (:name . "John F. Kennedy International Airport") (:icao-code . "KJFK"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('LIRA')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('LIRA')")
+  (:name . "Rome Ciampino Airport") (:icao-code . "LIRA"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('CYYZ')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('CYYZ')")
+  (:name . "Toronto Pearson International Airport") (:icao-code . "CYYZ"))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('YSSY')")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/Airports('YSSY')")
+  (:name . "Sydney Airport") (:icao-code . "YSSY")))
+@end example
+
+@node System Query Option $search
+@subsection System Query Option $search
+
+The $search system query option restricts the result to include only those entities matching the specified search expression. The definition of what it means to match is dependent upon the implementation. The request below get all People who has 'Boise' in their contents.
+
+serviceRoot/People?$search=United
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    ($search "United")
+    (fetch :collection))
+@end lisp
+
+@example
+
+(((:odata-id
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('russellwhyte')")
+  (:odata-etag . "W/\"08D79AA36F81DD60\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('russellwhyte')")
+  (:user-name . "russellwhyte") (:first-name . "Russell")
+  (:last-name . "Whyte") (:emails "Russell@@example.com" "Russell@@contoso.com")
+  (:address-info
+   ((:address . "187 Suffolk Ln.")
+    (:city (:country-region . "United States") (:name . "Boise")
+     (:region . "ID"))))
+  (:gender . "Male") (:concurrency . 637147899037343072))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('scottketchum')")
+  (:odata-etag . "W/\"08D79AA36F81DD60\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('scottketchum')")
+  (:user-name . "scottketchum") (:first-name . "Scott")
+  (:last-name . "Ketchum") (:emails "Scott@@example.com")
+  (:address-info
+   ((:address . "2817 Milton Dr.")
+    (:city (:country-region . "United States") (:name . "Albuquerque")
+     (:region . "NM"))))
+  (:gender . "Male") (:concurrency . 637147899037343072))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('javieralfred')")
+  (:odata-etag . "W/\"08D79AA36F81DD60\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('javieralfred')")
+  (:user-name . "javieralfred") (:first-name . "Javier")
+  (:last-name . "Alfred") (:emails "Javier@@example.com" "Javier@@contoso.com")
+  (:address-info
+   ((:address . "89 Jefferson Way Suite 2")
+    (:city (:country-region . "United States") (:name . "Portland")
+     (:region . "WA"))))
+  (:gender . "Male") (:concurrency . 637147899037343072))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('vincentcalabrese')")
+  (:odata-etag . "W/\"08D79AA36F81DD60\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('vincentcalabrese')")
+  (:user-name . "vincentcalabrese") (:first-name . "Vincent")
+  (:last-name . "Calabrese")
+  (:emails "Vincent@@example.com" "Vincent@@contoso.com")
+  (:address-info
+   ((:address . "55 Grizzly Peak Rd.")
+    (:city (:country-region . "United States") (:name . "Butte")
+     (:region . "MT"))))
+  (:gender . "Male") (:concurrency . 637147899037343072))
+ ((:odata-id
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('salliesampson')")
+  (:odata-etag . "W/\"08D79AA36F81DD60\"")
+  (:odata-edit-link
+   . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/People('salliesampson')")
+  (:user-name . "salliesampson") (:first-name . "Sallie")
+  (:last-name . "Sampson") (:emails "Sallie@@example.com" "Sallie@@contoso.com")
+  (:address-info
+   ((:address . "87 Polk St. Suite 5")
+    (:city (:country-region . "United States") (:name . "San Francisco")
+     (:region . "CA")))
+   ((:address . "89 Chiaroscuro Rd.")
+    (:city (:country-region . "United States") (:name . "Portland")
+     (:region . "OR"))))
+  (:gender . "Female") (:concurrency . 637147899037343072)))
+@end example
+
+@node Lambda Operators
+@subsection Lambda Operators
+
+OData defines two operators any and all that evaluate a Boolean expression on a collection. They can work on either collection properties or collection of entities.
+
+The request below returns People with Emails containing "ll@@contoso.com". The Emails is a collection of primitive type string.
+
+GET serviceRoot/People?$filter=Emails/any(s:endswith(s, 'contoso.com'))
+
+@node Data Modification
+@section Data Modification
+
+Updatable OData services support Create, Update and Delete operation for some or all exposed entities.
+
+@menu
+* Create an Entity::
+* Remove an Entity::
+* Update an Entity::
+* Relationship Operations::
+* Change a Link::
+* Functions and Actions::
+* Invoking Bound Functions::
+* Invoking Unbound Actions::
+* Invoking Bound Actions::
+@end menu
+
+@node Create an Entity
+@subsection Create an Entity
+
+To create an entity in a collection, the client sends a POST request to that collection's URL@. The POST body MUST contain a single valid entity representation. The request below creates a Person which contains complex type and collection property. 
+
+@lisp
+
+(defparameter *p* '(("@@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
+                              ("UserName" . "teresa")
+                              ("FirstName" . "Teresa")
+                              ("LastName" . "Gilbert")
+                              ("Gender" . "Female")
+                              ("Emails" . ("teresa@@example.com" "teresa@@contoso.com"))
+                              ("AddressInfo" . ((("Address" . "1 Suffolk Ln.")
+                                                ("City" . (("CountryRegion" . "United States")
+                                                           ("Name" . "Boise")
+                                                           ("Region" . "ID"))))))))
+
+(princ 
+  (-> +trip-pin-modify+
+    (collection "People")
+    (post *p*)))
+
+@end lisp
+
+@example
+((odata-context
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/$metadata#People/$entity)
+ (odata-id
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('teresa'))
+ (odata-etag . W/"08D799ECFD4995C4")
+ (odata-edit-link
+  . http://services.odata.org/V4/(S(dbwnjvoyanwfvbktg1eu5zvg))/TripPinServiceRW/People('teresa'))
+ (user-name . teresa) (first-name . Teresa) (last-name . Gilbert)
+ (emails teresa@@example.com teresa@@contoso.com)
+ (address-info
+  ((address . 1 Suffolk Ln.)
+   (city (country-region . United States) (name . Boise) (region . ID))))
+ (gender . Female) (concurrency . 637147115437004228))
+@end example
+
+@node Remove an Entity
+@subsection Remove an Entity
+
+The request below deletes the Person with UserName 'vincentcalabrese'.
+DELETE serviceRoot/People('vincentcalabrese') 
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "vincentcalabrese")
+    (del))
+@end lisp
+
+@example
+
+nil
+@end example
+
+@node Update an Entity
+@subsection Update an Entity
+
+The OData services SHOULD support PATCH as the preferred means of updating an entity. But also services MAY additionally support PUT@. The request below update the Emails of a person using PATCH@. 
+
+@lisp
+(-> +trip-pin-modify+
+   (collection "People")
+   (id "russellwhyte")
+   (update '(("@@odata.type" . "Microsoft.OData.SampleService.Models.TripPin.Person")
+             ("Emails" . ("Russell@@example.com" "Russell@@contoso.com" "newRussell@@contoso.com")))))
+@end lisp
+
+@node Relationship Operations
+@subsection Relationship Operations
+
+Relationships from one entity to another are represented as navigation properties.
+Link to Related Entities
+
+A successful POST request to a navigation property's references collection adds a relationship to an existing entity. The request below adds 'vincentcalabrese' to friends of 'scottketchum'.
+
+@lisp
+(-> +trip-pin-modify+
+   (collection "People") (id "scottketchum")
+   (property "Friends") ($ref)
+   (link `(("@@odata.context" . ,(quri:render-uri +trip-pin-modify+))
+           ("@@odata.id" . "People('vincentcalabrese')"))))
+@end lisp
+
+@example
+
+nil
+@end example
+
+@node Change a Link
+@subsection Change a Link
+
+A successful PUT request to a single-valued navigation property’s reference resource changes the related entity. The request below change the Airline of a Flight.
+
+@lisp
+(-> +trip-pin-modify+
+              (collection "People")
+              (id "russellwhyte")
+              (path "Trips(0)"
+                    "PlanItems(11)"
+                    "Microsoft.OData.SampleService.Models.TripPin.Flight"
+                    "Airline")
+              (update-link `(("@@odata.context" . ,(quri:render-uri +trip-pin-modify+))
+           ("@@odata.id" . "Airlines('FM')"))))
+@end lisp
+
+@example
+
+nil
+@end example
+
+@node Functions and Actions
+@subsection Functions and Actions
+
+OData supports custom operations (Actions and Functions). Functions are operations exposed by an OData service that MUST return data and MUST have no observable side effects. Actions are operations exposed by an OData service that MAY have side effects when invoked. Functions and actions both MAY bound to an entity type, primitive type, complex type, or a collection.
+
+@enumerate
+@item
+Invoking Unbound Functions
+
+
+The function below returns the nearest airport with the input geography point.
+
+
+@lisp
+(-> +trip-pin-modify+
+    (fcall 'get-nearest-airport :lat 33 :lon -118)
+    (fetch))
+@end lisp
+
+@example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/$metadata#Airports/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airports('KLAX')")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airports('KLAX')")
+ (:icao-code . "KLAX") (:name . "Los Angeles International Airport")
+ (:iata-code . "LAX")
+ (:location (:address . "1 World Way, Los Angeles, CA, 90045")
+  (:city (:country-region . "United States") (:name . "Los Angeles")
+   (:region . "California"))
+  (:loc (:type . "Point") (:coordinates -118.40806 33.9425)
+   (:crs (:type . "name") (:properties (:name . "EPSG:4326"))))))
+@end example
+@end enumerate
+
+@node Invoking Bound Functions
+@subsection Invoking Bound Functions
+
+The request below returns the favorite airline of a person, in TripPin service, "favorite airline" means airline which user choose most times. The function GetFavoriteAirline() is bound to Person.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (fcall "Microsoft.OData.SampleService.Models.TripPin.GetFavoriteAirline")
+    (fetch))
+@end lisp
+
+@example
+
+((:odata-context
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/$metadata#Airlines/$entity")
+ (:odata-id
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airlines('AA')")
+ (:odata-edit-link
+  . "http://services.odata.org/V4/(S(jreo0syd1dcfhrharzudcfgy))/TripPinServiceRW/Airlines('AA')")
+ (:airline-code . "AA") (:name . "American Airlines"))
+@end example
+
+@node Invoking Unbound Actions
+@subsection Invoking Unbound Actions
+
+TripPin currently has no scenario supported for unbound actions.
+
+@node Invoking Bound Actions
+@subsection Invoking Bound Actions
+
+The action below shares a trip to one of his friend. In TripPin service, by "share a trip" we mean that the owner and his friend now both have the trip and the trip share the same ShareId property.
+
+@lisp
+(-> +trip-pin-modify+
+    (collection "People")
+    (id "russellwhyte")
+    (path "Microsoft.OData.SampleService.Models.TripPin.ShareTrip")
+    (post '(("userName" . "scottketchum")
+            ("tripId" . 0))))
+@end lisp
+
+@example
+
+nil
+@end example

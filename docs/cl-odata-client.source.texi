@@ -37,14 +37,15 @@ Copyright @copyright{} 2021 Mariano Montone
 @emph{CL-ODATA-CLIENT} is a Common Lisp client for accessing ODATA services.
 
 @menu
-* Introduction::
+* Intro::
 * Installation::
 * Usage::
+* CL-ODATA-CLIENT Basic Tutorial::
 * API::
 * Index::
 @end menu
 
-@node Introduction
+@node Intro
 @chapter Introduction
 @anchor{introduction}
 
@@ -57,6 +58,8 @@ Copyright @copyright{} 2021 Mariano Montone
 @node Usage
 @chapter Usage
 @anchor{usage}
+
+@include basic-tutorial.texi
 
 @node API
 @chapter API
