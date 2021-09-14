@@ -64,6 +64,9 @@
       (collection "events")
       (fetch :collection)))
 
+(defun make-calendar (&key name)
+  `((:name . ,name)))
+
 (defun make-event (&key subject content start end location attendees)
   `((:subject . ,subject)
     (:body . ((:content-type . "HTML")
@@ -107,7 +110,7 @@
     ()
   (with-html-page
     (show-calendars-list +appuser+)
-    (:a :href (genurl 'create-calendar-page :acceptor-name 'msgraph-calendar)
+    (:a :href (genurl 'new-calendar-page :acceptor-name 'msgraph-calendar)
         (str "New calendar"))))
 
 (defroute show-calendar ("/calendar/:id" :acceptor-name msgraph-calendar)
@@ -116,10 +119,22 @@
   (with-html-page
     (:h1 (who:fmt "Calendar ~a" id))))
 
-(defroute create-calendar-page ("/new" :acceptor-name msgraph-calendar)
+(defroute new-calendar-page ("/new" :acceptor-name msgraph-calendar)
     ()
   (with-html-page
-    (:h1 (who:str "Create calendar"))))
+    (:form :class "pure-form pure-form-aligned"
+           :method "POST"
+           (:legend "Create calendar")
+           (:fieldset
+            (:div :class "pure-control-group"
+                  (:label "Name") (:input :name "name")))            
+           (:input :type "submit" :value "Create"))))
+
+(defroute create-calendar-page ("/new" :method :post :acceptor-name msgraph-calendar)
+    (&post name)
+  (create-calendar +appuser+
+                   `((name . ,name)))
+  (redirect (genurl 'home :acceptor-name 'msgraph-calendar)))
 
 (defun show-calendars-list (user)
   (access:with-dot ()
