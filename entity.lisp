@@ -46,7 +46,7 @@
                  :etag (access data :odata-etag)
                  :edit-link (access data :odata-edit-link)
                  :properties (remove-if (lambda (cons)
-                                          (eql (position "ODATA-" (symbol-name (car cons)) :test 'string=) 0))
+                                          (eql (search "ODATA-" (symbol-name (car cons)) :test 'string=) 0))
                                         data)))
 
 (defun get-property (entity property-name)
