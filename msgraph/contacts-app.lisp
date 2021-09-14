@@ -1,6 +1,6 @@
 (defpackage :msgraph.demo.contacts
   (:use :cl :msgraph :odata/lang :easy-routes :cl-who :arrows :access)
-  (:export :start-app))
+  (:export :start-app :stop-app))
 
 (in-package :msgraph.demo.contacts)
 
@@ -38,14 +38,14 @@
       (collection "contacts")
       (post contact)))
 
-(defroute home ("/")
+(defroute home ("/" :acceptor-name msgraph-contacts)
     ()
   (with-html-page
     (show-contacts-list +appuser+)
     (:a :href (genurl 'create-contact-page)
         (str "New contact"))))
 
-(defroute show-contact ("/contacts/:id")
+(defroute show-contact ("/contacts/:id" :acceptor-name msgraph-contacts)
     (&path (id 'string))
   (access:with-dot ()
     (let ((contact (get-contact +appuser+ id)))
@@ -61,7 +61,7 @@
 
         ))))
 
-(defroute create-contact-page ("/contacts/new")
+(defroute create-contact-page ("/contacts/new" :acceptor-name msgraph-contacts)
     ()
   (with-html-page
     (:form :class "pure-form pure-form-aligned"
@@ -78,7 +78,7 @@
                   (:label "Phone") (:input :name "phone")))
            (:input :type "submit" :value "Create"))))
 
-(defroute save-contact ("/contacts/new" :method :post)
+(defroute save-contact ("/contacts/new" :method :post :acceptor-name msgraph-contacts)
     (&post name surname email phone)
   (create-contact +appuser+
                   `((:given-name . ,name)
@@ -101,5 +101,13 @@
                               (who:str " ")
                               (who:str contact.surname)))))))))
 
-(defun start-app ()
-  (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
+(defparameter *acceptor* nil)
+
+(defun start-app (&key (port 0))
+  ;; When port is zero, the acceptor is bound to a random free port
+  (setf *acceptor* (hunchentoot:start (make-instance 'easy-routes-acceptor
+						     :port port
+						     :name 'msgraph-contacts))))
+
+(defun stop-app ()
+  (hunchentoot:stop *acceptor*))
