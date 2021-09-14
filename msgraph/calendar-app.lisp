@@ -23,6 +23,13 @@
       (collection "calendars")
       (fetch :collection)))
 
+(defun get-calendar (user id)
+  (-> msgraph::+msgraph+
+      (collection "users")
+      (id user)
+      (collection "calendars")
+      (id id)))
+
 (defun get-calendar-named (user name)
   (-> msgraph::+msgraph+
       (collection "users")
@@ -68,7 +75,7 @@
     (:location . ((:display-name . ,location)))
     (:attendees ,(loop for attendee in attendees
                        collect `(:email-address . ((:name . ,(first attendee))
-                                                    (:address . ,(second attendee))))))))
+                                                   (:address . ,(second attendee))))))))
 
 (defun add-event-example ()
   (let ((test-calendar (get-calendar-named +appuser+ "test")))
@@ -82,7 +89,7 @@
                           (:time-zone . "Pacific Standard Time")))
                  (:location . ((:display-name . "Harry's bar")))
                  (:attendees ((:email-address . ((:address . "samanthab@contoso.onmicrosoft.com")
-                                                  (:name . "Samantha Booth")))
+                                                 (:name . "Samantha Booth")))
                               (:type . "required")))))))
 
 ;; (get-events +appuser+ (get-calendar-named +appuser+ "test"))
@@ -95,3 +102,42 @@
 ;;                        :location "Mariano's house"
 ;;                        :attendees '(("Asgeir" "asgeir@copyleft.no")
 ;;                                     ("Mariano" "mariano@copyleft.no"))))
+
+(defroute home ("/" :acceptor-name msgraph-calendar)
+    ()
+  (with-html-page
+    (show-calendars-list +appuser+)
+    (:a :href (genurl 'create-calendar-page :acceptor-name 'msgraph-calendar)
+        (str "New calendar"))))
+
+(defroute show-calendar ("/calendar/:id" :acceptor-name msgraph-calendar)
+    ()
+  (let ((calendar (get-calendar 
+  (with-html-page
+    (:h1 (who:fmt "Calendar ~a" id))))
+
+(defroute create-calendar-page ("/new" :acceptor-name msgraph-calendar)
+    ()
+  (with-html-page
+    (:h1 (who:str "Create calendar"))))
+
+(defun show-calendars-list (user)
+  (access:with-dot ()
+    (who:with-html-output (*html*)
+      (:ul
+       (loop
+         for calendar in (get-calendars user)
+         do
+            (who:htm (:li (:a :href (genurl 'show-calendar :id (access calendar :id) :acceptor-name 'msgraph-calendar)
+                              (who:str calendar.name)))))))))
+
+(defparameter *acceptor* nil)
+
+(defun start-app (&key (port 0))
+  ;; When port is zero, the acceptor is bound to a random free port
+  (setf *acceptor* (hunchentoot:start (make-instance 'easy-routes-acceptor
+                                                     :port port
+                                                     :name 'msgraph-calendar))))
+
+(defun stop-app ()
+  (hunchentoot:stop *acceptor*))
