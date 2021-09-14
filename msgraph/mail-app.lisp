@@ -1,6 +1,6 @@
 (defpackage :msgraph.demo.mail
   (:use :cl :msgraph :odata/lang :easy-routes :cl-who :arrows :access)
-  (:export :start-app))
+  (:export :start-app :stop-app))
 
 (in-package :msgraph.demo.mail)
 
@@ -54,14 +54,14 @@
       (fcall "send")
       (post)))
 
-(defroute home ("/")
+(defroute home ("/" :acceptor-name msgraph-mail)
     ()
   (with-html-page
     (show-messages +appuser+)
-    (:a :href (genurl 'create-message-page)
+    (:a :href (genurl 'create-message-page :acceptor-name 'msgraph-mail)
         (str "New message"))))
 
-(defroute show-message ("/messages/:id")
+(defroute show-message ("/messages/:id" :acceptor-name msgraph-mail)
     (&path (id 'string))
   (let ((message (get-message +appuser+ id)))
     (access:with-dot ()
@@ -74,11 +74,11 @@
                                      (who:fmt "&lt;~a&gt;" message.from.email-address.address)))
                 (:label "To")
                 (:label (loop for recipient in message.to-recipients
-                           do
-                             (who:htm
-                              (who:str recipient.email-address.name)
-                              (:a :href (format nil "mailto:~a" recipient.email-address.address)
-                                  (who:fmt "&lt;~a&gt;" recipient.email-address.address)))))
+                              do
+                                 (who:htm
+                                  (who:str recipient.email-address.name)
+                                  (:a :href (format nil "mailto:~a" recipient.email-address.address)
+                                      (who:fmt "&lt;~a&gt;" recipient.email-address.address)))))
                 (:label "Subject")
                 (:label (str message.subject))
                 (:label "Body")
@@ -87,18 +87,18 @@
           (who:htm
            (:p
             (who:str "This message is a DRAFT")
-            (:form :action (genurl 'send-message-action :id id)
+            (:form :action (genurl 'send-message-action :id id :acceptor-name 'msgraph-mail)
                    :method :post
                    (:input :type "submit" :value "Send")))))
 
         ))))
 
-(defroute send-message-action ("/messages/:id/send" :method :post)
+(defroute send-message-action ("/messages/:id/send" :method :post :acceptor-name msgraph-mail)
     ()
   (send-message +appuser+ id)
-  (redirect (genurl 'home)))
+  (redirect (genurl 'home :acceptor-name 'msgraph-mail)))
 
-(defroute create-message-page ("/messages/new")
+(defroute create-message-page ("/messages/new" :acceptor-name msgraph-mail)
     ()
   (access:with-dot ()
     (with-html-page
@@ -126,9 +126,9 @@
 
 (defun parse-recipients (str)
   (loop for rstr in (split-sequence:split-sequence #\, str)
-     collect (parse-recipient rstr)))
+        collect (parse-recipient rstr)))
 
-(defroute save-message ("/messages/new" :method :post)
+(defroute save-message ("/messages/new" :method :post :acceptor-name msgraph-mail)
     (&post from to subject body)
   (create-message +appuser+
                   `((:subject . ,subject)
@@ -136,19 +136,27 @@
                               (:content . ,body)))
                     (:from . ,(first (parse-recipients from)))
                     (:to-recipients . ,(parse-recipients to))))
-  (redirect (genurl 'home)))
+  (redirect (genurl 'home :acceptor-name 'msgraph-mail)))
 
 (defun show-messages (user)
   (access:with-dot ()
     (who:with-html-output (*html*)
       (:ul
        (loop
-          for message in (get-messages user)
-          do
-            (who:htm (:li (:a :href (genurl 'show-message :id (access message :id))
+         for message in (get-messages user)
+         do
+            (who:htm (:li (:a :href (genurl 'show-message
+                                            :id (access message :id)
+                                            :acceptor-name 'msgraph-mail)
                               (who:str message.subject))
                           (when message.is-draft
                             (who:str "(DRAFT)")))))))))
 
-(defun start-app ()
-  (hunchentoot:start (make-instance 'easy-routes-acceptor :port 9090)))
+(defparameter *acceptor* nil)
+
+(defun start-app (&key (port 0))
+  "When port is zero, a random one is selected."
+  (setf *acceptor* (hunchentoot:start (make-instance 'easy-routes-acceptor :port port :name 'msgraph-mail))))
+
+(defun stop-app ()
+  (hunchentoot:stop *acceptor*))
