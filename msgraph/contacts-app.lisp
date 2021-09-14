@@ -42,7 +42,7 @@
     ()
   (with-html-page
     (show-contacts-list +appuser+)
-    (:a :href (genurl 'create-contact-page)
+    (:a :href (genurl 'create-contact-page :acceptor-name 'msgraph-contacts)
         (str "New contact"))))
 
 (defroute show-contact ("/contacts/:id" :acceptor-name msgraph-contacts)
@@ -87,16 +87,16 @@
                      ((:address . ,email)
                       (:name . ,(concatenate 'string name " " surname))))
                     (:business-phones . (,phone))))
-  (redirect (genurl 'home)))
+  (redirect (genurl 'home :acceptor-name 'msgraph-contacts)))
 
 (defun show-contacts-list (user)
   (access:with-dot ()
     (who:with-html-output (*html*)
       (:ul
        (loop
-          for contact in (get-contacts user)
-          do
-            (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id))
+         for contact in (get-contacts user)
+         do
+            (who:htm (:li (:a :href (genurl 'show-contact :id (access contact :id) :acceptor-name 'msgraph-contacts)
                               (who:str contact.given-name)
                               (who:str " ")
                               (who:str contact.surname)))))))))
@@ -106,8 +106,8 @@
 (defun start-app (&key (port 0))
   ;; When port is zero, the acceptor is bound to a random free port
   (setf *acceptor* (hunchentoot:start (make-instance 'easy-routes-acceptor
-						     :port port
-						     :name 'msgraph-contacts))))
+                                                     :port port
+                                                     :name 'msgraph-contacts))))
 
 (defun stop-app ()
   (hunchentoot:stop *acceptor*))
